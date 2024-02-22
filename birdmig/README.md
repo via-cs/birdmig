@@ -10,7 +10,7 @@
 - enter ```npm start``` in your terminal
 
 ## To run the Docker image:
-- Ensure that flask is running in the background.
+- Ensure that flask is running in the background. (Refer to the Flask section above)
 - Open Docker
 - Build the docker file: docker build -t bird_migration .
 - Docker run -d -p destination_port:source_destination --name bird_migration bird_migration
