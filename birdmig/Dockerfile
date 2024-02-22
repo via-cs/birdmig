@@ -10,7 +10,9 @@ COPY package*.json ./
 #COPY . .
 
 # Run additional commands for startup
-RUN npm install 
+RUN npm install \
+    && pip install flask
+
 COPY . ./
 
 # Begin the program
