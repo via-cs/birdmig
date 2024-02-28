@@ -7,12 +7,12 @@ filename = sys.argv[1]
 if not filename.endswith('.csv'):
     sys.exit("Error: argument must be a valid .csv file")
 
-dest_file = filename.replace('.csv', '.shp')
+dest_file = filename.replace('.csv', '.shp').replace('GBIF_', '')
 
 df = pd.read_csv(filename, sep='\t', lineterminator='\n')
 
 # Get the list of all column names from headers
-use_cols = ['occurrenceID', 'basisOfRecord', 'eventDate', 'kingdom', 'scientificName', 'taxonRank', 'decimalLatitude', 'decimalLongitude', 'countryCode', 'individualCount']
+use_cols = ['eventDate', 'scientificName', 'decimalLatitude', 'decimalLongitude', 'individualCount']
 df_trim = df[use_cols]
 
 # Rename for shapefile 10 character header limit
