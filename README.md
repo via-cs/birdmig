@@ -20,7 +20,8 @@
 
 # To run Docker with all applications
 - ```cd``` into ```/birdmig```
-- Run the command: ```docker compose up -d```
+- Rebuild the necessary images for both frontend and backend to work with: ```docker build```
+- Run the containers with the command: ```docker compose up -d```
 - Open the Docker Desktop App
 - Navigate to the container stack for ```birdmig```
 - Follow the link to view the the front end through ```http://localhost:<port number>```
