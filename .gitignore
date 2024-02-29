@@ -24,6 +24,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # custom
-/model/data/
+/model/data/*
+!/model/data/shp
+!/model/data/bclim
 /model/inputs/
 /model/outputs/
+/model/.R*
