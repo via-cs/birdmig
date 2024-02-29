@@ -19,8 +19,8 @@
 2. Set working directory by going to **Session > Set Working Directory > To source file location**
 3. Install packages by going to **Tools > Install packages**
     - Under *Install from:*, use
-        -> *Repository* for `raster` and `dismo`
-        -> *Package archive files* for `rgdal` and `maptools` local packages
+        * *Repository* for `raster` and `dismo`
+        * *Package archive files* for `rgdal` and `maptools` local packages
         under `model/packages`
 
 #### R console
