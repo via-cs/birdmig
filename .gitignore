@@ -24,6 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # custom
-/model/data/*.csv
+/model/data/
 /model/inputs/
 /model/outputs/
