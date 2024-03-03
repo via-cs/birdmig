@@ -26,7 +26,7 @@ yarn-error.log*
 # custom
 /model/data/*
 !/model/data/shp
-!/model/data/bclim
+!/model/data/bioclim
 /model/inputs/
 /model/outputs/
 /model/.R*
