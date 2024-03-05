@@ -6,7 +6,7 @@ services:
     depends_on:
       - backend
     ports:
-      - 3500:3500
+      - 3000:3000
   backend:
     build:
       context: backend

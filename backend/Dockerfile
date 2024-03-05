@@ -20,4 +20,4 @@ COPY . /code
 ENTRYPOINT [ "flask", "run" ]
 
 # Expose the service port for 
-EXPOSE 3000
+EXPOSE 5000

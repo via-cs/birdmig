@@ -11,7 +11,11 @@ api.config['CORS_HEADERS'] = 'Content-Type'
 def my_profile():
     response_body = {
         "name": "BirdMig",
-        "about" :"Hello from ECS193A Group 22!"
+        "about" :"ALPHA_DEMONSTRATION"
     }
 
     return response_body
+    
+# Running app
+if __name__ == '__main__':
+    api.run(debug=True)
