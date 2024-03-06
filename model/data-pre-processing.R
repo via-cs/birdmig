@@ -52,13 +52,14 @@ pa_train <- c(rep(1, nrow(jt_trim)), rep(0, nrow(bg))) # col of ones and zeros
 train <- data.frame(cbind(CLASS=pa_train, train)) # final dataframe
  
 # create spatial points
-dataMap.sf <- st_as_sf(df,
+train <- train[sample(nrow(train)),]
+dataMap.sf <- st_as_sf(train,
                        coords = c('lon', 'lat'),
                        crs = 4326)
 
 # write as geojson
 st_write(dataMap.sf, 
-         paste('data/shp/', filename, '.geojson', sep = ""),
+         paste('data/geojson/', filename, '.geojson', sep = ""),
          append = FALSE,
          delete_dsn = TRUE)
 
