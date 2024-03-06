@@ -1,8 +1,7 @@
-
+library(sf)
 library(raster)
-library(rgdal)
 library(dismo)
-library(maptools)
+library(geodata)
 
 # MODIFY THESE PARAMETERS FOR EACH DATAFILE
 
@@ -20,19 +19,23 @@ jt <- unique(jt) # xantusia without duplicates
 jt <- jt[complete.cases(jt),] # remove na's
 colnames(jt) <- c('lon','lat')
 
-# download Bioclim features
+# crop species data to wanted region
 jt <- jt[which(jt$lon>=e[1] & jt$lon<=e[2]),] # remove presences beyond extent
 jt <- jt[which(jt$lat>=e[3] & jt$lat<=e[4]),] # remove presences beyond extent
-# use dismo's getData to grab climate features
-bioclim.data <- getData(name = "worldclim",
-                        var = "bio",
-                        res = 2.5,
-                        path = "data/")
+
+# grab climate data using geodata
+bioclim.data <- worldclim_global(var = "bio",
+                                 path = "data/",
+                                 res = 2.5,
+                                 version = "2.1")
+bioclim.data <- stack(bioclim.data)
 bioclim.data <- crop(bioclim.data, e*1.25)  # crop to bg point extent
+
 # write rasters to /data folder
 for (i in c(1:19)){
-  writeRaster(bioclim.data[[i]], paste('data/bioclim/bclim', i, sep = ''),
-              format = "ascii", overwrite=TRUE)
+  writeRaster(bioclim.data[[i]], 
+           paste('data/bioclim/bclim', i, '.asc', sep = ''),
+           overwrite = TRUE)
 }
 
 ## ------------------------------------------------------------------------
@@ -49,22 +52,18 @@ pa_train <- c(rep(1, nrow(jt_trim)), rep(0, nrow(bg))) # col of ones and zeros
 train <- data.frame(cbind(CLASS=pa_train, train)) # final dataframe
  
 # create spatial points
-crs <- crs(bioclim.data[[1]])
-train <- train[sample(nrow(train)),]
-class.pa <- data.frame(train[,1])
-colnames(class.pa) <- 'CLASS'
-dataMap.jt  <- SpatialPointsDataFrame(train[,c(2,3)], class.pa,
-                                      proj4string = crs)
-# write as shp
-writeOGR(dataMap.jt,
-         paste('data/shp/', filename, '.shp', sep = ""),
-         filename, 
-         driver = 'ESRI Shapefile')
+dataMap.sf <- st_as_sf(df,
+                       coords = c('lon', 'lat'),
+                       crs = 4326)
+
+# write as geojson
+st_write(dataMap.sf, 
+         paste('data/shp/', filename, '.geojson', sep = ""),
+         append = FALSE,
+         delete_dsn = TRUE)
 
 # plot our points
 plot(bioclim.data[[1]], main='Bioclim 1')
 points(bg, col='red', pch = 16,cex=.3)
-points(jt, col='black', pch = 16,cex=.3)
-data("wrld_simpl")
+points(jt_trim, col='black', pch = 16,cex=.3)
 plot(wrld_simpl, add=TRUE, border='dark grey')
-
