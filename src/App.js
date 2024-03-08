@@ -1,10 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import logo from "./logo.svg";
 import "./App.css";
 
+
+
 function App() {
+
   const [profileData, setProfileData] = useState(null);
+
+  function sendData() {
+    // VVV WTF is up with the full call to port 5000
+    // Ideally, this auto-concatenates as was done in getData()
+    axios.post('http://127.0.0.1:5000/choose_bird', {data: "TEST_POST"})
+    .then(({data}) => {
+      console.log(data)
+    })
+    .catch((error) => {
+      if(error.response) {
+        console.log(error.response);
+      }
+    });
+  }
+
+  /*
   function getData() {
     axios({
       method: "GET",
@@ -15,6 +34,7 @@ function App() {
         setProfileData({
           profile_name: res.name,
           about_me: res.about,
+          distribData: res.output
         });
       })
       .catch((error) => {
@@ -26,22 +46,51 @@ function App() {
       });
   }
   //end of new line
+  */
 
+  useEffect(() => {
+    axios({
+      method: "GET",
+      url: "/profile",
+    })
+      .then((response) => {
+        const res = response.data;
+        setProfileData({
+          profile_name: res.name,
+          about_me: res.about,
+          distribData: res.output
+        });
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        }
+      });
+  }, []);
+
+  
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
 
-        <button onClick={getData}>Click me</button>
         {profileData && (
-          <div>
-            <p>Project name: {profileData.profile_name}</p>
-            <p>Message: {profileData.about_me}</p>
-          </div>
+        <div>
+          <p>Project name: {profileData.profile_name}</p>
+          <p>Message: {profileData.about_me}</p>
+          <p>Data: {profileData.distribData}</p>
+        </div>
         )}
+
+        <button onClick = {sendData}>TEST Post</button>
       </header>
     </div>
   );
 }
 
 export default App;
+
+/*<p>Project name: {profileData.profile_name}</p>
+        <p>Message: {profileData.about_me}</p>
+        <p>Data: {profileData.distribData}</p> */
