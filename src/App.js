@@ -11,10 +11,14 @@ function App() {
 
   function sendData() {
     // VVV WTF is up with the full call to port 5000
-    // Ideally, this auto-concatenates as was done in getData()
+    // Ideally, this auto-concatenates to the directory of the backend.
     axios.post('http://127.0.0.1:5000/choose_bird', {data: "TEST_POST"})
     .then(({data}) => {
-      console.log(data)
+      setProfileData({
+        profile_name: data.name,
+        about_me: data.about,
+        distribData: data.output
+      })
     })
     .catch((error) => {
       if(error.response) {
@@ -22,31 +26,6 @@ function App() {
       }
     });
   }
-
-  /*
-  function getData() {
-    axios({
-      method: "GET",
-      url: "/profile",
-    })
-      .then((response) => {
-        const res = response.data;
-        setProfileData({
-          profile_name: res.name,
-          about_me: res.about,
-          distribData: res.output
-        });
-      })
-      .catch((error) => {
-        if (error.response) {
-          console.log(error.response);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        }
-      });
-  }
-  //end of new line
-  */
 
   useEffect(() => {
     axios({

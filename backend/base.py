@@ -34,7 +34,8 @@ def my_profile():
 @api.route('/choose_bird', methods = ['POST'])
 def choose_bird():
   requestJSON = request.get_json()
-  if 'req' in session:
-    session['req'] = requestJSON["data"]
-  
-  return requestJSON
+  return {
+        "name": "Bird Mig",
+        "about": "ALPHA: Waiting for model to complete",
+        "output": "dumb"
+    }
