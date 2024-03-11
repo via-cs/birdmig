@@ -6,6 +6,7 @@ library(geodata)
 # MODIFY THESE PARAMETERS FOR EACH DATAFILE
 
 filename <- "CardellinaPusilla" # set filename
+filetype <= "shp"
 e <- extent(-124, -114, 32, 42) # set study area extent
 
 # pipe GBIF data
@@ -41,7 +42,7 @@ for (i in c(1:19)){
 ## ------------------------------------------------------------------------
 
 # Trim jt
-jt_trim <- jt[sample(nrow(jt), 2000), ]
+jt_trim <- jt[sample(nrow(jt), 1000), ]
 length_presences <- nrow(jt_trim)
 
 # sample background points from a slightly wider extent
@@ -59,7 +60,8 @@ dataMap.sf <- st_as_sf(train,
 
 # write as geojson
 st_write(dataMap.sf, 
-         paste('data/geojson/', filename, '.geojson', sep = ""),
+         paste('data/', filetype, '/', filename, '.', filetype,
+               sep = ""),
          append = FALSE,
          delete_dsn = TRUE)
 
