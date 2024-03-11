@@ -1,0 +1,19 @@
+services:
+  frontend:
+    build:
+      context: ./
+    restart: on-failure
+    depends_on:
+      - backend
+    ports:
+      - 3000:3000
+  backend:
+    build:
+      context: backend
+      target: builder
+    env_file: ./backend/.flaskenv
+    # SIGINT is required for flask to halt operations
+    # gracefully.
+    stop_signal: SIGINT
+    ports:
+      - 5000:5000
