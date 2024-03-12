@@ -6,7 +6,7 @@ library(geodata)
 # MODIFY THESE PARAMETERS FOR EACH DATAFILE
 
 filename <- "CardellinaPusilla" # set filename
-filetype <= "shp"
+filetype <- "shp"
 e <- extent(-124, -114, 32, 42) # set study area extent
 
 # pipe GBIF data
