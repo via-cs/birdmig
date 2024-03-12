@@ -37,7 +37,7 @@ function App() {
   function sendData() {
     // VVV WTF is up with the full call to port 5000
     // Ideally, this auto-concatenates to the directory of the backend.
-    axios.post('http://127.0.0.1:5000/model_input', {data: "bird_1"})
+    axios.post('http://127.0.0.1:5000/model_input', {data: "bird_2"})
     .then(({data}) => {
       setProfileData({
         profile_name: data.name,

@@ -18,31 +18,35 @@ def predict_bird():
   
 def generate_output(bird_name):
   
-  bird_info = {
-    "name": "No bird yet.",
-    "about": "Try finding a bird to add",
-    "output": bird_name
-  }
+  bird_info = "Try finding a bird to add."
   
   match bird_name:
     case "bird_1":
-      
-      dataImg = Image.open('DEBUG_Image.png')
-      buffer = BytesIO()
-      dataImg.save(buffer, format="png")
-      
-      bird_info = jsonify({
-        "name": "bird_1",
-        "about": "Generic info for bird 1",
-        "output": base64.b64encode(buffer.getvalue()).decode(),
-        "resFormat": dataImg.format
-      })
     
-  return bird_info
+      data_url = 'DEBUG_Image.png'
+      bird_info = "Generic info for unique bird 1",
+
+    case "bird_2":
+      
+      data_url = 'ALPHA_DemoMap.png'
+      bird_info = "Generic info for different bird 2",    
+  
+  # TODO: replace the content for the image data with the actual
+  # ML output.
+  dataImg = Image.open(data_url)
+  buffer = BytesIO()
+  dataImg.save(buffer, format="png")
+  
+  return jsonify({
+    "name": bird_name,
+    "about": bird_info,
+    "output": base64.b64encode(buffer.getvalue()).decode(),
+    "resFormat": dataImg.format
+  })
   
 @api.route('/model_input', methods = ['POST'])
 def choose_bird():
   requestJSON = request.get_json()
   requestJSON['data']
   
-  return redirect(url_for('predict_bird'))
+  return generate_output(requestJSON['data'])#redirect(url_for('predict_bird'))
