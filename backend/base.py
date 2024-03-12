@@ -1,41 +1,48 @@
 
-from flask import Flask, render_template, request, session
+from flask import Flask, jsonify, request, redirect, url_for
 from flask_cors import CORS, cross_origin
-# Libraries to help with ML
-import pandas
-import numpy as np
+# TEST for alpha.
+from PIL import Image
+from io import BytesIO
+import base64
 
 api = Flask(__name__)
 cors = CORS(api)
 api.config['CORS_HEADERS'] = 'Content-Type'
-api.secret_key = 'outset'
-
-#session['req'] = "None"
 
 
 @api.route('/profile', methods = ['GET'])
-def my_profile():
-    
-    currentRequest = session['req'] if 'req' in session else "None"
-    if(currentRequest == "None") :
-      return {
-        "name": "",
-        "about": "",
-        "output": "Click on an option to obtain data!"}
-    
-    response_body = {
-        "name": "Bird Mig",
-        "about": "ALPHA: Waiting for model to complete",
-        "output": "dumb"
-    }
-
-    return response_body
+def predict_bird():
+      
+    return generate_output("bird_1")
   
-@api.route('/choose_bird', methods = ['POST'])
+def generate_output(bird_name):
+  
+  bird_info = {
+    "name": "No bird yet.",
+    "about": "Try finding a bird to add",
+    "output": bird_name
+  }
+  
+  match bird_name:
+    case "bird_1":
+      
+      dataImg = Image.open('DEBUG_Image.png')
+      buffer = BytesIO()
+      dataImg.save(buffer, format="png")
+      
+      bird_info = jsonify({
+        "name": "bird_1",
+        "about": "Generic info for bird 1",
+        "output": base64.b64encode(buffer.getvalue()).decode(),
+        "resFormat": dataImg.format
+      })
+    
+  return bird_info
+  
+@api.route('/model_input', methods = ['POST'])
 def choose_bird():
   requestJSON = request.get_json()
-  return {
-        "name": "Bird Mig",
-        "about": "ALPHA: Waiting for model to complete",
-        "output": "dumb"
-    }
+  requestJSON['data']
+  
+  return redirect(url_for('predict_bird'))

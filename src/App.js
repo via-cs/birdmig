@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
-import logo from "./logo.svg";
+//import logo from "./logo.svg";
 import "./App.css";
 
 
@@ -9,25 +9,8 @@ function App() {
 
   const [profileData, setProfileData] = useState(null);
 
-  function sendData() {
-    // VVV WTF is up with the full call to port 5000
-    // Ideally, this auto-concatenates to the directory of the backend.
-    axios.post('http://127.0.0.1:5000/choose_bird', {data: "TEST_POST"})
-    .then(({data}) => {
-      setProfileData({
-        profile_name: data.name,
-        about_me: data.about,
-        distribData: data.output
-      })
-    })
-    .catch((error) => {
-      if(error.response) {
-        console.log(error.response);
-      }
-    });
-  }
-
-  useEffect(() => {
+  // Generic, quick and dirty function to get data.
+  function getData() {
     axios({
       method: "GET",
       url: "/profile",
@@ -37,7 +20,8 @@ function App() {
         setProfileData({
           profile_name: res.name,
           about_me: res.about,
-          distribData: res.output
+          data: res.output,
+          format: res.resFormat
         });
       })
       .catch((error) => {
@@ -47,29 +31,44 @@ function App() {
           console.log(error.response.headers);
         }
       });
-  }, []);
+  }
 
+  // Generic, quick and dirty function for sending data.
+  function sendData() {
+    // VVV WTF is up with the full call to port 5000
+    // Ideally, this auto-concatenates to the directory of the backend.
+    axios.post('http://127.0.0.1:5000/model_input', {data: "bird_1"})
+    .then(({data}) => {
+      setProfileData({
+        profile_name: data.name,
+        about_me: data.about,
+        data: data.output
+      })
+    })
+    .catch((error) => {
+      if(error.response) {
+        console.log(error.response);
+      }
+    });
+  }
   
   return (
     <div className="App">
       <header className="App-header">
 
+        <button onClick = {sendData}>Test Posting Data</button>
+        <button onClick={getData}>Test Getting Data</button>
+        
         {profileData && (
-        <div>
-          <p>Project name: {profileData.profile_name}</p>
-          <p>Message: {profileData.about_me}</p>
-          <p>Data: {profileData.distribData}</p>
-        </div>
+          <div>
+            <p>Project name: {profileData.profile_name}</p>
+            <p>Message: {profileData.about_me}</p>
+            <img src={`data:image/${profileData.format};base64,${profileData.data}`} alt="DEBUG images" />
+          </div>
         )}
-
-        <button onClick = {sendData}>TEST Post</button>
       </header>
     </div>
   );
 }
 
 export default App;
-
-/*<p>Project name: {profileData.profile_name}</p>
-        <p>Message: {profileData.about_me}</p>
-        <p>Data: {profileData.distribData}</p> */
