@@ -1,35 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-//import logo from "./logo.svg";
 import "./App.css";
+import BirdInfo from "./components/BirdInfo";
+import SDMChart from "./components/SDMChart";
+import TimeSeries from "./components/TimeSeries";
 
 
 
 function App() {
+  const [selectedBird, setSelectedBird] = useState(null);
+  const [birdData, setBirdData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [profileData, setProfileData] = useState(null);
+  useEffect(() => {
+    selectBird('Bird 1');
+  }, []);
 
-  // Generic, quick and dirty function to get data.
-  function getData() {
-    axios({
-      method: "GET",
-      url: "/profile",
-    })
-      .then((response) => {
-        const res = response.data;
-        setProfileData({
-          profile_name: res.name,
-          about_me: res.about,
-          data: res.output,
-          format: res.resFormat
-        });
+  function selectBird(birdName) {
+    setSelectedBird(birdName);
+    getData(birdName);
+  }
+
+  function getData(birdName) {
+    setLoading(true);
+    setError(null);
+    const baseUrl = 'http://localhost:5000';
+  
+    axios.get(`${baseUrl}/bird-data/${birdName}`)
+      .then(response => {
+        setBirdData(response.data);
+        setLoading(false);
       })
-      .catch((error) => {
-        if (error.response) {
-          console.log(error.response);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        }
+      .catch(error => {
+        console.error("Error fetching bird data", error);
+        setError("Error fetching bird data");
+        setBirdData(null);
+        setLoading(false);
       });
   }
 
@@ -54,19 +61,26 @@ function App() {
   
   return (
     <div className="App">
-      <header className="App-header">
-
-        <button onClick = {sendData}>Test Posting Data</button>
-        <button onClick={getData}>Test Getting Data</button>
-        
-        {profileData && (
-          <div>
-            <p>Project name: {profileData.profile_name}</p>
-            <p>Message: {profileData.about_me}</p>
-            <img src={`data:image/${profileData.format};base64,${profileData.data}`} alt="DEBUG images" />
-          </div>
+      <nav className="sidebar">
+        <ul>
+          {['Bird 1', 'Bird 2', 'Bird 3', 'Bird 4', 'Bird 5'].map((bird) => (
+            <li key={bird} onClick={() => selectBird(bird)}>
+              {bird}
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <main className="main-content">
+        {birdData ? (
+          <>
+            <BirdInfo data={birdData} />
+            <SDMChart data={birdData.sdmData} />
+            <TimeSeries data={birdData.timeSeriesData} />
+          </>
+        ) : (
+          <p>Select a bird to see its data.</p>
         )}
-      </header>
+      </main>
     </div>
   );
 }

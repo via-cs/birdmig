@@ -22,3 +22,11 @@ __pycache__/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# custom
+/model/data/*
+!/model/data/geojson
+!/model/data/bioclim
+/model/inputs/
+/model/outputs/
+/model/.R*
