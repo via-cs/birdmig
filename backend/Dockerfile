@@ -17,7 +17,7 @@ RUN pip3 install -r requirements.txt
 COPY . /code
 
 # Begin the program
-ENTRYPOINT [ "flask", "run" ]
+ENTRYPOINT [ "flask", "run", "--host=0.0.0.0" ]
 
 # Expose the service port for 
 EXPOSE 5000
