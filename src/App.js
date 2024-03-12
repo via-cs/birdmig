@@ -5,6 +5,8 @@ import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import TimeSeries from "./components/TimeSeries";
 
+
+
 function App() {
   const [selectedBird, setSelectedBird] = useState(null);
   const [birdData, setBirdData] = useState(null);
@@ -37,10 +39,26 @@ function App() {
         setLoading(false);
       });
   }
-  
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
 
+  // Generic, quick and dirty function for sending data.
+  function sendData() {
+    // VVV WTF is up with the full call to port 5000
+    // Ideally, this auto-concatenates to the directory of the backend.
+    axios.post('http://127.0.0.1:5000/model_input', {data: "bird_2"})
+    .then(({data}) => {
+      setProfileData({
+        profile_name: data.name,
+        about_me: data.about,
+        data: data.output
+      })
+    })
+    .catch((error) => {
+      if(error.response) {
+        console.log(error.response);
+      }
+    });
+  }
+  
   return (
     <div className="App">
       <nav className="sidebar">
