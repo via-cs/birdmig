@@ -11,24 +11,18 @@
 
 ### Library dependencies
 
-`data-pre-processing.R` requires four libraries: `raster`, `dismo`, `rgdal`, and
-`maptools`
+`data-pre-processing.R` requires four libraries: `raster`, `dismo`, `sf`, and
+`geodata`
 
 #### RStudio
 1. Open `data-pre-processing.R`
 2. Set working directory by going to **Session > Set Working Directory > To source file location**
 3. Install packages by going to **Tools > Install packages**
-    - Under *Install from:*, use
-        * *Repository* for `raster` and `dismo`
-        * *Package archive files* for `rgdal` and `maptools` local packages
-        under `model/packages`
-
-#### R console
-```
-> setwd("[path to repo]/birdmig/model")
-> install.packages(c("raster", "dismo"))
-> install.packages(c("packages/maptools_1.1-8.tar.gz", "packages/rgdal_1.6-7.tar.gz"), repos = NULL, type="source")
-```
+    - Under *Install from:*, use *Repository* for each of the listed packages
+    - Alternatively, type into console:
+    ```
+    install.packages(c("sf", "raster", "dismo", "geodata"))
+    ```
 
 ### Using `data-pre-processing.R`
 1. Ensure the desired .csv is saved under `model/data/` with the filename format `GBIF_[scientific name].csv`
