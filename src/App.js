@@ -1,3 +1,9 @@
+/** > > > IMPORTANT: < < <
+ * 
+ * THIS IS A DUMMIED-OUT APP.JS SOLELY FOR DEBUGGING SESSIONS.
+ * THIS SHOULD NEVER REPLACE ACTUAL WORK DONE FOR THE FRONT END.
+*/
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
@@ -5,46 +11,28 @@ import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import TimeSeries from "./components/TimeSeries";
 
-
-
 function App() {
-  const [selectedBird, setSelectedBird] = useState(null);
-  const [birdData, setBirdData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    selectBird('Bird 1');
-  }, []);
-
-  function selectBird(birdName) {
-    setSelectedBird(birdName);
-    getData(birdName);
-  }
-
-  function getData(birdName) {
+  const [io_result, setResult] = useState(null);
+  const baseUrl = 'http://localhost:5000';
+  
+  function getData() {
     setLoading(true);
     setError(null);
-    const baseUrl = 'http://localhost:5000';
   
-    axios.get(`${baseUrl}/bird-data/${birdName}`)
+    axios.get(`${baseUrl}/model-input`)
       .then(response => {
-        setBirdData(response.data);
-        setLoading(false);
+        setResult(response.msg);
       })
       .catch(error => {
         console.error("Error fetching bird data", error);
-        setError("Error fetching bird data");
-        setBirdData(null);
-        setLoading(false);
+        setResult(null);
       });
   }
 
   // Generic, quick and dirty function for sending data.
-  function sendData() {
-    // VVV WTF is up with the full call to port 5000
-    // Ideally, this auto-concatenates to the directory of the backend.
-    axios.post('http://127.0.0.1:5000/model_input', {data: "bird_2"})
+  function sendData(birdName) {
+    axios.post(`${baseUrl}/model_input`, )
     .then(({data}) => {
       setProfileData({
         profile_name: data.name,
@@ -61,26 +49,8 @@ function App() {
   
   return (
     <div className="App">
-      <nav className="sidebar">
-        <ul>
-          {['Bird 1', 'Bird 2', 'Bird 3', 'Bird 4', 'Bird 5'].map((bird) => (
-            <li key={bird} onClick={() => selectBird(bird)}>
-              {bird}
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <main className="main-content">
-        {birdData ? (
-          <>
-            <BirdInfo data={birdData} />
-            <SDMChart data={birdData.sdmData} />
-            <TimeSeries data={birdData.timeSeriesData} />
-          </>
-        ) : (
-          <p>Select a bird to see its data.</p>
-        )}
-      </main>
+      <button/>
+      <button/>
     </div>
   );
 }
