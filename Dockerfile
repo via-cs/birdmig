@@ -11,7 +11,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Run additional commands for startup
-RUN npm install
+RUN npm install && \
+npm install d3
 
 COPY . ./
 
