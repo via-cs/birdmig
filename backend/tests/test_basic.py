@@ -27,3 +27,20 @@ def test_get_bird_data(client):
     response = client.get('/bird-data/Unknown Bird')
     assert response.status_code == 404
     assert 'Invalid bird' in response.get_data(as_text=True)
+
+def test_get_invalid_bird_data(client):
+    response = client.get('/bird-data/invalid_bird_name')
+    assert response.status_code == 404
+    assert 'Invalid bird' in response.get_data(as_text=True)
+
+def test_get_bird_data_empty_bird_name(client):
+    response = client.get('/bird-data/')
+    assert response.status_code == 404  # Or whatever your expected behavior is
+
+def test_get_bird_data_special_characters(client):
+    response = client.get('/bird-data/@#!$')
+    assert response.status_code == 404  # Assuming special characters are not valid
+
+def test_post_bird_data_not_allowed(client):
+    response = client.post('/bird-data/Bird 1', data={})
+    assert response.status_code == 405  # Method Not Allowed
