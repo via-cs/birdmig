@@ -1,23 +1,25 @@
-# Dockerfile for the backend of the application.
+# Use a Python base image
+FROM python:3.12-alpine
 
-# Start an image with node base image.
-# node:18 is essentially node.js to help construct the web file.
-FROM --platform=$BUILDPLATFORM python:3.12-alpine AS builder
-
-# Sets the /app directory, or the CWDir.
+# Set the working directory in the container to /code
 WORKDIR /code
 
-# Copy contents of package.json files for utility.
-COPY requirements.txt requirements.txt
+# Copy the requirements.txt file to the container
+# Make sure to use the correct path relative to the Dockerfile's location
+COPY requirements.txt .
 
-
-# Run additional commands for startup
+# Install dependencies
 RUN pip3 install -r requirements.txt
 
-COPY . /code
+# Copy the entire app directory to the container
+COPY app .
 
-# Begin the program
-ENTRYPOINT [ "flask", "run", "--host=0.0.0.0" ]
+# Set environment variables
+ENV FLASK_APP=base.py
+ENV FLASK_RUN_HOST=0.0.0.0
 
-# Expose the service port for 
+# Expose the port the app runs on
 EXPOSE 5000
+
+# Command to run the application
+CMD ["flask", "run"]
