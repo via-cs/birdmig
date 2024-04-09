@@ -5,8 +5,6 @@ import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import TimeSeries from "./components/TimeSeries";
 
-
-
 function App() {
   const [selectedBird, setSelectedBird] = useState(null);
   const [birdData, setBirdData] = useState(null);
@@ -14,7 +12,7 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    selectBird('Bird 1');
+    selectBird("Bird 1");
   }, []);
 
   function selectBird(birdName) {
@@ -25,14 +23,15 @@ function App() {
   function getData(birdName) {
     setLoading(true);
     setError(null);
-    const baseUrl = 'http://localhost:5000';
-  
-    axios.get(`${baseUrl}/bird-data/${birdName}`)
-      .then(response => {
+    const baseUrl = "http://localhost:5000";
+
+    axios
+      .get(`${baseUrl}/bird-data/${birdName}`)
+      .then((response) => {
         setBirdData(response.data);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching bird data", error);
         setError("Error fetching bird data");
         setBirdData(null);
@@ -44,7 +43,7 @@ function App() {
     <div className="App">
       <nav className="sidebar">
         <ul>
-          {['Bird 1', 'Bird 2', 'Bird 3', 'Bird 4', 'Bird 5'].map((bird) => (
+          {["Bird 1", "Bird 2", "Bird 3", "Bird 4", "Bird 5"].map((bird) => (
             <li key={bird} onClick={() => selectBird(bird)}>
               {bird}
             </li>
@@ -62,6 +61,15 @@ function App() {
           <p>Select a bird to see its data.</p>
         )}
       </main>
+      <div>
+        <iframe
+          title="Map"
+          src="/migration_maps/blackpoll_warbler.html" // Relative path to the HTML file
+          width="100%"
+          height="600px"
+          frameBorder="0"
+        />
+      </div>
     </div>
   );
 }
