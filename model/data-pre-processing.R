@@ -42,11 +42,11 @@ for (i in c(1:19)){
 ## ------------------------------------------------------------------------
 
 # Trim jt
-jt_trim <- jt[sample(nrow(jt), 1000), ]
+jt_trim <- jt[sample(nrow(jt), 5000), ]
 length_presences <- nrow(jt_trim)
 
 # sample background points from a slightly wider extent
-bg <- randomPoints(bioclim.data[[1]], length_presences*2, ext=e, extf = 1.25)
+bg <- randomPoints(bioclim.data[[1]], length_presences*1.5, ext=e, extf = 1.25)
 colnames(bg) <- c('lon','lat')
 train <- rbind(jt_trim, bg)  # combine with presences
 pa_train <- c(rep(1, nrow(jt_trim)), rep(0, nrow(bg))) # col of ones and zeros
