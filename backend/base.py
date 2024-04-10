@@ -1,17 +1,21 @@
 from flask import Flask, jsonify, request, redirect, url_for, session
 from flask_cors import CORS, cross_origin
-from flask_session import Session, sessions
-# TEST for alpha.
+# Imports for image/data processing.
 from PIL import Image
 from io import BytesIO
 import base64
+# Flask-React storing
+from config import AppConfig
+from flask_session import Session
 
 api = Flask(__name__)
-cors = CORS(api)
-api.config['CORS_HEADERS'] = 'Content-Type'
 
-# Session enabling
-api.secret_key = "burd"
+# Configure the application from the AppConfig object.
+api.config.from_object(AppConfig)
+api.secret_key = AppConfig.SECRET_KEY
+
+cors = CORS(api, supports_credentials = True)
+app_session = Session(api)
 
 DEMO_bird_data = {
   "Bird 1": {
@@ -34,30 +38,48 @@ DEMO_bird_data = {
   }
 }
 
-@api.route('/model-input', methods = ['POST'])
-@cross_origin
+#debug
+import sys
+
+@api.route('/model-input/<bird_name>', methods = ['POST'])
+@cross_origin(supports_credentials= True)
 def request_bird(bird_name):
-  print("elements in session: " + str(len(session)))
-  session['requested_bird'] = bird_name
+
+  # Try to save the session data.
+  print("elements in session: " + str(len(session)), file=sys.stderr)
+  session['bird_name'] = bird_name
   
+  debug_msg = "session has: ["
   for item in session:
-    print("session has: [" + item + "] as part of its saved session variables")
-  return jsonify({"msg": "now click \"get bird\" to see info about the bird you want."})
+    debug_msg = debug_msg + item + ", "
+  print(debug_msg + "] as part of its saved session variables", file=sys.stderr)
+  
+  # Return some dummy data.
+  return jsonify({
+    "msg": "now click \"get bird\" to see info about the bird you want."})
   
 
 @api.route('/model-output', methods = ['GET'])
-@cross_origin()
+@cross_origin(supports_credentials= True)
 def get_cached_bird_data():
   
-  requested_bird = session.get('requested_bird')
+  print("Elements in session: " + str(len(session)), file=sys.stderr)
+  requested_bird = session.get('bird_name')
   
   # Using example data
   if (requested_bird) and (requested_bird in DEMO_bird_data):
+    print("The requested bird was " + requested_bird, file=sys.stderr)
+    
     return jsonify({
       "msg": "The bird that was previously requested was: [" + requested_bird + "]"
     })
-  else :
-    print("Requested bird: [" + requested_bird + "] is not a valid bird :/")
+  elif(requested_bird):
+    print("Requested bird: [" + requested_bird + "] is not a cached bird", file=sys.stderr)
+    
+    return jsonify({"error": "Invalid bird"}), 404
+  else:
+    print("Expected a bird, but got nothing from session.", file=sys.stderr)
+    
     return jsonify({"error": "Invalid bird"}), 404
 
 # Running app
