@@ -1,5 +1,5 @@
 flask
 flask_cors
 pillow
-flask-sessions
-python-dotenv
+
+flask_Session
