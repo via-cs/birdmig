@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   frontend:
     build:
@@ -6,14 +8,12 @@ services:
     depends_on:
       - backend
     ports:
-      - 3000:3000
+      - "3000:3000"
+  
   backend:
     build:
-      context: backend
-      target: builder
-    env_file: ./backend/.flaskenv
-    # SIGINT is required for flask to halt operations
-    # gracefully.
+      context: ./backend # Points to the directory containing your Dockerfile and the 'app' directory
+    # env_file: ./backend/.flaskenv # Only uncomment if you need to load additional environment variables
     stop_signal: SIGINT
     ports:
-      - 5000:5000
+      - "5000:5000"

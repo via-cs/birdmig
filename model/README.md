@@ -29,6 +29,7 @@
 2. In `data-pre-processing.R`,
     - change value for `filename` to `[scientific name]`
     - change value for `e` to desired latitude longitude
+    - change value for `filetype` to desired filetype (shp, geojson, etc.)
 3. Run file, all output is saved in `model/data/` under respective folders
 
 ## Running the SDM
