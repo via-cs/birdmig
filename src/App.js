@@ -26,7 +26,7 @@ function App() {
 
   // Generic, quick and dirty function for getting data.
   function getData() {
-    axios.get(`${baseUrl}/model-output`)
+    axios.get(`${baseUrl}/bird-data`)
       .then(response => {
         setResult(response.msg);
       })
@@ -38,9 +38,9 @@ function App() {
 
   // Generic, quick and dirty function for sending data.
   function sendData(birdName) {
-    axios.post(`${baseUrl}/model-input/${birdName}`, birdName)
+    axios.post(`${baseUrl}/bird-data/${birdName}`, birdName)
     .then(({data}) => {
-      setResult(data.msg)
+      setResult(data.info)
     })
     .catch((error) => {
       if(error.response) {

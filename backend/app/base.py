@@ -1,12 +1,15 @@
 from flask import Flask, jsonify, request, redirect, url_for, session
 from flask_cors import CORS, cross_origin
 # TEST for alpha.
-from PIL import Image
-from io import BytesIO
-import base64
+#from PIL import Image
+#from io import BytesIO
+#import base64
 # Flask-React storing
-from backend.config import AppConfig
 from flask_session import Session
+from .config import AppConfig
+# debug
+import sys
+
 
 api = Flask(__name__)
 
@@ -39,13 +42,15 @@ DEMO_bird_data = {
   }
 }
 
-@api.route('/bird-data/<bird_name>', methods = ['GET'])
+@api.route('/bird-data/<bird_name>', methods = ['POST'])
 @cross_origin(supports_credentials= True)
 def get_bird_data(bird_name):
   
   # Trying to retreive data about the requested bird.
   # Save the requested bird for feeding the model.
   session['bird_name'] = bird_name
+  
+  print("Session contents: " + str(len(session)), file=sys.stderr)
   
   # Using example data
   if bird_name in DEMO_bird_data:
@@ -62,4 +67,7 @@ if __name__ == '__main__':
 @cross_origin(supports_credentials= True)
 def get_model_output():
   # TODO: Read the model output.
-  pass
+  print("Reading: " + session['bird_name'], file = sys.stderr)
+  return jsonify({
+    "msg": "Requested info from bird: " + str(session['bird_name'])
+  })
