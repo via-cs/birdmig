@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import "./App.css";
-import BirdInfo from "./components/BirdInfo";
-import SDMChart from "./components/SDMChart";
-import TimeSeries from "./components/TimeSeries";
-
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './App.css';
+import BirdInfo from './components/BirdInfo';
+import SDMChart from './components/SDMChart';
+import MigrationMap from './components/MigrationMap';
+import EnvironmentalControls from './components/EnvironmentalControls';
 
 function App() {
   const [selectedBird, setSelectedBird] = useState(null);
   const [birdData, setBirdData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  
   useEffect(() => {
     selectBird('Bird 1');
   }, []);
@@ -25,11 +24,34 @@ function App() {
   function getData(birdName) {
     setLoading(true);
     setError(null);
-    const baseUrl = 'http://localhost:5000';
+    const baseUrl = 'http://localhost:5000'; 
+  
+    // Map the bird names to filenames
+    const birdMap = {
+      'Bird 1': 'blackpoll_warbler_kde_heatmap.html',
+      'Bird 2': 'eagle_kde_heatmap.html',
+      'Bird 3': 'geese_kde_heatmap.html',
+      'Bird 4': 'long_billed_curlew_kde_heatmap.html',
+      'Bird 5': 'whimbrel_kde_heatmap.html'
+    };
+    
+    const birdFileName = birdMap[birdName]; // Use the map to get the correct filename
+  
+    if (!birdFileName) {
+      setError(`No map available for ${birdName}.`);
+      setLoading(false);
+      return;
+    }
+  
+    const migrationMapUrl = `${baseUrl}/migration_images/${birdFileName}`; // Set the full path for the migration map
   
     axios.get(`${baseUrl}/bird-data/${birdName}`)
       .then(response => {
-        setBirdData(response.data);
+        // Set the bird data along with the migrationMapUrl
+        setBirdData({
+          ...response.data,
+          migrationMapUrl: migrationMapUrl // Add this new property
+        });
         setLoading(false);
       })
       .catch(error => {
@@ -39,6 +61,7 @@ function App() {
         setLoading(false);
       });
   }
+  
 
   return (
     <div className="App">
@@ -52,11 +75,17 @@ function App() {
         </ul>
       </nav>
       <main className="main-content">
+        {loading && <p>Loading...</p>}
+        {error && <p>Error: {error}</p>}
         {birdData ? (
           <>
             <BirdInfo data={birdData} />
             <SDMChart data={birdData.sdmData} />
-            <TimeSeries data={birdData.timeSeriesData} />
+            <MigrationMap url={birdData.migrationMapUrl} /> {/* Render MigrationMap with the URL */}
+            <EnvironmentalControls
+              onTemperatureChange={(value) => { /* handle change */ }}
+              onPrecipitationChange={(value) => { /* handle change */ }}
+            />
           </>
         ) : (
           <p>Select a bird to see its data.</p>
