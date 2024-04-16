@@ -12,7 +12,10 @@ COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
 # Copy the entire app directory to the container
-COPY app .
+COPY app ./app
+
+# Copy the templates directory to the container
+COPY templates ./templates
 
 # Set environment variables
 ENV FLASK_APP=base.py
