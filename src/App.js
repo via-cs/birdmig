@@ -35,7 +35,7 @@ function App() {
       'Bird 5': 'whimbrel_kde_heatmap.html'
     };
     
-    const birdFileName = birdMap[birdName]; // Use the map to get the correct filename
+    const birdFileName = birdMap[birdName];
   
     if (!birdFileName) {
       setError(`No map available for ${birdName}.`);
@@ -43,7 +43,7 @@ function App() {
       return;
     }
   
-    const migrationMapUrl = `${baseUrl}/migration_images/${birdFileName}`; // Set the full path for the migration map
+    const migrationMapUrl = `${baseUrl}/migration_images/${birdFileName}`;
   
     axios.get(`${baseUrl}/bird-data/${birdName}`)
       .then(response => {
@@ -79,13 +79,21 @@ function App() {
         {error && <p>Error: {error}</p>}
         {birdData ? (
           <>
-            <BirdInfo data={birdData} />
-            <SDMChart data={birdData.sdmData} />
-            <MigrationMap url={birdData.migrationMapUrl} /> {/* Render MigrationMap with the URL */}
-            <EnvironmentalControls
-              onTemperatureChange={(value) => { /* handle change */ }}
-              onPrecipitationChange={(value) => { /* handle change */ }}
-            />
+            <div className="BirdInfo">
+                <BirdInfo data={birdData} />
+            </div>
+            <div className="EnvironmentalControls">
+                <EnvironmentalControls
+                onTemperatureChange={(value) => { /* handle change */ }}
+                onPrecipitationChange={(value) => { /* handle change */ }}
+                />
+            </div>
+            <div className="MigrationMap">
+                <MigrationMap url={birdData.migrationMapUrl} /> {/* Render MigrationMap with the URL */}
+            </div>
+            <div className="SDMChart">
+                <SDMChart data={birdData.sdmData} />
+            </div>
           </>
         ) : (
           <p>Select a bird to see its data.</p>
