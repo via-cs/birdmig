@@ -17,21 +17,23 @@ DEMO_bird_data = {
     "Bird 1": {
         "info": "Generic info for unique bird 1",
         "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-        "timeSeriesData": {
-            "precipitation": [300, 400, 500],
-            "climate": [30, 40, 50],
-            "temperature": [60, 70, 80],
-        },
     },
     "Bird 2": {
         "info": "Generic info for different bird 2",
         "sdmData": [{"x": 1, "y": 100}, {"x": 2, "y": 200}, {"x": 3, "y": 500}],
-        "timeSeriesData": {
-            "precipitation": [300, 400, 500],
-            "climate": [30, 40, 50],
-            "temperature": [60, 70, 80],
-        }
-    }
+    },
+    "Bird 3": {
+        "info": "Generic info for unique bird 3",
+        "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
+    },
+    "Bird 4": {
+        "info": "Generic info for unique bird 4",
+        "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
+    },
+    "Bird 5": {
+        "info": "Generic info for unique bird 5",
+        "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
+    },
 }
 
 @api.route('/bird-data/<bird_name>')
