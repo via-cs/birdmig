@@ -46,8 +46,9 @@
     "proxy": "https://127.0.0.1:5000"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^14.3.0",
+    "@testing-library/react": "^14.3.1",
     "jest": "^29.7.0"
   }
 }

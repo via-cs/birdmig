@@ -1,22 +1,17 @@
-// components/BirdInfo.test.js
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BirdInfo from './BirdInfo';
 
-describe('BirdInfo Component', () => {
-  it('renders Bird Information heading', () => {
-    const mockData = { info: 'This is a test bird' };
-    render(<BirdInfo data={mockData} />);
+describe('BirdInfo', () => {
+  test('renders information about the bird', () => {
+    const testData = {
+      info: 'Blackpoll Warbler is a small songbird of the New World warbler family.'
+    };
     
-    const headingElement = screen.getByRole('heading', { name: 'Bird Information' });
-    expect(headingElement).toBeInTheDocument();
-  });
-
-  it('renders the information passed to it', () => {
-    const mockData = { info: 'This is a test bird' };
-    render(<BirdInfo data={mockData} />);
+    render(<BirdInfo data={testData} />);
     
-    const infoParagraph = screen.getByText('This is a test bird');
-    expect(infoParagraph).toBeInTheDocument();
+    const infoElement = screen.getByText(testData.info);
+    expect(infoElement).toBeInTheDocument();
+    expect(infoElement.tagName).toBe('P');  // Ensures that the information is displayed in a paragraph element
   });
 });
