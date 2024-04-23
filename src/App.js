@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import TimeSeries from "./components/TimeSeries";
+import PolylineMap from "./components/PolylineMap";
 
 function App() {
   const [selectedBird, setSelectedBird] = useState(null);
@@ -25,6 +26,7 @@ function App() {
     setError(null);
     const baseUrl = "http://localhost:5000";
 
+    // Fetch bird data
     axios
       .get(`${baseUrl}/bird-data/${birdName}`)
       .then((response) => {
@@ -56,20 +58,12 @@ function App() {
             <BirdInfo data={birdData} />
             <SDMChart data={birdData.sdmData} />
             <TimeSeries data={birdData.timeSeriesData} />
+            <PolylineMap data={selectedBird} />
           </>
         ) : (
           <p>Select a bird to see its data.</p>
         )}
       </main>
-      <div>
-        <iframe
-          title="Map"
-          src="/migration_maps/blackpoll_warbler.html" // Relative path to the HTML file
-          width="100%"
-          height="600px"
-          frameBorder="0"
-        />
-      </div>
     </div>
   );
 }
