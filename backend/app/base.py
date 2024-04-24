@@ -54,7 +54,6 @@ def get_trajectory_data():
 
         # Convert data to dictionary format
         trajectory_data = bird_data[['LATITUDE', 'LONGITUDE', 'TIMESTAMP']].to_dict(orient='records')
-        print(trajectory_data)
         return jsonify(trajectory_data)
     except FileNotFoundError:
         return jsonify({'error': f'CSV file for {selected_bird} not found'})
@@ -66,7 +65,6 @@ def get_bird_ids():
     try:
         df = pd.read_csv(filename)
         bird_ids = df['ID'].unique().tolist()
-        print(bird_ids)
         return jsonify(bird_ids)
     except FileNotFoundError:
         return jsonify({'error': f'CSV file for {selected_bird} not found'})
