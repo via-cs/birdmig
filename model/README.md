@@ -31,3 +31,13 @@
     - change value for `e` to desired latitude longitude
     - change value for `filetype` to desired filetype (shp, geojson, etc.)
 3. Run file, all output is saved in `model/data/` under respective folders
+
+## Running the SDM
+
+1. Open `birdmid-sdm.ipynb`
+2. Ensure you are running a version of python that supports pip installation
+   (for example, Anaconda3)
+3. Run all cells
+    - Everything required by model should be in the github
+    - Necessary files can always be procured by running `data-pre-processing.R`
+      with necessary input files
