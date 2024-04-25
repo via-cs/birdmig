@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, render_template, request, redirect, url_for, session
+from flask import Flask, jsonify, render_template, request, session
 from flask_cors import CORS, cross_origin
 from jinja2 import TemplateNotFound
 # TEST for alpha.
@@ -46,6 +46,17 @@ DEMO_bird_data = {
     },
 }
 
+@api.route('/prediction_input', methods= ['POST'])
+@cross_origin(supports_credentials= True)
+def SendClimateVars():
+  sent_details = request.get_json()
+  
+  session['year'] = sent_details['year']
+  session['emissions'] = sent_details['emissions']
+  
+  return "Received predictor variables successfully"
+
+
 @api.route('/bird-data/<bird_name>', methods = ['POST'])
 @cross_origin(supports_credentials= True)
 def get_bird_data(bird_name):
@@ -60,7 +71,6 @@ def get_bird_data(bird_name):
   if bird_name in DEMO_bird_data:
     return jsonify(DEMO_bird_data[bird_name])
   else :
-    print("Requested bird: [" + bird_name + "] is not cached.")
     return jsonify({"error": "Invalid bird"}), 404
 
 @api.route('/bird-info/<bird_name>')
@@ -94,13 +104,3 @@ def migration_image(filename):
 # Running app
 if __name__ == '__main__':
     api.run(debug=True)
- 
-# Debug function
-@api.route('/bird-data/', methods = ['GET'])
-@cross_origin(supports_credentials= True)
-def get_model_output():
-  # TODO: Read the model output.
-  print("Reading: " + session['bird_name'], file = sys.stderr)
-  return jsonify({
-    "msg": "Requested info from bird: " + str(session['bird_name'])
-  })
