@@ -57,22 +57,6 @@ def SendClimateVars():
   return "Received predictor variables successfully"
 
 
-@api.route('/bird-data/<bird_name>', methods = ['POST'])
-@cross_origin(supports_credentials= True)
-def get_bird_data(bird_name):
-  
-  # Trying to retreive data about the requested bird.
-  # Save the requested bird for feeding the model.
-  session['bird_name'] = bird_name
-  
-  print("Session contents: " + str(len(session)), file=sys.stderr)
-  
-  # Using example data
-  if bird_name in DEMO_bird_data:
-    return jsonify(DEMO_bird_data[bird_name])
-  else :
-    return jsonify({"error": "Invalid bird"}), 404
-
 @api.route('/bird-info/<bird_name>')
 def get_bird_info(bird_name):
     """Endpoint to retrieve only bird information."""
