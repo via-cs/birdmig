@@ -5,6 +5,7 @@ import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import TimeSeries from "./components/TimeSeries";
 import PolylineMap from "./components/PolylineMap";
+import GeneralMigrationMap from "./components/KDEHeatmap";
 
 function App() {
   const [selectedBird, setSelectedBird] = useState(null);
@@ -58,7 +59,8 @@ function App() {
             <BirdInfo data={birdData} />
             <SDMChart data={birdData.sdmData} />
             <TimeSeries data={birdData.timeSeriesData} />
-            <PolylineMap data={selectedBird} />
+            
+            <GeneralMigrationMap data={selectedBird} />
           </>
         ) : (
           <p>Select a bird to see its data.</p>

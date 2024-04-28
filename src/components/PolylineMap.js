@@ -4,7 +4,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-polylinedecorator";
 import * as d3 from "d3";
-import * as turf from "@turf/turf"; // Import turf.js for calculating bearing
 
 function calculateBearing(startPoint, endPoint) {
   const startLat = startPoint.lat * (Math.PI / 180);
@@ -30,6 +29,7 @@ function PolylineMap({ data }) {
   const [trajectoryData, setTrajectoryData] = useState({});
   const [selectedBirdIDs, setSelectedBirdIDs] = useState([]);
   const [allBirdIDs, setAllBirdIDs] = useState([]);
+ 
   const fetchAllBirdIDs = useCallback(() => {
     const baseUrl = "http://localhost:5000";
     axios
@@ -99,38 +99,53 @@ function PolylineMap({ data }) {
       return;
     }
 
+    const latLngs = validData.map((d) => [
+      parseFloat(d.LATITUDE),
+      parseFloat(d.LONGITUDE),
+    ]);
 
-  const latLngs = validData.map((d) => [
-    parseFloat(d.LATITUDE),
-    parseFloat(d.LONGITUDE),
-  ]);
+    // Create polyline and add it to the map with a specific color
+    const polyline = L.polyline(latLngs, {color: 'darkblue', weight: 4 }).addTo(map);
+    // Add marker for the start point
+    const startTimestamp = validData[0].TIMESTAMP;
+    const startMonth = new Date(startTimestamp).toLocaleString("en-US", {
+      month: "long",
+    });
+    const startMarker = new L.popup()
+      .setLatLng(latLngs[0])
+      .setContent(`Start Point - ${startMonth}`);
 
-  // Create polyline and add it to the map with a specific color
-  const polyline = L.polyline(latLngs, {
-  }).addTo(map);
+    // Add marker for the end point
+    const endTimestamp = validData[validData.length - 1].TIMESTAMP;
+    const endMonth = new Date(endTimestamp).toLocaleString("en-US", {
+      month: "long",
+    });
+    const endMarker = new L.popup()
+      .setLatLng(latLngs[latLngs.length - 1])
+      .setContent(`End Point - ${endMonth}`);
 
-  // Calculate bearings for each segment of the polyline
-  const bearings = [];
-  for (let i = 0; i < latLngs.length - 1; i++) {
-    const startPoint = L.latLng(latLngs[i]);
-    const endPoint = L.latLng(latLngs[i + 1]);
-    const bearing = calculateBearing(startPoint, endPoint);
-    bearings.push(bearing);
-  }
+    map.addLayer(startMarker).addLayer(endMarker);
+    // Calculate bearings for each segment of the polyline
+    const bearings = [];
+    for (let i = 0; i < latLngs.length - 1; i += 150) {
+      const startPoint = L.latLng(latLngs[i]);
+      const endPoint = L.latLng(latLngs[i + 1]);
+      const bearing = calculateBearing(startPoint, endPoint);
+      bearings.push(bearing);
+    }
 
-  // Create polyline decorator and add it to the map
-  L.polylineDecorator(polyline, {
-    patterns: bearings.map((bearing, index) => ({
-      offset: 10,
-      repeat: 150,
-      symbol: L.Symbol.arrowHead({
-        pixelSize: 8,
-        polygon: false,
-        pathOptions: { color: 'red' } // Customize arrow color if needed
-      }),
-      
-    }))
-  }).addTo(map);
+    // Create polyline decorator and add it to the map
+    L.polylineDecorator(polyline, {
+      patterns: bearings.map((bearing, index) => ({
+        offset: 10,
+        repeat: 150,
+        symbol: L.Symbol.arrowHead({
+          pixelSize: 6,
+          polygon: false,
+          pathOptions: { color: "blue" }, // Customize arrow color if needed
+        }),
+      })),
+    }).addTo(map);
 
     // Clean up map instance if component unmounts
     return () => {

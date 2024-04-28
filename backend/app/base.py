@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 import pandas as pd
+import numpy as np
+import math
+from shapely.geometry import LineString
 
 api = Flask(__name__)
 cors = CORS(api)
@@ -41,8 +44,6 @@ def get_bird_data(bird_name):
 def get_trajectory_data():
     selected_bird = request.args.get('bird')
     bird_id = request.args.get('birdID')
-    print(selected_bird)
-    print(bird_id)
     filename = f'./data/{selected_bird}.csv'
     try:
         df = pd.read_csv(filename)
@@ -69,5 +70,44 @@ def get_bird_ids():
     except FileNotFoundError:
         return jsonify({'error': f'CSV file for {selected_bird} not found'})
 
+
+@api.route('/get_general_migration')
+@cross_origin()
+def get_general_migration():
+    selected_bird = request.args.get('bird')
+    filename = f'./data/{selected_bird}.csv'
+    
+    try:
+        df = pd.read_csv(filename)
+        # Convert TIMESTAMP column to datetime
+        df['TIMESTAMP'] = pd.to_datetime(df['TIMESTAMP'])
+        
+        # Group by ID and get the start and end points for each group
+        grouped = df.groupby('ID')
+        arrows = []
+        for _, group in grouped:
+            start_point = (group.iloc[0]['LATITUDE'], group.iloc[0]['LONGITUDE'])
+            end_point = (group.iloc[-1]['LATITUDE'], group.iloc[-1]['LONGITUDE'])
+            
+            delta_lat = end_point[0] - start_point[0]
+            delta_lon = end_point[1] - start_point[1]
+            direction = np.arctan2(delta_lat, delta_lon) * (180 / np.pi)
+            
+            arrows.append((start_point, end_point))
+        
+        # Simplify the line and get generalized route
+        latitudes = df['LATITUDE']
+        longitudes = df['LONGITUDE']
+        points = list(zip(latitudes, longitudes))
+        line = LineString(points)
+        simplified_line = line.simplify(0.009, preserve_topology=False)
+        generalized_route = list(simplified_line.coords)
+        
+        return jsonify(generalized_route=generalized_route, arrows=arrows)
+    
+    except Exception as e:
+        return jsonify(error=str(e)), 400
+        
+    
 if __name__ == '__main__':
     api.run(debug=True)
