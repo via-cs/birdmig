@@ -6,7 +6,6 @@ import { CookiesProvider, useCookies } from "react-cookie"
 import BirdInfo from './components/BirdInfo';
 import SDMChart from './components/SDMChart';
 import MigrationMap from './components/MigrationMap';
-import EnvironmentalControls from './components/EnvironmentalControls';
 import PredictionControls from './components/PredictionControls';
 
 function App() {
