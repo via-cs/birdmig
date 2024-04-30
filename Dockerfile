@@ -12,7 +12,8 @@ COPY package*.json ./
 
 # Run additional commands for startup
 RUN npm install && \
-npm install d3
+  npm install d3 && \
+  npm install react-cookie
 
 COPY . ./
 
