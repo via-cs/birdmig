@@ -11,19 +11,21 @@ function SDMChart({ data }) {
         width = 400 - margin.left - margin.right,
         height = 300 - margin.top - margin.bottom;
 
-      // Append the svg object to the div
+      // Append the svg object to the div and use viewBox for responsiveness
       const svg = d3.select(d3Container.current)
         .html("") // Clear svg content before redrawing
         .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
+          .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+          .attr("preserveAspectRatio", "xMidYMid meet") // This preserves the aspect ratio
+          .style("width", "100%") // Make svg width responsive
+          .style("height", "auto") // Height can be auto (or you might want to specify a fixed height or use 100%)
         .append("g")
           .attr("transform", `translate(${margin.left},${margin.top})`);
 
       // Add X axis
       const x = d3.scaleLinear()
         .domain([0, d3.max(data, d => d.x)])
-        .range([ 0, width ]);
+        .range([0, width]);
       svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x));
@@ -31,7 +33,7 @@ function SDMChart({ data }) {
       // Add Y axis
       const y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d.y)])
-        .range([ height, 0]);
+        .range([height, 0]);
       svg.append("g")
         .call(d3.axisLeft(y));
 

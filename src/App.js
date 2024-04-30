@@ -110,19 +110,20 @@ function App() {
           {error && <p>Error: {error}</p>}
           {birdInfo && <div className="BirdInfo">
             <BirdInfo data={birdInfo} />
-          </div>}
+            <div className="PredictionControls">
+                <PredictionControls
+                onYearChanged={(value) => { updatePredictionVars(value, selectedEmissions); }}
+                onEmissionChanged={(value) => { updatePredictionVars(selectedYear, value); }}
+                />
+            </div>
+            </div>}
           {sdmData && <div className="SDMChart">
             <SDMChart data={sdmData} />
           </div>}
           <div className="MigrationMap">
             <MigrationMap url={migrationMapUrl} />
           </div>
-          <div className="PredictionControls">
-            <PredictionControls
-              onYearChanged={(value) => { updatePredictionVars(value, selectedEmissions); }}
-              onEmissionChanged={(value) => { updatePredictionVars(selectedYear, value); }}
-            />
-          </div>
+          
         </main>
       </CookiesProvider>
     </div>
