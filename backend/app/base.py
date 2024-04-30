@@ -1,16 +1,26 @@
 import os
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request, session
 from flask_cors import CORS, cross_origin
 from jinja2 import TemplateNotFound
+# TEST for alpha.
+#from PIL import Image
+#from io import BytesIO
+#import base64
+# Flask-React storing
+from flask_session import Session
+from .config import AppConfig
+# debug
+import sys
 
-# Importing for potential image manipulation, not used directly in provided code.
-from PIL import Image
-from io import BytesIO
-import base64
 
-api = Flask(__name__, template_folder='../templates')
-CORS(api)
-api.config['CORS_HEADERS'] = 'Content-Type'
+api = Flask(__name__)
+
+# Configure the application from the AppConfig object.
+api.config.from_object(AppConfig)
+api.secret_key = AppConfig.SECRET_KEY
+
+cors = CORS(api, supports_credentials = True)
+app_session = Session(api)
 
 # Example data for demonstration purposes.
 DEMO_bird_data = {
@@ -35,6 +45,17 @@ DEMO_bird_data = {
         "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
     },
 }
+
+@api.route('/prediction_input', methods= ['POST'])
+@cross_origin(supports_credentials= True)
+def SendClimateVars():
+  sent_details = request.get_json()
+  
+  session['year'] = sent_details['year']
+  session['emissions'] = sent_details['emissions']
+  
+  return "Received predictor variables successfully"
+
 
 @api.route('/bird-info/<bird_name>')
 def get_bird_info(bird_name):
