@@ -1,64 +1,31 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
-import { CookiesProvider, useCookies } from "react-cookie"
-//Components
+import { CookiesProvider, useCookies } from "react-cookie";
 import BirdInfo from './components/BirdInfo';
 import SDMChart from './components/SDMChart';
 import MigrationMap from './components/MigrationMap';
-import EnvironmentalControls from './components/EnvironmentalControls';
 import PredictionControls from './components/PredictionControls';
 
 function App() {
-  
-  /* Cookies are required for functionality with flask sessions. */
-  axios.create({withCredentials:true});
-  // override axios defaults to enable credentials for flask sessions.
-  axios.defaults.withCredentials  = true
+  axios.create({withCredentials: true});
+  axios.defaults.withCredentials = true;
 
-  // Allow the app to use cookies, for utility with backend request memory.
-  const [cookies, setCookie] = useCookies(['user'])
-
-  // Set cookies on request. TODO: find more graceful solution to set cookies.
+  const [cookies, setCookie] = useCookies(['user']);
   function onRequest() {
-    setCookie('user', 1)
+    setCookie('user', 1);
   }
 
-  // Saving the backend URL for requests to the backend
   const backendUrl = 'http://localhost:5000';
-  
   const [selectedBird, setSelectedBird] = useState(null);
   const [birdInfo, setBirdInfo] = useState(null);
   const [sdmData, setSdmData] = useState(null);
   const [migrationMapUrl, setMigrationMapUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // Declare current climate data.
-  // Defaults hard-coded by being copied from PredictionControls.js
-  // TODO: have them be set upon initialization of PredictionControls?
   const [selectedYear, setObservedYear] = useState(2021);
   const [selectedEmissions, setEmissionRate] = useState('SSP 245');
 
-  function updatePredictionVars(year, emissionRate) {
-    setObservedYear(year);
-    setEmissionRate(emissionRate);
-
-    axios.post(`${backendUrl}/prediction_input`, {
-      year: year,
-      emissions: emissionRate
-    })
-    .then(({data}) => {
-      //TODO: does front end need to do anything when prediction vars are sent?
-    })
-    .catch((error) => {
-      if(error.response) {
-        console.log(error.response);
-      }
-    });
-  }
-  
-  // Map the bird names to filenames for migration images
   const birdMap = {
     'Blackpoll Warbler': 'blackpoll_warbler_kde_heatmap.html',
     'Bald Eagle': 'eagle_kde_heatmap.html',
@@ -67,8 +34,20 @@ function App() {
     'Whimbrel': 'whimbrel_kde_heatmap.html'
   };
 
+  function updatePredictionVars(year, emissionRate) {
+    setObservedYear(year);
+    setEmissionRate(emissionRate);
+    axios.post(`${backendUrl}/prediction_input`, { year: year, emissions: emissionRate })
+      .then(({data}) => {})
+      .catch((error) => {
+        if(error.response) {
+          console.log(error.response);
+        }
+      });
+  }
+
   useEffect(() => {
-    selectBird('Bird 1'); // Default bird selection on component mount
+    selectBird('Blackpoll Warbler');
   }, []);
 
   function selectBird(birdName) {
@@ -80,9 +59,7 @@ function App() {
 
   function fetchBirdInfo(birdName) {
     setLoading(true);
-    const baseUrl = 'http://localhost:5000'; 
-
-    axios.get(`${baseUrl}/bird-info/${birdName}`)
+    axios.get(`${backendUrl}/bird-info/${birdName}`)
       .then(response => {
         setBirdInfo(response.data);
         setLoading(false);
@@ -97,9 +74,7 @@ function App() {
 
   function fetchSDMData(birdName) {
     setLoading(true);
-    const baseUrl = 'http://localhost:5000';
-
-    axios.get(`${baseUrl}/bird-sdm-data/${birdName}`)
+    axios.get(`${backendUrl}/bird-sdm-data/${birdName}`)
       .then(response => {
         setSdmData(response.data.sdmData);
         setLoading(false);
@@ -113,10 +88,10 @@ function App() {
   }
 
   function updateMigrationMapUrl(birdName) {
-    const baseUrl = 'http://localhost:5000';
-    setMigrationMapUrl(`${baseUrl}/migration_images/${birdMap[birdName]}`);
+    // Access files directly from the public folder
+    setMigrationMapUrl(`${process.env.PUBLIC_URL}/migration_images/${birdMap[birdName]}`);
   }
-
+  
 
   return (
     <div className="App">
@@ -134,18 +109,18 @@ function App() {
           {loading && <p>Loading...</p>}
           {error && <p>Error: {error}</p>}
           {birdInfo && <div className="BirdInfo">
-              <BirdInfo data={birdInfo} />
+            <BirdInfo data={birdInfo} />
           </div>}
           {sdmData && <div className="SDMChart">
-              <SDMChart data={sdmData} />
+            <SDMChart data={sdmData} />
           </div>}
           <div className="MigrationMap">
-              <MigrationMap url={migrationMapUrl} />
+            <MigrationMap url={migrationMapUrl} />
           </div>
           <div className="PredictionControls">
             <PredictionControls
-              onYearChanged={(value)=>{ updatePredictionVars(value, selectedEmissions) }}
-              onEmissionChanged={(value)=>{ updatePredictionVars(selectedYear, value)}}
+              onYearChanged={(value) => { updatePredictionVars(value, selectedEmissions); }}
+              onEmissionChanged={(value) => { updatePredictionVars(selectedYear, value); }}
             />
           </div>
         </main>
