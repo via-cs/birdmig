@@ -1,8 +1,7 @@
-from flask import Flask, jsonify, render_template, request, session
+from flask import Flask, jsonify, request, session, send_from_directory
 from flask_cors import CORS
 from flask_session import Session
 from .config import AppConfig
-from jinja2 import TemplateNotFound
 
 api = Flask(__name__)
 api.config.from_object(AppConfig)
@@ -56,6 +55,10 @@ def get_bird_sdm_data(bird_name):
         return jsonify({'name': bird_name, 'sdmData': bird['sdmData']})
     else:
         return jsonify({'error': 'Bird not found'}), 404
+    
+@api.route('/json/<filename>')
+def send_json(filename):
+    return send_from_directory('climate_data/json_data', filename)
 
 if __name__ == '__main__':
     api.run(debug=True)
