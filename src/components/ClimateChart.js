@@ -18,71 +18,72 @@ class ClimateChart extends Component {
     normalizeData(data) {
         const minValue = d3.min(data, d => d.Mean_Value);
         const maxValue = d3.max(data, d => d.Mean_Value);
+    
+        // Avoid division by zero if all values are the same
+        if (minValue === maxValue) {
+            return data.map(d => ({
+                Month: d.Month,
+                Mean_Value: 0.5 // or any fixed middle value
+            }));
+        }
+    
         return data.map(d => ({
             Month: d.Month,
-            Mean_Value: minValue + (d.Mean_Value - minValue) / (maxValue - minValue) // Normalized
+            Mean_Value: (d.Mean_Value - minValue) / (maxValue - minValue)
         }));
     }
+    
 
     drawChart() {
         if (this.props.data && this.d3Container.current) {
             const svg = d3.select(this.d3Container.current);
             svg.selectAll("*").remove(); // Clear the SVG to prevent duplication
 
-            const margin = { top: 40, right: 20, bottom: 70, left: 60 }; // Adjusted for label spacing
+            const margin = { top: 40, right: 20, bottom: 70, left: 60 };
             const width = 800 - margin.left - margin.right;
             const height = 500 - margin.top - margin.bottom;
 
-            const normalizedData = this.normalizeData(this.props.data); // Normalize the data
+            const normalizedData = this.normalizeData(this.props.data);
 
             const chart = svg.append('g')
                              .attr('transform', `translate(${margin.left},${margin.top})`);
 
-            // Parse months as date for better handling in D3
-            const parseMonth = d3.timeParse("%m");
-            const data = normalizedData.map(d => ({
-                date: parseMonth(d.Month.toString()),
-                value: d.Mean_Value
-            }));
+            // Setup the x-axis as a band scale
+            const x = d3.scaleBand()
+                        .domain(normalizedData.map(d => d.Month))
+                        .range([0, width])
+                        .padding(0.1);
 
-            // Scales
-            const x = d3.scaleTime()
-                        .domain(d3.extent(data, d => d.date))
-                        .range([0, width]);
+            // Setup the y-axis as a linear scale
             const y = d3.scaleLinear()
                         .domain([0, 1]) // Normalized scale
                         .range([height, 0]);
 
-            // Axes
-            const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat("%B"))
-                           .ticks(data.length);
+            // Add axes to the chart
+            const xAxis = d3.axisBottom(x).tickFormat(d3.format("d"));
             const yAxis = d3.axisLeft(y);
 
             chart.append('g')
                  .attr('transform', `translate(0,${height})`)
-                 .call(xAxis)
-                 .selectAll("text")
-                 .style("text-anchor", "end")
-                 .attr("dx", "-.8em")
-                 .attr("dy", ".15em")
-                 .attr("transform", "rotate(-65)");
+                 .call(xAxis);
 
-            chart.append('g').call(yAxis);
+            chart.append('g')
+                 .call(yAxis);
 
-            // Line generator
+            // Define the line generator
             const line = d3.line()
-                          .x(d => x(d.date))
-                          .y(d => y(d.value));
+                          .x(d => x(d.Month) + x.bandwidth() / 2) // Center the line in the band
+                          .y(d => y(d.Mean_Value));
 
-            // Drawing the line
+            // Draw the line
             chart.append('path')
-                 .datum(data)
+                 .datum(normalizedData)
                  .attr('fill', 'none')
                  .attr('stroke', 'steelblue')
                  .attr('stroke-width', 2)
                  .attr('d', line);
 
-            // Adding labels
+            // Add axis labels
             svg.append("text")
                .attr("transform", "translate(" + (width/2 + margin.left) + " ," + (height + margin.top + 50) + ")")
                .style("text-anchor", "middle")
@@ -91,8 +92,8 @@ class ClimateChart extends Component {
             svg.append("text")
                .attr("transform", "rotate(-90)")
                .attr("y", 0 - margin.left + 20)
-               .attr("x",0 - (height / 2))
-               .attr("dy", "1em")
+               .attr("x", 0 - (height / 2))
+               .attr("dy", "-1.2em")
                .style("text-anchor", "middle")
                .text("Normalized Mean Value");
         }
@@ -101,7 +102,7 @@ class ClimateChart extends Component {
     render() {
         return (
             <div className="ClimateChart">
-                <h2>Monthly Climate Data</h2>
+                <h2>Climate Data Visualization</h2>
                 <svg ref={this.d3Container} width="900" height="600"></svg>
             </div>
         );
