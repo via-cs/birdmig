@@ -1,9 +1,6 @@
 flask
 flask_cors
 pillow
-
 flask_Session
-
-
 python-dotenv
 jinja2

@@ -56,7 +56,7 @@
   }
   
   /* Component Styles */
-  .BirdInfo, .SDMChart, .MigrationMap, .EnvironmentalControls {
+  .BirdInfo, .SDMChart, .MigrationMap, .EnvironmentalControls{
     background-color: white;
     padding: 20px;
     border-radius: 8px;
@@ -68,6 +68,19 @@
     flex-direction: column;
   }
   
+  .ClimateChart {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: auto;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+  
+
   /* Prediction Controls Styles */
   .PredictionControls {
     display: flex;
@@ -112,8 +125,8 @@
     }
   
     .BirdInfo { grid-row: 1; }
-    .MigrationMap { grid-row: 2; }
-    .SDMChart { grid-row: 3; }
+    .MigrationMap { grid-row: 3; }
+    .SDMChart { grid-row: 2; }
   }
   
   @media (max-width: 500px) {
