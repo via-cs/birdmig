@@ -78,36 +78,48 @@ def get_general_migration():
     filename = f'./data/{selected_bird}.csv'
     
     try:
-        df = pd.read_csv(filename)
+        df = pd.read_csv(filename, low_memory=False)
+        
         # Convert TIMESTAMP column to datetime
         df['TIMESTAMP'] = pd.to_datetime(df['TIMESTAMP'])
         
-        # Group by ID and get the start and end points for each group
+        # Group by ID and get the start and end months for each group
         grouped = df.groupby('ID')
-        arrows = []
+        print(grouped)
+        simplified_polylines = []
         for _, group in grouped:
-            start_point = (group.iloc[0]['LATITUDE'], group.iloc[0]['LONGITUDE'])
-            end_point = (group.iloc[-1]['LATITUDE'], group.iloc[-1]['LONGITUDE'])
+            # Sort by timestamp
+            group = group.sort_values(by='TIMESTAMP')
             
+            # Get coordinates
+            coordinates = list(zip(group['LATITUDE'], group['LONGITUDE']))
+            
+            # Apply Douglas-Peucker algorithm for simplification
+            simplified_line = simplify_line(coordinates)
+            
+            # Calculate direction for simplified line
+            start_point = simplified_line[0]
+            end_point = simplified_line[-1]
             delta_lat = end_point[0] - start_point[0]
             delta_lon = end_point[1] - start_point[1]
             direction = np.arctan2(delta_lat, delta_lon) * (180 / np.pi)
             
-            arrows.append((start_point, end_point))
+            # Append simplified line with direction to simplified_polylines
+            simplified_polylines.append({
+                'coordinates': simplified_line,
+                'direction': direction
+            })
         
-        # Simplify the line and get generalized route
-        latitudes = df['LATITUDE']
-        longitudes = df['LONGITUDE']
-        points = list(zip(latitudes, longitudes))
-        line = LineString(points)
-        simplified_line = line.simplify(0.009, preserve_topology=False)
-        generalized_route = list(simplified_line.coords)
         
-        return jsonify(generalized_route=generalized_route, arrows=arrows)
+        return jsonify(segmented_polylines=simplified_polylines)
     
     except Exception as e:
         return jsonify(error=str(e)), 400
         
-    
+def simplify_line(coordinates, tolerance=0.1):
+    line = LineString(coordinates)
+    simplified_line = line.simplify(tolerance, preserve_topology=False)
+    return list(zip(*simplified_line.xy))
+
 if __name__ == '__main__':
     api.run(debug=True)

@@ -5,13 +5,14 @@ import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import TimeSeries from "./components/TimeSeries";
 import PolylineMap from "./components/PolylineMap";
-import GeneralMigrationMap from "./components/KDEHeatmap";
+import GeneralMigrationMap from "./components/GeneralMigrationMap";
 
 function App() {
   const [selectedBird, setSelectedBird] = useState(null);
   const [birdData, setBirdData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showPolylineMap, setShowPolylineMap] = useState(true);
 
   useEffect(() => {
     selectBird("Bird 1");
@@ -59,8 +60,16 @@ function App() {
             <BirdInfo data={birdData} />
             <SDMChart data={birdData.sdmData} />
             <TimeSeries data={birdData.timeSeriesData} />
-            
-            <GeneralMigrationMap data={selectedBird} />
+            <div className="map-container">
+              <button onClick={() => setShowPolylineMap(!showPolylineMap)}>
+                {showPolylineMap ? "Show General Map" : "Show Polyline Map"}
+              </button>
+              {showPolylineMap ? (
+                <PolylineMap data={selectedBird} />
+              ) : (
+                <GeneralMigrationMap data={selectedBird} />
+              )}
+            </div>
           </>
         ) : (
           <p>Select a bird to see its data.</p>

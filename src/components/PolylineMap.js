@@ -25,11 +25,11 @@ function calculateBearing(startPoint, endPoint) {
 function PolylineMap({ data }) {
   const mapRef = useRef(null);
 
-  const birdName = "anser";
+  const birdName = "whimbrel";
   const [trajectoryData, setTrajectoryData] = useState({});
   const [selectedBirdIDs, setSelectedBirdIDs] = useState([]);
   const [allBirdIDs, setAllBirdIDs] = useState([]);
- 
+
   const fetchAllBirdIDs = useCallback(() => {
     const baseUrl = "http://localhost:5000";
     axios
@@ -105,7 +105,10 @@ function PolylineMap({ data }) {
     ]);
 
     // Create polyline and add it to the map with a specific color
-    const polyline = L.polyline(latLngs, {color: 'darkblue', weight: 4 }).addTo(map);
+    const polyline = L.polyline(latLngs, {
+      color: "darkblue",
+      weight: 4,
+    }).addTo(map);
     // Add marker for the start point
     const startTimestamp = validData[0].TIMESTAMP;
     const startMonth = new Date(startTimestamp).toLocaleString("en-US", {
@@ -154,17 +157,22 @@ function PolylineMap({ data }) {
   }, [trajectoryData]);
 
   return (
-    <div>
-      <select onChange={handleDropdownChange} value={selectedBirdIDs[0]}>
-        <option value="">Select bird ID</option>
-        {allBirdIDs.map((birdID) => (
-          <option key={birdID} value={birdID}>
-            {birdID}
-          </option>
-        ))}
-      </select>
-      <div ref={mapRef} style={{ width: "800px", height: "600px" }}>
+    <div style={{ position: "relative" }}>
+      <div
+        ref={mapRef}
+        style={{ position: "relative", width: "800px", height: "600px" }}
+      >
         <span>This is a span element</span>
+        <div style={{ position: "absolute", top: 0, right: 0, zIndex: 999 }}>
+          <select onChange={handleDropdownChange} value={selectedBirdIDs[0]}>
+            <option value="">Select {birdName} ID</option>
+            {allBirdIDs.map((birdID, index) => (
+              <option key={birdID} value={birdID}>
+                {birdName.toUpperCase()} {index + 1}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );
