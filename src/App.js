@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { CookiesProvider, useCookies } from "react-cookie";
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
+import PolylineMap from "./components/PolylineMap";
+import GeneralMigrationMap from "./components/GeneralMigrationMap";
 import MigrationMap from "./components/MigrationMap";
 import PredictionControls from "./components/PredictionControls";
 import ClimateChart from "./components/ClimateChart";
 
 function App() {
-	axios.create({ withCredentials: true });
-	axios.defaults.withCredentials = true;
-
 	const [cookies, setCookie] = useCookies(["user"]);
 	function onRequest() {
 		setCookie("user", 1);
@@ -28,6 +27,10 @@ function App() {
 	const [selectedEmissions, setEmissionRate] = useState("SSP 245");
 	const [climateData, setClimateData] = useState(null);
 	const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
+    const [birdData, setBirdData] = useState(null);
+    const [showPolylineMap, setShowPolylineMap] = useState(true);
+        axios.create({ withCredentials: true });
+        axios.defaults.withCredentials = true;
 
 	const birdMap = {
 		"Blackpoll Warbler": "blackpoll_warbler_kde_heatmap.html",
@@ -195,6 +198,24 @@ function App() {
                             <ClimateChart data={climateData} />
                         )}
                     </div>
+                    {birdData ? (
+          <>
+            <BirdInfo data={birdData} />
+            <SDMChart data={birdData.sdmData} />
+            <div className="map-container">
+              <button onClick={() => setShowPolylineMap(!showPolylineMap)}>
+                {showPolylineMap ? "Show General Map" : "Show Polyline Map"}
+              </button>
+              {showPolylineMap ? (
+                <PolylineMap data={selectedBird} />
+              ) : (
+                <GeneralMigrationMap data={selectedBird} />
+              )}
+            </div>
+          </>
+        ) : (
+          <p>Select a bird to see its data.</p>
+        )}
                 </main>
             </CookiesProvider>
         </div>
