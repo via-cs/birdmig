@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
 import axios from "axios";
 import "leaflet-arrowheads";
@@ -8,8 +8,6 @@ function ArrowheadsPolyline({ positions, arrowheads, ...props }) {
 
   useEffect(() => {
     const polyline = polylineRef.current;
-
-    // Function to update arrowheads
     const updateArrowheads = () => {
       if (arrowheads) {
         polyline.arrowheads(arrowheads);
@@ -17,19 +15,18 @@ function ArrowheadsPolyline({ positions, arrowheads, ...props }) {
       }
     };
 
-    // Update arrowheads when the map zoom level changes
     const mapContainer = polyline._map;
     if (mapContainer) {
       mapContainer.on("zoom", updateArrowheads);
     }
 
-    // Clean up event listener
     return () => {
       if (mapContainer) {
         mapContainer.off("zoom", updateArrowheads);
       }
     };
   }, [arrowheads]);
+
   return (
     <Polyline
       smoothFactor={5}
@@ -41,37 +38,33 @@ function ArrowheadsPolyline({ positions, arrowheads, ...props }) {
   );
 }
 
-function GeneralMigrationMap() {
-  const birdName = "whimbrel";
+function GeneralMigrationMap({ selectedBird }) {
   const [segmentedPolylines, setSegmentedPolylines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mapCenter, setMapCenter] = useState([40, -100]); // Center over North America
 
   useEffect(() => {
+    const baseUrl = "http://localhost:5000";
     const getMigrationPattern = async () => {
-      const baseUrl = "http://localhost:5000";
+      setLoading(true);
       try {
-        const response = await axios.get(`${baseUrl}/get_general_migration?bird=${birdName}`);
+        const response = await axios.get(`${baseUrl}/get_general_migration?bird=${selectedBird}`);
         if (response && response.data && response.data.segmented_polylines) {
           setSegmentedPolylines(response.data.segmented_polylines);
         } else {
           throw new Error("Unexpected API response structure");
         }
-        setLoading(false);
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.error) {
-          setError(error.response.data.error);
-        } else {
-          setError("An error occurred");
-        }
-        setLoading(false);
+        setError("An error occurred while fetching migration patterns: " + (error.response?.data?.error || error.message));
       }
+      setLoading(false);
     };
-  
-    getMigrationPattern();
-  }, []);
-  
+
+    if (selectedBird) {
+      getMigrationPattern();
+    }
+  }, [selectedBird]);
 
   return (
     <div>
@@ -80,14 +73,13 @@ function GeneralMigrationMap() {
       {!loading && !error && (
         <MapContainer
           center={mapCenter}
-          zoom={3} // Adjust the zoom level as needed
+          zoom={3}
           style={{ height: "600px", width: "100%" }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {/* Render segmented polylines as ArrowheadsPolyline */}
           {segmentedPolylines.map((segment, index) => (
             <ArrowheadsPolyline
               key={index}
