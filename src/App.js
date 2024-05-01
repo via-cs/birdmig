@@ -11,215 +11,196 @@ import PredictionControls from "./components/PredictionControls";
 import ClimateChart from "./components/ClimateChart";
 
 function App() {
-	const [cookies, setCookie] = useCookies(["user"]);
-	function onRequest() {
-		setCookie("user", 1);
-	}
+  const [cookies, setCookie] = useCookies(["user"]);
+  const backendUrl = "http://localhost:5000";
 
-	const backendUrl = "http://localhost:5000";
-	const [selectedBird, setSelectedBird] = useState(null);
-	const [birdInfo, setBirdInfo] = useState(null);
-	const [sdmData, setSdmData] = useState(null);
-	const [migrationMapUrl, setMigrationMapUrl] = useState("");
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
-	const [selectedYear, setObservedYear] = useState(2021);
-	const [selectedEmissions, setEmissionRate] = useState("SSP 245");
-	const [climateData, setClimateData] = useState(null);
-	const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
-    const [birdData, setBirdData] = useState(null);
-    const [showPolylineMap, setShowPolylineMap] = useState(true);
-        axios.create({ withCredentials: true });
-        axios.defaults.withCredentials = true;
+  // Define birdMap and climateVariables
+  const birdMap = {
+    "Blackpoll Warbler": "blackpoll_warbler_kde_heatmap.html",
+    "Bald Eagle": "eagle_kde_heatmap.html",
+    "White Fronted Goose": "geese_kde_heatmap.html",
+    "Long Billed Curlew": "long_billed_curlew_kde_heatmap.html",
+    Whimbrel: "whimbrel_kde_heatmap.html",
+  };
 
-	const birdMap = {
-		"Blackpoll Warbler": "blackpoll_warbler_kde_heatmap.html",
-		"Bald Eagle": "eagle_kde_heatmap.html",
-		"White Fronted Goose": "geese_kde_heatmap.html",
-		"Long Billed Curlew": "long_billed_curlew_kde_heatmap.html",
-		Whimbrel: "whimbrel_kde_heatmap.html",
-	};
+  const climateVariables = {
+    prec: "prec.json",
+    tmax: "tmax.json",
+    srad: "srad.json",
+    tmin: "tmin.json",
+    vapr: "vapr.json",
+    wind: "wind.json",
+    tavg: "tavg.json",
+  };
 
-	const climateVariables = {
-		prec: "prec.json",
-		tmax: "tmax.json",
-		srad: "srad.json",
-		tmin: "tmin.json",
-		vapr: "vapr.json",
-		wind: "wind.json",
-		tavg: "tavg.json",
-	};
+  // Define updatePredictionVars
+  function updatePredictionVars(year, emissionRate) {
+    setObservedYear(year);
+    setEmissionRate(emissionRate);
+  }
 
-	function updatePredictionVars(year, emissionRate) {
-		setObservedYear(year);
-		setEmissionRate(emissionRate);
-		axios
-			.post(`${backendUrl}/prediction_input`, {
-				year: year,
-				emissions: emissionRate,
-			})
-			.then(({ data }) => {})
-			.catch((error) => {
-				if (error.response) {
-					console.log(error.response);
-				}
-			});
-	}
+  const [selectedBird, setSelectedBird] = useState(null);
+  const [birdInfo, setBirdInfo] = useState(null);
+  const [sdmData, setSdmData] = useState(null);
+  const [migrationMapUrl, setMigrationMapUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedYear, setObservedYear] = useState(2021);
+  const [selectedEmissions, setEmissionRate] = useState("SSP 245");
+  const [climateData, setClimateData] = useState(null);
+  const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
+  const [birdData, setBirdData] = useState(null);
+  const [showPolylineMap, setShowPolylineMap] = useState(true);
 
-	useEffect(() => {
-		selectBird("Blackpoll Warbler");
-	}, []);
+  axios.create({ withCredentials: true });
+  axios.defaults.withCredentials = true;
 
-	function selectBird(birdName) {
-		setSelectedBird(birdName);
-		fetchBirdInfo(birdName);
-		fetchSDMData(birdName);
-		updateMigrationMapUrl(birdName);
-	}
+  useEffect(() => {
+    selectBird("Blackpoll Warbler");
+  }, []);
 
-	function fetchBirdInfo(birdName) {
-		setLoading(true);
-		axios
-			.get(`${backendUrl}/bird-info/${birdName}`)
-			.then((response) => {
-				setBirdInfo(response.data);
-				setLoading(false);
-			})
-			.catch((error) => {
-				console.error("Error fetching bird info", error);
-				setError("Error fetching bird info");
-				setBirdInfo(null);
-				setLoading(false);
-			});
-	}
 
-	function fetchSDMData(birdName) {
-		setLoading(true);
-		axios
-			.get(`${backendUrl}/bird-sdm-data/${birdName}`)
-			.then((response) => {
-				setSdmData(response.data.sdmData);
-				setLoading(false);
-			})
-			.catch((error) => {
-				console.error("Error fetching SDM data", error);
-				setError("Error fetching SDM data");
-				setSdmData(null);
-				setLoading(false);
-			});
-	}
+  function selectBird(birdName) {
+    setSelectedBird(birdName);
+    fetchBirdInfo(birdName);
+    fetchSDMData(birdName);
+    updateMigrationMapUrl(birdName);
+  }
 
-	function updateMigrationMapUrl(birdName) {
-		// Access files directly from the public folder
-		setMigrationMapUrl(
-			`${process.env.PUBLIC_URL}/migration_images/${birdMap[birdName]}`
-		);
-	}
+  function fetchBirdInfo(birdName) {
+    setLoading(true);
+    axios
+      .get(`${backendUrl}/bird-info/${birdName}`)
+      .then((response) => {
+        setBirdInfo(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching bird info", error);
+        setError("Error fetching bird info");
+        setBirdInfo(null);
+        setLoading(false);
+      });
+  }
 
-	useEffect(() => {
-		if (selectedClimateVariable) {
-			fetchClimateData(selectedClimateVariable);
-		}
-	}, [selectedClimateVariable]);
+  function fetchSDMData(birdName) {
+    setLoading(true);
+    axios
+      .get(`${backendUrl}/bird-sdm-data/${birdName}`)
+      .then((response) => {
+        setSdmData(response.data.sdmData);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching SDM data", error);
+        setError("Error fetching SDM data");
+        setSdmData(null);
+        setLoading(false);
+      });
+  }
 
-	function fetchClimateData(variable) {
-		setLoading(true);
-		axios
-			.get(`${backendUrl}/json/${climateVariables[variable]}`)
-			.then((response) => {
-				setClimateData(response.data);
-				setLoading(false);
-			})
-			.catch((error) => {
-				console.error("Error fetching climate data", error);
-				setError("Failed to fetch climate data");
-				setLoading(false);
-			});
-	}
-
-	function handleClimateVariableChange(variable) {
-		setSelectedClimateVariable(variable);
-	}
-
-	return (
-        <div className="App">
-            <CookiesProvider>
-                <nav className="sidebar">
-                    <ul>
-                        {Object.keys(birdMap).map((bird) => (
-                            <li key={bird} onClick={() => selectBird(bird)}>
-                                {bird}
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-                <main className="main-content">
-                    {loading && <p>Loading...</p>}
-                    {error && <p>Error: {error}</p>}
-                    {birdInfo && (
-                        <div className="BirdInfo">
-                            <BirdInfo data={birdInfo} />
-                            <div className="PredictionControls">
-                                <PredictionControls
-                                    onYearChanged={(value) => {
-                                        updatePredictionVars(value, selectedEmissions);
-                                    }}
-                                    onEmissionChanged={(value) => {
-                                        updatePredictionVars(selectedYear, value);
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    )}
-                    <div className="MigrationMap">
-                        <MigrationMap url={migrationMapUrl} />
-                    </div>
-                    {sdmData && (
-                        <div className="SDMChart">
-                            <SDMChart data={sdmData} />
-                        </div>
-                    )}
-                    <div className="ClimateDataContainer">
-                        <div className="ClimateData">
-                            <strong>Climate Data</strong>
-                            <div className="tabs">
-                                {Object.keys(climateVariables).map((variable) => (
-                                    <button
-                                        key={variable}
-                                        className={`tab ${selectedClimateVariable === variable ? 'active' : ''}`}
-                                        onClick={() => handleClimateVariableChange(variable)}
-                                    >
-                                        {variable.toUpperCase()}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        {climateData && (
-                            <ClimateChart data={climateData} />
-                        )}
-                    </div>
-                    {birdData ? (
-          <>
-            <BirdInfo data={birdData} />
-            <SDMChart data={birdData.sdmData} />
-            <div className="map-container">
-              <button onClick={() => setShowPolylineMap(!showPolylineMap)}>
-                {showPolylineMap ? "Show General Map" : "Show Polyline Map"}
-              </button>
-              {showPolylineMap ? (
-                <PolylineMap data={selectedBird} />
-              ) : (
-                <GeneralMigrationMap data={selectedBird} />
-              )}
-            </div>
-          </>
-        ) : (
-          <p>Select a bird to see its data.</p>
-        )}
-                </main>
-            </CookiesProvider>
-        </div>
+  function updateMigrationMapUrl(birdName) {
+    // Access files directly from the public folder
+    setMigrationMapUrl(
+      `${process.env.PUBLIC_URL}/migration_images/${birdMap[birdName]}`
     );
+  }
+
+  useEffect(() => {
+    if (selectedClimateVariable) {
+      fetchClimateData(selectedClimateVariable);
+    }
+  }, [selectedClimateVariable]);
+
+  function fetchClimateData(variable) {
+    setLoading(true);
+    axios
+      .get(`${backendUrl}/json/${climateVariables[variable]}`)
+      .then((response) => {
+        setClimateData(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching climate data", error);
+        setError("Failed to fetch climate data");
+        setLoading(false);
+      });
+  }
+
+  function handleClimateVariableChange(variable) {
+    setSelectedClimateVariable(variable);
+  }
+
+  return (
+    <div className="App">
+      <CookiesProvider>
+        <nav className="sidebar">
+          <ul>
+            {Object.keys(birdMap).map((bird) => (
+              <li key={bird} onClick={() => selectBird(bird)}>
+                {bird}
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <main className="main-content">
+          {loading && <p>Loading...</p>}
+          {error && <p>Error: {error}</p>}
+          {birdInfo && (
+            <div className="BirdInfo">
+              <BirdInfo data={birdInfo} />
+              <div className="PredictionControls">
+                <PredictionControls
+                  onYearChanged={(value) => {
+                    updatePredictionVars(value, selectedEmissions);
+                  }}
+                  onEmissionChanged={(value) => {
+                    updatePredictionVars(selectedYear, value);
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          <div className="MigrationMap">
+            <div className="map-container">
+                    <button onClick={() => setShowPolylineMap(!showPolylineMap)}>
+                    {showPolylineMap ? "Show General Map" : "Show Polyline Map"}
+                    </button>
+                    {showPolylineMap ? (
+                    <PolylineMap data={selectedBird} />
+                    ) : (
+                    <GeneralMigrationMap data={selectedBird} />
+                    )}
+                </div>
+            </div>
+          {sdmData && (
+            <div className="SDMChart">
+              <SDMChart data={sdmData} />
+            </div>
+          )}
+          <div className="ClimateDataContainer">
+            <div className="ClimateData">
+              <strong>Climate Data</strong>
+              <div className="tabs">
+                {Object.keys(climateVariables).map((variable) => (
+                  <button
+                    key={variable}
+                    className={`tab ${selectedClimateVariable === variable ? 'active' : ''}`}
+                    onClick={() => handleClimateVariableChange(variable)}
+                  >
+                    {variable.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {climateData && (
+              <ClimateChart data={climateData} />
+            )}
+          </div>
+        </main>
+      </CookiesProvider>
+    </div>
+  );
 }
-    
+
 export default App;

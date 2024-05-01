@@ -52,19 +52,26 @@ function GeneralMigrationMap() {
     const getMigrationPattern = async () => {
       const baseUrl = "http://localhost:5000";
       try {
-        const response = await axios.get(
-          `${baseUrl}/get_general_migration?bird=${birdName}`
-        );
-        setSegmentedPolylines(response.data.segmented_polylines);
+        const response = await axios.get(`${baseUrl}/get_general_migration?bird=${birdName}`);
+        if (response && response.data && response.data.segmented_polylines) {
+          setSegmentedPolylines(response.data.segmented_polylines);
+        } else {
+          throw new Error("Unexpected API response structure");
+        }
         setLoading(false);
       } catch (error) {
-        setError(error.response.data.error || "An error occurred");
+        if (error.response && error.response.data && error.response.data.error) {
+          setError(error.response.data.error);
+        } else {
+          setError("An error occurred");
+        }
         setLoading(false);
       }
     };
-
+  
     getMigrationPattern();
   }, []);
+  
 
   return (
     <div>

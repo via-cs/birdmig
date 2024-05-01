@@ -1,4 +1,3 @@
-from shapely.geometry import LineString
 from flask import Flask, jsonify, request, session, send_from_directory
 from flask_cors import CORS, cross_origin
 from flask_session import Session
@@ -6,12 +5,15 @@ from .config import AppConfig
 import pandas as pd
 import numpy as np
 import math
+from shapely.geometry import LineString
 
 api = Flask(__name__)
+api.config['CORS_HEADERS'] = 'Content-Type'
 api.config.from_object(AppConfig)
 api.secret_key = AppConfig.SECRET_KEY
 
-cors = CORS(api, supports_credentials=True)
+# Set up CORS with specific origins and allow credentials
+CORS(api, supports_credentials=True, origins=["http://localhost:3000"])
 app_session = Session(api)
 
 DEMO_bird_data = {
@@ -43,10 +45,11 @@ DEMO_bird_data = {
 }
 
 @api.route('/bird-data/<bird_name>')
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def get_bird_data(bird_name):
     if bird_name in DEMO_bird_data:
         return jsonify(DEMO_bird_data[bird_name])
+    
 @api.route('/prediction_input', methods=['POST'])
 def send_climate_vars():
     sent_details = request.get_json()
@@ -75,7 +78,7 @@ def send_json(filename):
     return send_from_directory('climate_data/json_data', filename)
 
 @api.route('/get_trajectory_data')
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def get_trajectory_data():
     selected_bird = request.args.get('bird')
     bird_id = request.args.get('birdID')
@@ -93,8 +96,9 @@ def get_trajectory_data():
         return jsonify(trajectory_data)
     except FileNotFoundError:
         return jsonify({'error': f'CSV file for {selected_bird} not found'})
+
 @api.route('/get_bird_ids')
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def get_bird_ids():
     selected_bird = request.args.get('bird')
     filename = f'./data/{selected_bird}.csv'
@@ -107,7 +111,7 @@ def get_bird_ids():
 
 
 @api.route('/get_general_migration')
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def get_general_migration():
     selected_bird = request.args.get('bird')
     filename = f'./data/{selected_bird}.csv'
