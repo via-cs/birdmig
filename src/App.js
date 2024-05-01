@@ -139,59 +139,66 @@ function App() {
 	}
 
 	return (
-		<div className="App">
-			<CookiesProvider>
-				<nav className="sidebar">
-					<ul>
-						{Object.keys(birdMap).map((bird) => (
-							<li key={bird} onClick={() => selectBird(bird)}>
-								{bird}
-							</li>
-						))}
-					</ul>
-				</nav>
-				<main className="main-content">
-					{loading && <p>Loading...</p>}
-					{error && <p>Error: {error}</p>}
-					{birdInfo && (
-						<div className="BirdInfo">
-							<BirdInfo data={birdInfo} />
-							<div className="PredictionControls">
-								<PredictionControls
-									onYearChanged={(value) => {
-										updatePredictionVars(value, selectedEmissions);
-									}}
-									onEmissionChanged={(value) => {
-										updatePredictionVars(selectedYear, value);
-									}}
-								/>
-							</div>
-							<li>
-								<strong>Climate Data</strong>
-								{Object.keys(climateVariables).map((variable) => (
-									<button
-										key={variable}
-										onClick={() => handleClimateVariableChange(variable)}
-									>
-										Load {variable.toUpperCase()}
-									</button>
-								))}
-							</li>
-						</div>
-					)}
-					<div className="MigrationMap">
-						<MigrationMap url={migrationMapUrl} />
-					</div>
+        <div className="App">
+            <CookiesProvider>
+                <nav className="sidebar">
+                    <ul>
+                        {Object.keys(birdMap).map((bird) => (
+                            <li key={bird} onClick={() => selectBird(bird)}>
+                                {bird}
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+                <main className="main-content">
+                    {loading && <p>Loading...</p>}
+                    {error && <p>Error: {error}</p>}
+                    {birdInfo && (
+                        <div className="BirdInfo">
+                            <BirdInfo data={birdInfo} />
+                            <div className="PredictionControls">
+                                <PredictionControls
+                                    onYearChanged={(value) => {
+                                        updatePredictionVars(value, selectedEmissions);
+                                    }}
+                                    onEmissionChanged={(value) => {
+                                        updatePredictionVars(selectedYear, value);
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )}
+                    <div className="MigrationMap">
+                        <MigrationMap url={migrationMapUrl} />
+                    </div>
                     {sdmData && (
-						<div className="SDMChart">
-							<SDMChart data={sdmData} />
-						</div>
-					)}
-					{climateData && <ClimateChart data={climateData} />}
-				</main>
-			</CookiesProvider>
-		</div>
-	);
+                        <div className="SDMChart">
+                            <SDMChart data={sdmData} />
+                        </div>
+                    )}
+                    <div className="ClimateDataContainer">
+                        <div className="ClimateData">
+                            <strong>Climate Data</strong>
+                            <div className="tabs">
+                                {Object.keys(climateVariables).map((variable) => (
+                                    <button
+                                        key={variable}
+                                        className={`tab ${selectedClimateVariable === variable ? 'active' : ''}`}
+                                        onClick={() => handleClimateVariableChange(variable)}
+                                    >
+                                        {variable.toUpperCase()}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        {climateData && (
+                            <ClimateChart data={climateData} />
+                        )}
+                    </div>
+                </main>
+            </CookiesProvider>
+        </div>
+    );
 }
-
+    
 export default App;

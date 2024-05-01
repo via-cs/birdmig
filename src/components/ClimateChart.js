@@ -38,16 +38,16 @@ class ClimateChart extends Component {
         if (this.props.data && this.d3Container.current) {
             const svg = d3.select(this.d3Container.current);
             svg.selectAll("*").remove(); // Clear the SVG to prevent duplication
-
+    
             const margin = { top: 40, right: 20, bottom: 70, left: 60 };
-            const width = 800 - margin.left - margin.right;
-            const height = 500 - margin.top - margin.bottom;
-
+            const width = this.d3Container.current.clientWidth - margin.left - margin.right; // Adjusted for margins
+            const height = this.d3Container.current.clientHeight - margin.top - margin.bottom; // Adjusted for margins
+    
             const normalizedData = this.normalizeData(this.props.data);
-
+    
             const chart = svg.append('g')
                              .attr('transform', `translate(${margin.left},${margin.top})`);
-
+    
             // Setup the x-axis as a band scale
             const x = d3.scaleBand()
                         .domain(normalizedData.map(d => d.Month))
@@ -103,7 +103,7 @@ class ClimateChart extends Component {
         return (
             <div className="ClimateChart">
                 <h2>Climate Data Visualization</h2>
-                <svg ref={this.d3Container} width="900" height="600"></svg>
+                <svg ref={this.d3Container}></svg>
             </div>
         );
     }
