@@ -1,21 +1,24 @@
 # Dockerfile for the front end of the application.
 
-# Start an image with node base image.
-# node:18 is essentially node.js to help construct the web file.
+# Start with the Node.js 18 Alpine image
 FROM node:18-alpine
 
-# Sets the /app directory, or the CWDir.
+# Set the working directory to /app
 WORKDIR /app
 
-# Copy contents of package.json files for utility to run the front end locally.
+# Copy package.json and package-lock.json (if available)
 COPY package*.json ./
 
-# Run additional commands for startup
+# Install dependencies listed in package.json
+# Include specific additional packages needed for the project
 RUN npm install && \
-  npm install d3 && \
-  npm install react-cookie
+    npm install d3 && \
+    npm install react-cookie && \
+    npm install leaflet react-leaflet leaflet-arrowheads leaflet-polylinedecorator
 
-COPY . ./
+# Copy the rest of the application
+COPY . .
 
-# Begin the program
-ENTRYPOINT [ "npm",  "start" ]
+# The application is started with npm start
+# This should keep the container running as it launches the app
+ENTRYPOINT ["npm", "start"]

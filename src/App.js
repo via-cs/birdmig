@@ -3,7 +3,6 @@ import axios from "axios";
 import "./App.css";
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
-import TimeSeries from "./components/TimeSeries";
 import PolylineMap from "./components/PolylineMap";
 import GeneralMigrationMap from "./components/GeneralMigrationMap";
 
@@ -26,7 +25,7 @@ function App() {
   function getData(birdName) {
     setLoading(true);
     setError(null);
-    const baseUrl = "http://localhost:5000";
+    const baseUrl = "http://127.0.0.1:5000/";
 
     // Fetch bird data
     axios
@@ -59,7 +58,6 @@ function App() {
           <>
             <BirdInfo data={birdData} />
             <SDMChart data={birdData.sdmData} />
-            <TimeSeries data={birdData.timeSeriesData} />
             <div className="map-container">
               <button onClick={() => setShowPolylineMap(!showPolylineMap)}>
                 {showPolylineMap ? "Show General Map" : "Show Polyline Map"}
