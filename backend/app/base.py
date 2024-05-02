@@ -5,12 +5,16 @@ from .config import AppConfig
 import pandas as pd
 import numpy as np
 import math
+import pickle
 from shapely.geometry import LineString
 
 api = Flask(__name__)
 api.config['CORS_HEADERS'] = 'Content-Type'
 api.config.from_object(AppConfig)
 api.secret_key = AppConfig.SECRET_KEY
+
+with open('./models/svm_classifier_model.pkl', 'rb') as f:
+    model = pickle.load(f)
 
 # Set up CORS with specific origins and allow credentials
 CORS(api, supports_credentials=True, origins=["http://localhost:3000"])
@@ -56,6 +60,17 @@ def send_climate_vars():
     session['year'] = sent_details['year']
     session['emissions'] = sent_details['emissions']
     return "Received predictor variables successfully"
+
+@api.route('/prediction_input', methods=['POST'])
+def predict():
+    prediction_input = request.get_json()
+
+    prediction_df = pd.DataFrame([prediction_input])
+    
+    prediction_result = model.predict(prediction_df)
+    
+    return jsonify({'prediction': prediction_result.tolist()})
+
 
 @api.route('/bird-info/<bird_name>')
 def get_bird_info(bird_name):

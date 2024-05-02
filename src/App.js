@@ -36,20 +36,28 @@ function App() {
 	function updatePredictionVars(year, emissionRate) {
 		setObservedYear(year);
 		setEmissionRate(emissionRate);
+
+		axios
+			.post(`${backendUrl}/prediction_input`, { year, emissions: emissionRate })
+			.then((response) => {
+				console.log("Prediction variables sent successfully:", response.data);
+			})
+			.catch((error) => {
+				console.error("Error sending prediction variables:", error);
+			});
 	}
 
 	const [selectedBird, setSelectedBird] = useState(null);
 	const [birdInfo, setBirdInfo] = useState(null);
 	const [sdmData, setSdmData] = useState(null);
-	const [migrationMapUrl, setMigrationMapUrl] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [selectedYear, setObservedYear] = useState(2021);
 	const [selectedEmissions, setEmissionRate] = useState("SSP 245");
 	const [climateData, setClimateData] = useState(null);
 	const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
-	const [birdData, setBirdData] = useState(null);
 	const [showPolylineMap, setShowPolylineMap] = useState(true);
+	const [predictionData, setPredictionData] = useState(null);
 
 	axios.create({ withCredentials: true });
 	axios.defaults.withCredentials = true;
@@ -122,6 +130,29 @@ function App() {
 		setSelectedClimateVariable(variable);
 	}
 
+	function fetchPredictionData() {
+        axios
+            .post(`${backendUrl}/prediction_input`, {}, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                setPredictionData(response.data.prediction);
+            })
+            .catch((error) => {
+                console.error("Error fetching prediction data", error);
+            });
+    }
+    
+    
+
+	useEffect(() => {
+		if (selectedBird) {
+			fetchPredictionData();
+		}
+	}, [selectedBird, selectedYear, selectedEmissions]);
+
 	return (
 		<div className="App">
 			<CookiesProvider>
@@ -164,7 +195,7 @@ function App() {
 					</div>
 					{sdmData && (
 						<div className="SDMChart">
-							<SDMChart data={sdmData} />
+							<SDMChart data={sdmData} prediction={predictionData} />
 						</div>
 					)}
 					<div className="ClimateDataContainer">
