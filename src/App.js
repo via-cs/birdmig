@@ -7,6 +7,7 @@ import { io } from "socket.io-client";
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import PolylineMap from "./components/PolylineMap";
+import Heatmap from "./components/HeatMap";
 import GeneralMigrationMap from "./components/GeneralMigrationMap";
 import PredictionControls from "./components/PredictionControls";
 import ClimateChart from "./components/ClimateChart";
