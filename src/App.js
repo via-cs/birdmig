@@ -136,48 +136,10 @@ function App() {
 	function handleClimateVariableChange(variable) {
 		setSelectedClimateVariable(variable);
 	}
-
-    /*
-	function fetchPredictionData() {
-        axios
-            .post(`${backendUrl}/prediction_input`, {}, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => {
-                setPredictionData(response.data.prediction);
-            })
-            .catch((error) => {
-                console.error("Error fetching prediction data", error);
-            });
-    }*/
     
     
 
 	useEffect(() => {
-
-		if (selectedBird) {
-			//fetchPredictionData();
-		}
-        /*
-        var source = new EventSource(backendUrl);
-        source.addEventListener(
-            "predictions",
-            function(event) {
-                var data = JSON.parse(event.data);
-                setPredictionData(data.prediction);
-            },
-            false
-        );
-        source.addEventListener(
-            "error",
-            function(event) {
-                console.log(event)
-            },
-            false
-        )*/
-
         const socket = io(backendUrl, {
             transports: ["websocket"],
             cors: {
@@ -187,7 +149,7 @@ function App() {
         
         setSocketInstance(socket)
         socket.on("predictions", (data) => {
-            setPredictionData(data)
+            setPredictionData(data.prediction)
         })
 
 	}, [selectedBird, selectedYear, selectedEmissions]);
@@ -229,11 +191,7 @@ function App() {
 							<GeneralMigrationMap selectedBird={birdMap[selectedBird]} />
 						)}
 					</div>
-					{sdmData && (
-						/*<div className="SDMChart">
-							<SDMChart data={sdmData} prediction={predictionData} />
-						</div>*/
-					)}
+					<p>Data: {predictionData ? predictionData : "Nothing"}</p>
 					<div className="ClimateDataContainer">
 						<div className="ClimateData">
 							<strong>Climate Data</strong>
