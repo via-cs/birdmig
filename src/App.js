@@ -25,11 +25,7 @@ function App() {
 	const climateVariables = {
 		prec: "prec.json",
 		tmax: "tmax.json",
-		srad: "srad.json",
 		tmin: "tmin.json",
-		vapr: "vapr.json",
-		wind: "wind.json",
-		tavg: "tavg.json",
 	};
 
 	// Define updatePredictionVars
