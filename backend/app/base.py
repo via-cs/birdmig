@@ -9,6 +9,10 @@ import math
 import pickle
 from shapely.geometry import LineString
 
+from PIL import Image
+from io import BytesIO
+import base64
+# DEBUGGING
 import sys
 
 api = Flask(__name__)
@@ -79,6 +83,19 @@ def send_predictions():
     prediction_result = model.predict(prediction_df)
     
     print(prediction_result, file = sys.stderr)
+    
+    '''
+    # For image data:
+    dataImg = Image.open(data_url)
+    buffer = BytesIO()
+    dataImg.save(buffer, format="png")
+    
+    #If we'll need to encapsulate a file, use this:
+    jsonify({
+            "prediction": base64.b64encode(buffer.getvalue()).decode(),
+            "resFormat": dataImg.format
+    })
+    '''
     
     socket_io.emit("predictions", {'prediction': "prediction_result.tolist()"})
     
