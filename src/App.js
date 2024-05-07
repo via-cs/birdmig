@@ -3,8 +3,8 @@ import axios from "axios";
 import "./App.css";
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
-import TimeSeries from "./components/TimeSeries";
 import PolylineMap from "./components/PolylineMap";
+import Heatmap from "./components/HeatMap";
 import GeneralMigrationMap from "./components/GeneralMigrationMap";
 
 function App() {
@@ -59,7 +59,7 @@ function App() {
           <>
             <BirdInfo data={birdData} />
             <SDMChart data={birdData.sdmData} />
-            <TimeSeries data={birdData.timeSeriesData} />
+            <Heatmap data={selectedBird} />
             <div className="map-container">
               <button onClick={() => setShowPolylineMap(!showPolylineMap)}>
                 {showPolylineMap ? "Show General Map" : "Show Polyline Map"}
