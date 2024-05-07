@@ -86,15 +86,18 @@ def send_predictions():
     
     '''
     # For image data:
-    dataImg = Image.open(data_url)
+    dataImg = Image.open(<insert URL for the image here>)
     buffer = BytesIO()
     dataImg.save(buffer, format="png")
     
     #If we'll need to encapsulate a file, use this:
-    jsonify({
+    socket_io.emit("predictions", {
             "prediction": base64.b64encode(buffer.getvalue()).decode(),
             "resFormat": dataImg.format
     })
+    
+    # The front end (App.js) will also need changes to properly display the sent image, displaying the prediction base64 array as the image format specified in the resFormat field.
+    # A google search may be necessary for having react.js display a base64 array(?) of data as a specified image format.
     '''
     
     socket_io.emit("predictions", {'prediction': "prediction_result.tolist()"})
