@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, session, send_from_directory
 from flask_cors import CORS, cross_origin
 from flask_session import Session
+from flask_socketio import SocketIO, emit
 from .config import AppConfig
 import pandas as pd
 import numpy as np
@@ -8,8 +9,9 @@ import math
 import pickle
 from shapely.geometry import LineString
 
+import sys
+
 api = Flask(__name__)
-api.config['CORS_HEADERS'] = 'Content-Type'
 api.config.from_object(AppConfig)
 api.secret_key = AppConfig.SECRET_KEY
 
@@ -19,6 +21,7 @@ with open('./models/svm_classifier_model.pkl', 'rb') as f:
 # Set up CORS with specific origins and allow credentials
 CORS(api, supports_credentials=True, origins=["http://localhost:3000"])
 app_session = Session(api)
+socket_io = SocketIO(api, cors_allowed_origins = "http://localhost:3000")
 
 DEMO_bird_data = {
     "Blackpoll Warbler": {
@@ -55,22 +58,30 @@ def get_bird_data(bird_name):
         return jsonify(DEMO_bird_data[bird_name])
     
 @api.route('/prediction_input', methods=['POST'])
-def send_climate_vars():
-    sent_details = request.get_json()
-    session['year'] = sent_details['year']
-    session['emissions'] = sent_details['emissions']
-    return "Received predictor variables successfully"
-
-@api.route('/prediction_input', methods=['POST'])
 def predict():
     prediction_input = request.get_json()
 
-    prediction_df = pd.DataFrame([prediction_input])
+    session['year'] = prediction_input['year']
+    session['emissions'] = prediction_input['emissions']
+        
+    send_predictions()
+    
+    return "Processing Prediction"#jsonify({'prediction': send_predictions()})
+
+#@socket_io.on("predict")
+def send_predictions():
+    print("Predicting something....", file = sys.stderr)
+    
+    # prediction_df = pd.read_csv('./data/warbler.csv')
+    # Dummy data genereated to quickly debug the predictions.
+    prediction_df = pd.DataFrame({f"X{i}": range(25 * i, 25 * (i + 1)) for i in range(19)})
     
     prediction_result = model.predict(prediction_df)
     
-    return jsonify({'prediction': prediction_result.tolist()})
-
+    print(prediction_result, file = sys.stderr)
+    
+    socket_io.emit("predictions", {'prediction': "prediction_result.tolist()"})
+    
 
 @api.route('/bird-info/<bird_name>')
 def get_bird_info(bird_name):
@@ -177,3 +188,4 @@ def simplify_line(coordinates, tolerance=0.1):
 
 if __name__ == '__main__':
     api.run(debug=True)
+    socket_io.run(api, debug=True, port=5000)

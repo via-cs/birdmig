@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { CookiesProvider, useCookies } from "react-cookie";
+import { io } from "socket.io-client";
+//import WebSocketCall from ""
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import PolylineMap from "./components/PolylineMap";
@@ -10,6 +12,7 @@ import PredictionControls from "./components/PredictionControls";
 import ClimateChart from "./components/ClimateChart";
 
 function App() {
+    const [socketInstance, setSocketInstance] = useState("");
 	const [cookies, setCookie] = useCookies(["user"]);
 	const backendUrl = "http://localhost:5000";
 
@@ -38,9 +41,12 @@ function App() {
 		setEmissionRate(emissionRate);
 
 		axios
-			.post(`${backendUrl}/prediction_input`, { year, emissions: emissionRate })
+			.post(`${backendUrl}/prediction_input`, {
+                    year: year,
+                    emissions: emissionRate })
 			.then((response) => {
-				console.log("Prediction variables sent successfully:", response.data);
+                console.log(response.data.prediction)
+				//setPredictionData(response.data.prediction);
 			})
 			.catch((error) => {
 				console.error("Error sending prediction variables:", error);
@@ -130,6 +136,7 @@ function App() {
 		setSelectedClimateVariable(variable);
 	}
 
+    /*
 	function fetchPredictionData() {
         axios
             .post(`${backendUrl}/prediction_input`, {}, {
@@ -143,14 +150,45 @@ function App() {
             .catch((error) => {
                 console.error("Error fetching prediction data", error);
             });
-    }
+    }*/
     
     
 
 	useEffect(() => {
+
 		if (selectedBird) {
-			fetchPredictionData();
+			//fetchPredictionData();
 		}
+        /*
+        var source = new EventSource(backendUrl);
+        source.addEventListener(
+            "predictions",
+            function(event) {
+                var data = JSON.parse(event.data);
+                setPredictionData(data.prediction);
+            },
+            false
+        );
+        source.addEventListener(
+            "error",
+            function(event) {
+                console.log(event)
+            },
+            false
+        )*/
+
+        const socket = io(backendUrl, {
+            transports: ["websocket"],
+            cors: {
+                origin: "http://localhost:3000"
+            }
+        });
+        
+        setSocketInstance(socket)
+        socket.on("predictions", (data) => {
+            setPredictionData(data)
+        })
+
 	}, [selectedBird, selectedYear, selectedEmissions]);
 
 	return (
@@ -173,11 +211,8 @@ function App() {
 							<BirdInfo data={birdInfo} />
 							<div className="PredictionControls">
 								<PredictionControls
-									onYearChanged={(value) => {
-										updatePredictionVars(value, selectedEmissions);
-									}}
-									onEmissionChanged={(value) => {
-										updatePredictionVars(selectedYear, value);
+									onPredictionUpdated={(year, emissions) => {
+										updatePredictionVars(year, emissions);
 									}}
 								/>
 							</div>
@@ -194,9 +229,9 @@ function App() {
 						)}
 					</div>
 					{sdmData && (
-						<div className="SDMChart">
+						/*<div className="SDMChart">
 							<SDMChart data={sdmData} prediction={predictionData} />
-						</div>
+						</div>*/
 					)}
 					<div className="ClimateDataContainer">
 						<div className="ClimateData">

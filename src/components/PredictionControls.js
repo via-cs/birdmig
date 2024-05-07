@@ -16,15 +16,15 @@ function PredictionControls(props) {
 
   const handleYearChange = (e) => {
     setYear(e.target.value);
-    if (props.onYearChanged) {
-      props.onYearChanged(e.target.value);
+    if (props.onPredictionUpdated) {
+      props.onPredictionUpdated(e.target.value, co2);
     }
   }
 
   function handleCO2Change (emission_type) {
     setEmission(emission_type);
-    if(props.onEmissionChanged) {
-      props.onEmissionChanged(emission_type);
+    if(props.onPredictionUpdated) {
+      props.onPredictionUpdated(year, emission_type);
     }
   }
 
@@ -44,7 +44,7 @@ function PredictionControls(props) {
       <ul>
         {CO2_Futures.map((emission_type) => (
             <button
-              disabled = {co2 == emission_type}
+              disabled = {co2 === emission_type}
               onClick={()=>handleCO2Change(emission_type)}>
               {emission_type}
             </button>
