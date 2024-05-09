@@ -1,90 +1,56 @@
-import json
 import os
 import rasterio
+import json
 from pathlib import Path
-import numpy as np
 
+print("Current Working Directory:", os.getcwd())
 
-current_dir = Path(__file__).resolve().parent
-os.chdir(current_dir)
-
-tif_files_dir = current_dir / 'tif_files'
-json_data_dir = current_dir / 'json_data'
+# Define the directory where the tif files are located (adjust the path as necessary)
+tif_files_dir = Path('./tif_files/')  # Potentially adjust this path
+json_data_dir = Path('./json_data/')  # Directory to save the JSON files
 
 # Create the directory to save JSON files if it doesn't exist
 json_data_dir.mkdir(parents=True, exist_ok=True)
-variable_dirs = os.listdir(tif_files_dir)
 
-for variable_dir in variable_dirs:
-    # Define the path to the variable directory
-    variable_path = tif_files_dir / variable_dir
-    
-    # If the variable directory is bio_10 or bio_2.5, skip processing here
-    if variable_dir.startswith('bio'):
-        continue
-    
-   
-    tif_files = [f for f in variable_path.glob('*.tif')]
-    time_series_data_list = []
-    
-    for tif_file in tif_files:
-        with rasterio.open(tif_file) as src:
-            # Read the data as a numpy array
-            data = src.read(1)
+# Verify the existence of the tif_files directory
+if not tif_files_dir.exists():
+    print(f"Directory not found: {tif_files_dir}")
+else:
+    # Loop over each subdirectory in the tif_files directory
+    for variable_dir in os.listdir(tif_files_dir):
+        variable_path = tif_files_dir / variable_dir
+        if variable_path.is_dir():
+            # List all .tif files in the directory
+            tif_files = sorted([f for f in variable_path.glob('*.tif')])
             
-            # Flatten the data array
-            flattened_data = data.flatten()
+            # Initialize an empty list to hold the data
+            time_series_data_list = []
             
-            # Remove NaN values from the flattened array
-            flattened_data = flattened_data[~np.isnan(flattened_data)]
-            
-            # Calculate the mean value
-            mean_value = np.mean(flattened_data, dtype=np.float64).item()  # Convert to Python float            
-            
-            # Extract the month from the file name
-            month = int(tif_file.stem.split('_')[-1])
-            
-            # Append the mean value and month to the time series data list
-            time_series_data_list.append({'Month': month, 'Mean_Value': mean_value})
-    
-    json_file_path = json_data_dir / f'{variable_dir}.json'
-    
-    with json_file_path.open('w') as json_file:
-        json.dump(time_series_data_list, json_file)
+            # Loop over each .tif file
+            for tif_file in tif_files:
+                month = int(tif_file.stem.split('_')[-1])  # Assuming filename format includes month at the end
+                
+                # Open the .tif file
+                with rasterio.open(tif_file) as src:
+                    # Read the data for the entire .tif file
+                    data = src.read(1)
+                    
+                    # Flatten the array and filter out invalid values
+                    valid_data = data.flatten()
+                    valid_data = valid_data[~src.dataset_mask().flatten() == 0]  # Mask out the nodata cells
+                    valid_data = valid_data[valid_data < 1e30]  # Filter out extreme values
+                    
+                    # Calculate the mean and convert it to a Python float if not NaN
+                    if valid_data.size > 0:
+                        mean_value = float(valid_data.mean())
+                    else:
+                        mean_value = float('nan')
 
-# Process bio variables separately
-# Define the different formats for bio variables
-bio_formats = ['bio_2.5']
+                    # Append the data to the list
+                    time_series_data_list.append({'Month': month, 'Mean_Value': mean_value})
 
-
-for bio_format in bio_formats:
-    bio_dir = tif_files_dir / bio_format
-    tif_files = list(bio_dir.glob('*.tif'))
-    time_series_data_list = []
-    
-    # Loop over each TIF file
-    for tif_file in tif_files:
-        with rasterio.open(tif_file) as src:
-            # Read the data as a numpy array
-            data = src.read(1)
             
-            # Flatten the data array
-            flattened_data = data.flatten()
-            
-            # Remove NaN values from the flattened array
-            flattened_data = flattened_data[~np.isnan(flattened_data)]
-            
-            # Calculate the mean value
-            mean_value = np.mean(flattened_data, dtype=np.float64).item()  # Convert to Python float            
-            
-            # Extract the variable number from the file name
-            variable_number = int(tif_file.stem.split('_')[-1])
-            
-            # Append the mean value and variable number to the time series data list
-            time_series_data_list.append({'Variable': variable_number, 'Mean_Value': mean_value})
-    
-
-    json_file_path = json_data_dir / f'{bio_format}.json'
-    
-    with json_file_path.open('w') as json_file:
-        json.dump(time_series_data_list, json_file)
+            # Save the collected data to a JSON file
+            json_file_path = json_data_dir / f'{variable_dir}.json'
+            with json_file_path.open('w') as json_file:
+                json.dump(time_series_data_list, json_file)
