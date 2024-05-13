@@ -2,24 +2,38 @@ library(sf)
 library(raster)
 library(dismo)
 library(geodata)
+library(ncdf4)
 
-e <- extent(-179, -35, -55, 85) # set study area extent to Americas
+e <- extent(-179, -50, 7, 65) # set study area extent to Americas
 
 ssp_list <- list ("ssp126", "ssp245", "ssp370", "ssp585")
-year_list <- list("2021-2040", "2041-2060", "2061-2080")
+year_list <- as.list(seq(2015,2100)) 
+feature_list <- list ("tas", "pr")
 
 for (s in ssp_list) {
   for (y in year_list) {
-    # grab climate data using geodata
-    filename <- paste('data/future/wc2.1_2.5m_bioc_MIROC6_', s, "_", y, '.tif', sep='')
-    bioclim.data <- stack(filename)
-    options(scipen=999) # avoid scientific notation
-    bioclim.data <- crop(bioclim.data, e*1.25)  # crop to bg point extent
-
-    # write rasters to /data folder
-    for (i in c(1:19)){
-      writeRaster(bioclim.data[[i]],
-                  paste('data/future/', y, '/', s, '/bclim', i, '.asc', sep = ''),
+    for (f in feature_list) {
+      # grab climate data using geodata
+      filename <- paste('data/MIROC6/.netcd4/', s, '/r1i1p1f1/', f, 
+                        '/', f, '_day_MIROC6_', s, '_r1i1p1f1_gn_', as.character(y), '.nc', sep='')
+      bioclim.data <- raster(filename)
+      bioclim.data <- rotate(bioclim.data, left=TRUE) # convert (0, 360) to (-180, 180)
+      options(scipen=999) # avoid scientific notation
+      bioclim.data <- crop(bioclim.data, e*1.25)  # crop to bg point extent
+  
+      # write rasters to /data folder
+      if (f == "pr") {
+        file_save = "precipitation.asc"
+      } else {
+        file_save = "temperature.asc"
+      }
+      
+      cidr <- getwd()
+      subdr <- paste('data/MIROC6/', s, '/', y, sep='')
+      dir.create(file.path(cidr, subdr), recursive = TRUE)
+      
+      writeRaster(bioclim.data,
+                  paste(subdr, '/', file_save, sep = ''),
                   overwrite = TRUE)
     }
   }
