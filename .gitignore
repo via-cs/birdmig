@@ -34,4 +34,4 @@ yarn-error.log*
 
 # Too big a file
 model/data/geojson/Haliaeetus_leucocephalus.geojson
-model/outputs/Anser_albifrons-future/*
+model/outputs/models/Anser_albifrons_et_classifier_model.pkl
