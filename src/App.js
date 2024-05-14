@@ -24,7 +24,7 @@ function App() {
     "Bald Eagle": "eagle",
     "White Fronted Goose": "anser",
     "Long Billed Curlew": "curlew",
-    Whimbrel: "whimbrel",
+    "Whimbrel": "whimbrel",
   };
 
   const climateVariables = {
