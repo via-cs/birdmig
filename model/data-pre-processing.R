@@ -2,6 +2,7 @@ library(sf)
 library(raster)
 library(dismo)
 library(geodata)
+library(ncdf4)
 
 # Parameters
 species_list <- list("Anser_albifrons",
@@ -10,18 +11,17 @@ species_list <- list("Anser_albifrons",
                      "Numenius_phaeopus",
                      "Setophaga_striata")
 export_filetype <- "geojson"
-e <- extent(-179, -35, -55, 85) # set study area extent to Americas
+e <- extent(-179, -50, 7, 65) # set study area extent to Americas
 
 # Grab Climate Data
-bioclim.data <- worldclim_global(var = "bio",
-                                 path = "data/",
-                                 res = 2.5,
-                                 version = "2.1")
-bioclim.data <- stack(bioclim.data)
+bioclim.data <- stack(raster("data/MIROC6/raw/historical/temperature_2014.nc"),
+                      raster("data/MIROC6/raw/historical/precipitation_2014.nc"))
+bioclim.data <- rotate(bioclim.data, left=TRUE) # convert (0, 360) to (-180, 180)
 bioclim.data <- crop(bioclim.data, e*1.25)  # crop to bg point extent
 
 # pipe GBIF data
 for (s in species_list) {
+  s = "Anser_albifrons"
   jt_raw <- read.csv(paste('data/GBIF_', s, '.csv', sep = ""),
                      header = TRUE, sep = '\t')
   jt <- data.frame(matrix(ncol = 2, nrow = length(jt_raw$decimalLongitude)))
@@ -36,11 +36,11 @@ for (s in species_list) {
   jt <- jt[which(jt$lat>=e[3] & jt$lat<=e[4]),] # remove presences beyond extent
   
   # Trim jt
-  #jt_trim <- jt[sample(nrow(jt), 50000), ]
+  #jt_trim <- jt[sample(nrow(jt), length(bioclim.data[[1]])), ]
   length_presences <- nrow(jt)
   
   # sample background points from a slightly wider extent
-  bg <- randomPoints(bioclim.data[[1]], length_presences*2, ext=e, extf = 1.25)
+  bg <- randomPoints(bioclim.data[[1]], length_presences, ext=e, extf = 1.25)
   colnames(bg) <- c('lon','lat')
   train <- rbind(jt, bg)  # combine with presences
   pa_train <- c(rep(1, length_presences), rep(0, nrow(bg))) # col of ones and zeros
@@ -63,15 +63,16 @@ for (s in species_list) {
 ## ------------------------------------------------------------------------
 
 # plot our points
-plot(bioclim.data[[1]], main='Bioclim 1')
+plot(bioclim.data[[1]], main='Precipitation')
 points(bg, col='red', pch = 16,cex=.3)
 points(jt, col='black', pch = 16,cex=.3)
 plot(wrld_simpl, add=TRUE, border='dark grey')
 
-# write bioclimate variables
-for (i in c(1:19)){
-  writeRaster(bioclim.data[[i]], 
-              paste('data/bioclim/bclim', i, '.asc', sep = ''),
-              overwrite = TRUE)
-}
 
+writeRaster(bioclim.data[[1]], 
+            paste('data/MIROC6/historical/temperature.asc', sep = ''),
+            overwrite = TRUE)
+
+writeRaster(bioclim.data[[2]], 
+            paste('data/MIROC6/historical/precipitation.asc', sep = ''),
+            overwrite = TRUE)
