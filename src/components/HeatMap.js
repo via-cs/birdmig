@@ -6,29 +6,32 @@ import "leaflet.heat/dist/leaflet-heat.js";
 
 function Heatmap({ data }) {
   const mapRef = useRef(null);
-  const birdName = "warbler";
+  const birdName = data;
+  console.log(birdName);
   const [heatmapData, setHeatmapData] = useState([]);
 
-  useEffect(() => {
-    const getHeatmapData = async () => {
-      const baseUrl = "http://localhost:5000";
-      try {
-        const response = await axios.get(
-          `${baseUrl}/get_heatmap_data?bird=${birdName}`
-        );
+  const getHeatmapData = () => {
+    const baseUrl = "http://localhost:5000";
+    axios
+      .get(`${baseUrl}/get_heatmap_data?bird=${birdName}`)
+      .then((response) => {
         setHeatmapData(response.data);
-      } catch (error) {
+      })
+      .catch((error) => {
         console.error("Error fetching heatmap data:", error);
-      }
-    };
+        setHeatmapData([]);
+      });
+  };
+
+  useEffect(() => {
     getHeatmapData();
   }, [birdName]);
 
   useEffect(() => {
-    if (!heatmapData || heatmapData.length === 0) return;
-
+    if (!heatmapData || !Array.isArray(heatmapData)) return;
+    if (!mapRef.current) return;
     // Initialize Leaflet map
-    const map = L.map(mapRef.current).setView([42, -120], 6);
+    const map = L.map(mapRef.current).setView([40, -100], 2);
 
     // Add tile layer
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -43,10 +46,10 @@ function Heatmap({ data }) {
     ]);
 
     const customGradient = {
-      0.2: "purple",
-      0.4: "blue",
-      0.6: "lime",
-      0.8: "yellow",
+      0.1: "purple",
+      0.3: "blue",
+      0.5: "lime",
+      0.7: "yellow",
       0.9: "red",
     };
 
@@ -63,11 +66,8 @@ function Heatmap({ data }) {
   }, [heatmapData]);
 
   return (
-    <div style={{ position: "relative" }}>
-      <div
-        ref={mapRef}
-        style={{ position: "relative", width: "800px", height: "600px" }}
-      ></div>
+    <div>
+      <div ref={mapRef} className="Map"></div>
     </div>
   );
 }

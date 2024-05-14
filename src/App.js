@@ -9,6 +9,7 @@ import Heatmap from "./components/HeatMap";
 import GeneralMigrationMap from "./components/GeneralMigrationMap";
 import PredictionControls from "./components/PredictionControls";
 import ClimateChart from "./components/ClimateChart";
+import { image } from "d3";
 
 function App() {
   const [cookies, setCookie] = useCookies(["user"]);
@@ -33,6 +34,12 @@ function App() {
     tavg: "tavg.json",
   };
 
+  const images = require.context("./images", true);
+  const imageList = images.keys().map((image) => images(image));
+  const orderedImageList = Object.keys(birdMap).map((bird) => {
+    const index = Object.keys(birdMap).indexOf(bird);
+    return imageList.find((image) => image.includes(`/${bird}.`));
+  });
   // Define updatePredictionVars
   function updatePredictionVars(year, emissionRate) {
     setObservedYear(year);
@@ -57,7 +64,10 @@ function App() {
   const [selectedEmissions, setEmissionRate] = useState("SSP 245");
   const [climateData, setClimateData] = useState(null);
   const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
-  const [showPolylineMap, setShowPolylineMap] = useState(true);
+  /* const [showPolylineMap, setShowPolylineMap] = useState(true);
+  const [showHeatMap, setShowHeatMap] = useState(false);
+  const [showSDM, setShowSDM] = useState(false);*/
+  const [selectedMap, setSelectedMap] = useState("Polyline");
   const [predictionData, setPredictionData] = useState(null);
 
   axios.create({ withCredentials: true });
@@ -69,7 +79,6 @@ function App() {
 
   function selectBird(birdName) {
     setSelectedBird(birdName);
-    console.log(selectedBird);
     fetchBirdInfo(birdName);
     fetchSDMData(birdName);
   }
@@ -159,11 +168,22 @@ function App() {
   return (
     <div className="App">
       <CookiesProvider>
+        <div className="header">
+          <h1> {selectedBird} </h1>
+        </div>
+        
         <nav className="sidebar">
           <ul>
-            {Object.keys(birdMap).map((bird) => (
+            {Object.keys(birdMap).map((bird, index) => (
               <li key={bird} onClick={() => selectBird(bird)}>
                 {bird}
+                {orderedImageList[index] && (
+                  <img
+                    className="image"
+                    src={orderedImageList[index]}
+                    alt={`${index}`}
+                  />
+                )}
               </li>
             ))}
           </ul>
@@ -187,14 +207,28 @@ function App() {
             </div>
           )}
           <div className="MigrationMap">
-            <button onClick={() => setShowPolylineMap(!showPolylineMap)}>
-              {showPolylineMap ? "Show General Map" : "Show Polyline Map"}
-            </button>
-            {showPolylineMap ? (
-              <PolylineMap data={birdMap[selectedBird]} />
-            ) : (
-              <GeneralMigrationMap selectedBird={birdMap[selectedBird]} />
-            )}
+            <div className="tabs">
+              <button
+                className="tab"
+                onClick={() => setSelectedMap("Polyline")}
+              >
+                Show Single Bird Trajectory
+              </button>
+              <button className="tab" onClick={() => setSelectedMap("Heatmap")}>
+                Show General Bird Trajectory
+              </button>
+              <button className="tab" onClick={() => setSelectedMap("SDM")}>
+                Show Species Distribution Map
+              </button>
+            </div>
+            <div>
+              {selectedMap === "Polyline" && (
+                <PolylineMap selectedBird={birdMap[selectedBird]} />
+              )}
+              {selectedMap === "Heatmap" && (
+                <Heatmap data={birdMap[selectedBird]} />
+              )}
+            </div>
           </div>
           {sdmData && (
             <div className="SDMChart">

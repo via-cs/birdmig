@@ -176,11 +176,10 @@ def simplify_line(coordinates, tolerance=0.1):
     return list(zip(*simplified_line.xy))
 
 @api.route('/get_heatmap_data')
-@cross_origin()
-def get_kde_data():
+@cross_origin(supports_credentials=True)
+def get_heatmap_data():
     selected_bird = request.args.get('bird')
     filename = f'./data/{selected_bird}.csv'
-    
     try:
         df = pd.read_csv(filename, low_memory=False)
         heatmap_data = df[['LATITUDE', 'LONGITUDE']].values.tolist()

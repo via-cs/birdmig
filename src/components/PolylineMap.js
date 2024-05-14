@@ -3,7 +3,6 @@ import axios from "axios";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-polylinedecorator";
-import * as d3 from "d3";
 
 function calculateBearing(startPoint, endPoint) {
   const startLat = startPoint.lat * (Math.PI / 180);
@@ -22,10 +21,10 @@ function calculateBearing(startPoint, endPoint) {
   return bearing;
 }
 
-function PolylineMap({ data }) {
+function PolylineMap({ selectedBird }) {
   const mapRef = useRef(null);
 
-  const birdName = "whimbrel";
+  const birdName = selectedBird;
   const [trajectoryData, setTrajectoryData] = useState({});
   const [selectedBirdIDs, setSelectedBirdIDs] = useState([]);
   const [allBirdIDs, setAllBirdIDs] = useState([]);
@@ -81,10 +80,11 @@ function PolylineMap({ data }) {
   }, [selectedBirdIDs, birdName]);
 
   useEffect(() => {
-    if (!trajectoryData || Object.keys(trajectoryData).length === 0) return;
+    if (!trajectoryData || !Array.isArray(trajectoryData)) return;
+    if (!mapRef.current) return;
 
     // Initialize Leaflet map centered over North America
-    var map = L.map(mapRef.current).setView([37.8, -96.9], 4); // Centered over North America
+    var map = L.map(mapRef.current).setView([40, -100], 2); // Centered over North America
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -157,12 +157,8 @@ function PolylineMap({ data }) {
   }, [trajectoryData]);
 
   return (
-    <div style={{ position: "relative" }}>
-      <div
-        ref={mapRef}
-        style={{ position: "relative", width: "800px", height: "600px" }}
-      >
-        <span>This is a span element</span>
+    <div>
+      <div ref={mapRef} className="Map">
         <div style={{ position: "absolute", top: 0, right: 0, zIndex: 999 }}>
           <select onChange={handleDropdownChange} value={selectedBirdIDs[0]}>
             <option value="">Select {birdName} ID</option>
