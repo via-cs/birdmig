@@ -147,25 +147,6 @@ function App() {
     setSelectedClimateVariable(variable);
   }
 
-  function fetchPredictionData() {
-    axios
-      .post(
-        `${backendUrl}/prediction_input`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then((response) => {
-        setPredictionData(response.data.prediction);
-      })
-      .catch((error) => {
-        console.error("Error fetching prediction data", error);
-      });
-  }
-
 	useEffect(() => {
         const socket = io(backendUrl, {
             transports: ["websocket"],
