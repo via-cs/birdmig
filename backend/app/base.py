@@ -198,6 +198,18 @@ def simplify_line(coordinates, tolerance=0.1):
     simplified_line = line.simplify(tolerance, preserve_topology=False)
     return list(zip(*simplified_line.xy))
 
+@api.route('/get_heatmap_data')
+@cross_origin(supports_credentials=True)
+def get_heatmap_data():
+    selected_bird = request.args.get('bird')
+    filename = f'./data/{selected_bird}.csv'
+    try:
+        df = pd.read_csv(filename, low_memory=False)
+        heatmap_data = df[['LATITUDE', 'LONGITUDE']].values.tolist()
+        return jsonify(heatmap_data)
+    except Exception as e:
+        return jsonify(error=str(e)), 400    
+    
 if __name__ == '__main__':
     api.run(debug=True)
     socket_io.run(api, debug=True, port=5000)

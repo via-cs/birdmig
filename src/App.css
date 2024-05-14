@@ -1,210 +1,250 @@
 /* Global Styles */
 .App {
-    display: flex;
-    min-height: 100vh; /* Full viewport height */
-    font-family: 'Roboto', sans-serif;
+  display: flex;
+  min-height: 100vh; /* Full viewport height */
+  font-family: "Roboto", sans-serif;
 }
 
 /* Main Content Styling */
 .main-content {
-    flex-grow: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns */
-    grid-template-rows: 1fr 1fr; /* Two rows */
-    gap: 20px; /* Space between grid items */
-    padding: 20px 40px; /* Add side margins */
-    background-color: #ecf0f1;
-    overflow-y: auto; /* Enable scroll if content overflows */
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns */
+  grid-template-rows: 1fr 1fr; /* Two rows */
+  gap: 20px; /* Space between grid items */
+  padding: 20px 20px; /* Add side margins */
+  margin-top: 60px;
+  background-color: #ecf0f1;
+  overflow-y: auto; /* Enable scroll if content overflows */
 }
 
+/*Header Styles */
+.header {
+  background-color: #2c3e50;
+  color: white;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  padding: 10px 15px;
+  z-index: 1000;
+  font-size: 2vmin;
+  transition: margin-top 0.5s;
+}
 /* Sidebar Styles */
 .sidebar {
-    flex: 0 0 200px; /* Sidebar width */
-    background-color: #2c3e50; /* Sidebar background color */
-    color: white;
-    padding: 20px;
-    margin: 20px 0; /* Add side margins */
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Minimum height of the viewport */
-    overflow-y: auto; /* Allow scrolling within the sidebar if content overflows */
+  flex: 0 0 200px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Minimum height of the viewport */
+  overflow-y: auto; /* Allow scrolling within the sidebar if content overflows */
+  margin-top: 60px;
 }
 
 .sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    background-color: #2c3e50;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #2c3e50;
+  flex-grow: 0.75;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar li {
-    padding: 10px;
-    cursor: pointer;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    background-color: #2c3e50;
-    flex: 1; /* Distribute space evenly amongst the links */
-    display: flex;
-    align-items: center; /* Center link text vertically */
-    justify-content: center; /* Center link text horizontally */
+  padding: 10px;
+  cursor: pointer;
+  background-color: #2c3e50;
+  flex: 1; /* Distribute space evenly amongst the links */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center link text vertically */
+  justify-content: center; /* Center link text horizontally */
 }
 
 .sidebar li:hover {
-    background-color: #34495e;
+  background-color: #34495e;
 }
-
+.image {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  padding-top: 10px;
+  object-fit: cover;
+}
 /* Component Styles */
 .BirdInfo,
 .SDMChart,
 .MigrationMap,
 .EnvironmentalControls,
 .ClimateDataContainer {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px; /* Margin bottom added */
-    width: 90%; /* Make all containers take up full width */
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 60px;
+  margin-bottom: 20px; /* Margin bottom added */
+  width: 90%; /* Make all containers take up full width */
 }
-
 .ClimateChart {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px; /* Margin bottom added */
-    width: auto;
-    align-items: center;
-    display: flex;
-    flex-direction: column;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* Margin bottom added */
+  width: auto;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .ClimateDataContainer {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px; /* Margin bottom added */
-    width: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  background-color: white;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* Margin bottom added */
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
+.MigrationMap {
+  width: auto;
+  padding: 20px;
+}
+.Map {
+  border-radius: 8px;
+  margin: 10px;
+  width: 100%;
+  height: 550px;
+  z-index: 0;
+}
 /* Prediction Controls Styles */
 .PredictionControls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .PredictionControls .slider {
-    width: auto;
-    margin: 10px 0; /* Add some vertical spacing */
+  width: auto;
+  margin: 10px 0; /* Add some vertical spacing */
 }
 
 .PredictionControls button {
-    padding: 8px 16px;
-    border: none;
-    background-color: #3498db;
-    color: white;
-    border-radius: 20px; /* Rounded corners */
-    margin-top: 10px;
-    cursor: pointer;
-    outline: none;
+  padding: 8px 16px;
+  border: none;
+  background-color: #3498db;
+  color: white;
+  border-radius: 20px; /* Rounded corners */
+  margin-top: 10px;
+  cursor: pointer;
+  outline: none;
 }
 
 .PredictionControls button:hover {
-    background-color: #2980b9;
+  background-color: #2980b9;
+}
+
+.SDMChart {
+  margin-top: 20px;
 }
 
 /* Tabs styling */
 .tabs {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .tab {
-    padding: 8px 16px;
-    border: none;
-    background-color: #3498db;
-    color: white;
-    border-radius: 20px; /* Rounded corners */
-    cursor: pointer;
-    outline: none;
+  padding: 8px 16px;
+  border: none;
+  background-color: #3498db;
+  color: white;
+  border-radius: 20px; /* Rounded corners */
+  cursor: pointer;
+  outline: none;
 }
 
 .tab:hover {
-    background-color: #2980b9;
+  background-color: #2980b9;
 }
 
 .tab.active {
-    background-color: #2c3e50; /* Darker shade for active tab */
+  background-color: #2c3e50; /* Darker shade for active tab */
 }
 
 .ClimateData {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px; /* Margin bottom added */
-    width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* Margin bottom added */
+  width: auto;
 }
 
 .ClimateChart {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .ClimateChart svg {
-    width: 100%;
-    height: 100%;
-}
+  width: 100%;
+  height: 100%;
+} /* Optional: add background color for better visibility */
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .main-content {
-        grid-template-columns: 1fr; /* Single column layout on small screens */
-        grid-template-rows: auto auto auto auto; /* Adjust rows for stacking */
-        padding: 20px; /* Reset padding for single column layout */
-    }
+  .header {
+    margin-top: 50px;
+  }
+  .main-content {
+    grid-template-columns: 1fr; /* Single column layout on small screens */
+    grid-template-rows: auto auto auto auto; /* Adjust rows for stacking */
+    padding: 20px; /* Reset padding for single column layout */
+  }
 
-    .sidebar {
-        flex: 0 0 150px; /* Smaller width for smaller screens */
-        margin: 20px 0; /* Add side margins */
-    }
+  .sidebar {
+    flex: 0 0 150px; /* Smaller width for smaller screens */
+    padding: 15px;
+  }
 
-    .BirdInfo,
-    .EnvironmentalControls,
-    .MigrationMap,
-    .SDMChart {
-        grid-column: 1;
-    }
+  .BirdInfo,
+  .EnvironmentalControls,
+  .MigrationMap,
+  .SDMChart {
+    grid-column: 1;
+  }
 
-    .BirdInfo {
-        grid-row: 1;
-    }
+  .BirdInfo {
+    grid-row: 1;
+  }
 
-    .MigrationMap {
-        grid-row: 3;
-    }
+  .MigrationMap {
+    grid-row: 3;
+  }
 
-    .SDMChart {
-        grid-row: 2;
-    }
+  .SDMChart {
+    grid-row: 2;
+  }
 }
 
 @media (max-width: 500px) {
-    .sidebar {
-        flex: 0 0 120px; /* Even smaller width or full-width if needed */
-    }
+  .header {
+    margin-top: 40px;
+  }
+  .sidebar {
+    flex: 0 0 120px; /* Even smaller width or full-width if needed */
+  }
 }
