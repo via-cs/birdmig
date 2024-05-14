@@ -43,7 +43,7 @@ function App() {
 
 		axios
 			.post(`${backendUrl}/prediction_input`, {
-                    bird: selectedBird,
+                    bird: birdMap[selectedBird],
                     year: year,
                     emissions: emissionRate })
 			.then((response) => {

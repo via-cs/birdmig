@@ -82,8 +82,16 @@ def send_predictions():
     
     print(f"=== Info ===\nBird: {session['bird']}\nYear: {session['year']}\nEmissions: {session['emissions']}", file = sys.stderr)
     
+    birdsModelDirs = {
+        "warbler": "Setophaga_striata",
+        "eagle": "Haliaeetus_leucocephalus",
+        "anser": "Anser_albifrons",
+        "curlew": "Numenius_americanus",
+        "whimbrel": "Numenius_phaeopus"
+    }
+    
     # For image data:
-    output_path = f"../model/outputs/png-images/Anser_albifrons/{session['emissions']}/{session['year']}.png"
+    output_path = f"../model/outputs/png-images/{birdsModelDirs[session['bird']]}/{session['emissions']}/{session['year']}.png"
     dataImg = Image.open(output_path)
     buffer = BytesIO()
     dataImg.save(buffer, format="png")
