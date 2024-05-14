@@ -4,7 +4,6 @@ import geopandas as gpd
 import glob
 from pyimpute import load_training_vector
 from pyimpute import load_targets
-from pyimpute import impute
 from sklearn import model_selection
 from sklearn.ensemble import ExtraTreesClassifier
 import numpy as np
