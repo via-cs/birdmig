@@ -20,13 +20,6 @@ api = Flask(__name__)
 api.config.from_object(AppConfig)
 api.secret_key = AppConfig.SECRET_KEY
 
-script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-model_path = "models/extra_trees_classifier_model.pkl"
-abs_model_path = os.path.join(script_dir, model_path)
-
-with open(abs_model_path, 'rb') as f:
-    model = pickle.load(f)
-
 # Set up CORS with specific origins and allow credentials
 CORS(api, supports_credentials=True, origins=["http://localhost:3000"])
 app_session = Session(api)
