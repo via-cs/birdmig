@@ -43,10 +43,11 @@ function App() {
     const index = Object.keys(birdMap).indexOf(bird);
     return imageList.find((image) => image.includes(`/${bird}.`));
   });
+
   // Define updatePredictionVars
   function updatePredictionVars(year, emissionRate) {
-    setObservedYear(year);
-    setEmissionRate(emissionRate);
+    //setObservedYear(year);
+    //setEmissionRate(emissionRate);
 
 		axios
 			.post(`${backendUrl}/prediction_input`, {
@@ -68,7 +69,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedYear, setObservedYear] = useState(2021);
-  const [selectedEmissions, setEmissionRate] = useState("SSP 245");
+  const [selectedEmissions, setEmissionRate] = useState("ssp245");
   const [climateData, setClimateData] = useState(null);
   const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
   /* const [showPolylineMap, setShowPolylineMap] = useState(true);
@@ -193,11 +194,8 @@ function App() {
               <BirdInfo data={birdInfo} />
               <div className="PredictionControls">
                 <PredictionControls
-                  onYearChanged={(value) => {
-                    updatePredictionVars(value, selectedEmissions);
-                  }}
-                  onEmissionChanged={(value) => {
-                    updatePredictionVars(selectedYear, value);
+                  onPredictionUpdated = {(year, emissions) => {
+                    updatePredictionVars(year, emissions)
                   }}
                 />
               </div>
