@@ -29,8 +29,9 @@ yarn-error.log*
 !/model/data/geojson
 /model/inputs/
 /model/.R*
-/backend/flask_session
 .vscode
+/model/outputs/tiff-images
+/backend/flask_session
 
 # Too big a file
 model/data/geojson/Haliaeetus_leucocephalus.geojson
