@@ -38,7 +38,7 @@ for species in tqdm(species_list):
     # Load target vectors
     target_xs, raster_info = load_targets(raster_features)
 
-    # Create random forest models
+    # Create extra trees models
     model = ExtraTreesClassifier()
 
     k = 5

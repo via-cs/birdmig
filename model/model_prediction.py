@@ -8,7 +8,7 @@ import rasterio
 from matplotlib.pylab import plt
 
 species_list = ['Anser_albifrons', 'Haliaeetus_leucocephalus', 'Numenius_americanus', 'Numenius_phaeopus', 'Setophaga_striata']
-year_list = list(range(2015, 2100))
+year_list = list(range(2015, 2101))
 ssp_list = ["ssp126", "ssp245", "ssp370", "ssp585"]
 
 for species in tqdm(species_list, desc="Species"):
