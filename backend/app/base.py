@@ -1,18 +1,28 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session, send_from_directory
 from flask_cors import CORS, cross_origin
+from flask_session import Session
+from .config import AppConfig
 import pandas as pd
 import numpy as np
 import math
+import pickle
 from shapely.geometry import LineString
 
 api = Flask(__name__)
-cors = CORS(api)
 api.config['CORS_HEADERS'] = 'Content-Type'
+api.config.from_object(AppConfig)
+api.secret_key = AppConfig.SECRET_KEY
 
-# Example bird data dictionary
+with open('./models/svm_classifier_model.pkl', 'rb') as f:
+    model = pickle.load(f)
+
+# Set up CORS with specific origins and allow credentials
+CORS(api, supports_credentials=True, origins=["http://localhost:3000"])
+app_session = Session(api)
+
 DEMO_bird_data = {
-    "Bird 1": {
-        "info": "Generic info for unique bird 1",
+    "Blackpoll Warbler": {
+        "info": "Migration details about Blackpoll Warbler",
         "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
         "timeSeriesData": {
             "precipitation": [300, 400, 500],
@@ -20,27 +30,70 @@ DEMO_bird_data = {
             "temperature": [60, 70, 80],
         },
     },
-    "Bird 2": {
-        "info": "Generic info for different bird 2",
+    "Bald Eagle": {
+        "info": "Migration details about Bald Eagle",
         "sdmData": [{"x": 1, "y": 100}, {"x": 2, "y": 200}, {"x": 3, "y": 500}],
-        "timeSeriesData": {
-            "precipitation": [300, 400, 500],
-            "climate": [30, 40, 50],
-            "temperature": [60, 70, 80],
-        }
-    }
+    },
+    "White Fronted Goose": {
+        "info": "Migration details about White Fronted Goose",
+        "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
+    },
+    "Long Billed Curlew": {
+        "info": "Migration details about Long Billed Curlew",
+        "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
+    },
+    "Whimbrel": {
+        "info": "Migration details about Whimbrel",
+        "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
+    },
 }
 
 @api.route('/bird-data/<bird_name>')
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def get_bird_data(bird_name):
     if bird_name in DEMO_bird_data:
         return jsonify(DEMO_bird_data[bird_name])
+    
+@api.route('/prediction_input', methods=['POST'])
+def send_climate_vars():
+    sent_details = request.get_json()
+    session['year'] = sent_details['year']
+    session['emissions'] = sent_details['emissions']
+    return "Received predictor variables successfully"
+
+@api.route('/prediction_input', methods=['POST'])
+def predict():
+    prediction_input = request.get_json()
+
+    prediction_df = pd.DataFrame([prediction_input])
+    
+    prediction_result = model.predict(prediction_df)
+    
+    return jsonify({'prediction': prediction_result.tolist()})
+
+
+@api.route('/bird-info/<bird_name>')
+def get_bird_info(bird_name):
+    bird = DEMO_bird_data.get(bird_name)
+    if bird:
+        return jsonify({'name': bird_name, 'info': bird['info']})
     else:
         return jsonify({"error": "Invalid bird"}), 404
 
+@api.route('/bird-sdm-data/<bird_name>')
+def get_bird_sdm_data(bird_name):
+    bird = DEMO_bird_data.get(bird_name)
+    if bird:
+        return jsonify({'name': bird_name, 'sdmData': bird['sdmData']})
+    else:
+        return jsonify({'error': 'Bird not found'}), 404
+    
+@api.route('/json/<filename>')
+def send_json(filename):
+    return send_from_directory('climate_data/json_data', filename)
+
 @api.route('/get_trajectory_data')
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def get_trajectory_data():
     selected_bird = request.args.get('bird')
     bird_id = request.args.get('birdID')
@@ -58,8 +111,9 @@ def get_trajectory_data():
         return jsonify(trajectory_data)
     except FileNotFoundError:
         return jsonify({'error': f'CSV file for {selected_bird} not found'})
+
 @api.route('/get_bird_ids')
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def get_bird_ids():
     selected_bird = request.args.get('bird')
     filename = f'./data/{selected_bird}.csv'
@@ -72,7 +126,7 @@ def get_bird_ids():
 
 
 @api.route('/get_general_migration')
-@cross_origin()
+@cross_origin(supports_credentials=True)
 def get_general_migration():
     selected_bird = request.args.get('bird')
     filename = f'./data/{selected_bird}.csv'
@@ -122,11 +176,10 @@ def simplify_line(coordinates, tolerance=0.1):
     return list(zip(*simplified_line.xy))
 
 @api.route('/get_heatmap_data')
-@cross_origin()
-def get_kde_data():
+@cross_origin(supports_credentials=True)
+def get_heatmap_data():
     selected_bird = request.args.get('bird')
     filename = f'./data/{selected_bird}.csv'
-    
     try:
         df = pd.read_csv(filename, low_memory=False)
         heatmap_data = df[['LATITUDE', 'LONGITUDE']].values.tolist()
