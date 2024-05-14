@@ -8,10 +8,10 @@ function PredictionControls(props) {
 
   // TODO: perhaps rename these to something more meaningful for a general audience?
   const CO2_Futures = [
-    'SSP 126',
-    'SSP 245',
-    'SSP 370',
-    'SSP 585'
+    'ssp126',
+    'ssp245',
+    'ssp370',
+    'ssp585'
   ]
 
   const handleYearChange = (e) => {

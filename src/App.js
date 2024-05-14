@@ -43,6 +43,7 @@ function App() {
 
 		axios
 			.post(`${backendUrl}/prediction_input`, {
+                    bird: selectedBird,
                     year: year,
                     emissions: emissionRate })
 			.then((response) => {
@@ -191,7 +192,7 @@ function App() {
 							<GeneralMigrationMap selectedBird={birdMap[selectedBird]} />
 						)}
 					</div>
-					<p>Data: {predictionData ? predictionData : "Nothing"}</p>
+                    <img src={predictionData ? `data:image/png;base64, ${predictionData}`: "public\logo192.png"}/>
 					<div className="ClimateDataContainer">
 						<div className="ClimateData">
 							<strong>Climate Data</strong>
