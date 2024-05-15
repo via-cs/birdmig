@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { CookiesProvider, useCookies } from "react-cookie";
+import { io } from "socket.io-client";
+//import WebSocketCall from ""
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import PolylineMap from "./components/PolylineMap";
@@ -12,8 +14,9 @@ import ClimateChart from "./components/ClimateChart";
 import { image } from "d3";
 
 function App() {
-  const [cookies, setCookie] = useCookies(["user"]);
-  const backendUrl = "http://localhost:5000";
+    const [socketInstance, setSocketInstance] = useState("");
+	const [cookies, setCookie] = useCookies(["user"]);
+	const backendUrl = "http://localhost:5000";
 
   // Define birdMap and climateVariables
   const birdMap = {
@@ -21,7 +24,7 @@ function App() {
     "Bald Eagle": "eagle",
     "White Fronted Goose": "anser",
     "Long Billed Curlew": "curlew",
-    Whimbrel: "whimbrel",
+    "Whimbrel": "whimbrel",
   };
 
   const climateVariables = {
@@ -40,20 +43,22 @@ function App() {
     const index = Object.keys(birdMap).indexOf(bird);
     return imageList.find((image) => image.includes(`/${bird}.`));
   });
-  // Define updatePredictionVars
-  function updatePredictionVars(year, emissionRate) {
-    setObservedYear(year);
-    setEmissionRate(emissionRate);
 
-    axios
-      .post(`${backendUrl}/prediction_input`, { year, emissions: emissionRate })
-      .then((response) => {
-        console.log("Prediction variables sent successfully:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error sending prediction variables:", error);
-      });
-  }
+
+  function updatePredictionVars(year, emissionRate, inputBird) {
+		axios
+			.post(`${backendUrl}/prediction_input`, {
+                    bird: birdMap[inputBird],
+                    year: year,
+                    emissions: emissionRate })
+			.then((response) => {
+                console.log(response.data.prediction)
+				//setPredictionData(response.data.prediction);
+			})
+			.catch((error) => {
+				console.error("Error sending prediction variables:", error);
+			});
+	}
 
   const [selectedBird, setSelectedBird] = useState(null);
   const [birdInfo, setBirdInfo] = useState(null);
@@ -61,7 +66,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedYear, setObservedYear] = useState(2021);
-  const [selectedEmissions, setEmissionRate] = useState("SSP 245");
+  const [selectedEmissions, setEmissionRate] = useState("ssp245");
   const [climateData, setClimateData] = useState(null);
   const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
   /* const [showPolylineMap, setShowPolylineMap] = useState(true);
@@ -81,6 +86,7 @@ function App() {
     setSelectedBird(birdName);
     fetchBirdInfo(birdName);
     fetchSDMData(birdName);
+    updatePredictionVars(selectedYear, selectedEmissions, birdName)
   }
 
   function fetchBirdInfo(birdName) {
@@ -140,30 +146,20 @@ function App() {
     setSelectedClimateVariable(variable);
   }
 
-  function fetchPredictionData() {
-    axios
-      .post(
-        `${backendUrl}/prediction_input`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then((response) => {
-        setPredictionData(response.data.prediction);
-      })
-      .catch((error) => {
-        console.error("Error fetching prediction data", error);
-      });
-  }
+	useEffect(() => {
+        const socket = io(backendUrl, {
+            transports: ["websocket"],
+            cors: {
+                origin: "http://localhost:3000"
+            }
+        });
+        
+        setSocketInstance(socket)
+        socket.on("predictions", (data) => {
+            setPredictionData(data.prediction)
+        })
 
-  useEffect(() => {
-    if (selectedBird) {
-      fetchPredictionData();
-    }
-  }, [selectedBird, selectedYear, selectedEmissions]);
+	}, [selectedBird, selectedYear, selectedEmissions]);
 
   return (
     <div className="App">
@@ -196,11 +192,10 @@ function App() {
               <BirdInfo data={birdInfo} />
               <div className="PredictionControls">
                 <PredictionControls
-                  onYearChanged={(value) => {
-                    updatePredictionVars(value, selectedEmissions);
-                  }}
-                  onEmissionChanged={(value) => {
-                    updatePredictionVars(selectedYear, value);
+                  onPredictionUpdated = {(year, emissions) => {
+                    setObservedYear(year)
+                    setEmissionRate(emissions)
+                    updatePredictionVars(year, emissions, selectedBird)
                   }}
                 />
               </div>

@@ -29,6 +29,7 @@ yarn-error.log*
 !/model/data/geojson
 /model/inputs/
 /model/.R*
+.vscode
 /model/outputs/tiff-images
 /backend/flask_session
 

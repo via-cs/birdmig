@@ -8,23 +8,23 @@ function PredictionControls(props) {
 
   // TODO: perhaps rename these to something more meaningful for a general audience?
   const CO2_Futures = [
-    'SSP 126',
-    'SSP 245',
-    'SSP 370',
-    'SSP 585'
+    'ssp126',
+    'ssp245',
+    'ssp370',
+    'ssp585'
   ]
 
   const handleYearChange = (e) => {
     setYear(e.target.value);
-    if (props.onYearChanged) {
-      props.onYearChanged(e.target.value);
+    if (props.onPredictionUpdated) {
+      props.onPredictionUpdated(e.target.value, co2);
     }
   }
 
   function handleCO2Change (emission_type) {
     setEmission(emission_type);
-    if(props.onEmissionChanged) {
-      props.onEmissionChanged(emission_type);
+    if(props.onPredictionUpdated) {
+      props.onPredictionUpdated(year, emission_type);
     }
   }
 
@@ -44,7 +44,7 @@ function PredictionControls(props) {
       <ul>
         {CO2_Futures.map((emission_type) => (
             <button
-              disabled = {co2 == emission_type}
+              disabled = {co2 === emission_type}
               onClick={()=>handleCO2Change(emission_type)}>
               {emission_type}
             </button>

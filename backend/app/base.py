@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, session, send_from_directory
 from flask_cors import CORS, cross_origin
 from flask_session import Session
+from flask_socketio import SocketIO, emit
 from .config import AppConfig
 import pandas as pd
 import numpy as np
@@ -8,17 +9,21 @@ import math
 import pickle
 from shapely.geometry import LineString
 
+from PIL import Image
+from io import BytesIO
+import base64
+# DEBUGGING
+import sys
+import os
+
 api = Flask(__name__)
-api.config['CORS_HEADERS'] = 'Content-Type'
 api.config.from_object(AppConfig)
 api.secret_key = AppConfig.SECRET_KEY
-
-with open('./models/svm_classifier_model.pkl', 'rb') as f:
-    model = pickle.load(f)
 
 # Set up CORS with specific origins and allow credentials
 CORS(api, supports_credentials=True, origins=["http://localhost:3000"])
 app_session = Session(api)
+socket_io = SocketIO(api, cors_allowed_origins = "http://localhost:3000")
 
 DEMO_bird_data = {
     "Blackpoll Warbler": {
@@ -55,22 +60,40 @@ def get_bird_data(bird_name):
         return jsonify(DEMO_bird_data[bird_name])
     
 @api.route('/prediction_input', methods=['POST'])
-def send_climate_vars():
-    sent_details = request.get_json()
-    session['year'] = sent_details['year']
-    session['emissions'] = sent_details['emissions']
-    return "Received predictor variables successfully"
-
-@api.route('/prediction_input', methods=['POST'])
 def predict():
     prediction_input = request.get_json()
-
-    prediction_df = pd.DataFrame([prediction_input])
     
-    prediction_result = model.predict(prediction_df)
+    session['bird'] = prediction_input['bird']
+    session['year'] = prediction_input['year']
+    session['emissions'] = prediction_input['emissions']
+        
+    send_predictions()
     
-    return jsonify({'prediction': prediction_result.tolist()})
+    return "Processing Prediction"
 
+def send_predictions():
+    
+    print(f"=== Info ===\nBird: {session['bird']}\nYear: {session['year']}\nEmissions: {session['emissions']}", file = sys.stderr)
+    
+    birdsModelDirs = {
+        "warbler": "Setophaga_striata",
+        "eagle": "Haliaeetus_leucocephalus",
+        "anser": "Anser_albifrons",
+        "curlew": "Numenius_americanus",
+        "whimbrel": "Numenius_phaeopus"
+    }
+    
+    # For image data:
+    output_path = f"../model/outputs/png-images/{birdsModelDirs[session['bird']]}/{session['emissions']}/{session['year']}.png"
+    dataImg = Image.open(output_path)
+    buffer = BytesIO()
+    dataImg.save(buffer, format="png")
+    
+    #If we'll need to encapsulate a file, use this:
+    socket_io.emit("predictions", {
+            "prediction": base64.b64encode(buffer.getvalue()).decode(),
+            "resFormat": dataImg.format
+    })
 
 @api.route('/bird-info/<bird_name>')
 def get_bird_info(bird_name):
@@ -179,7 +202,7 @@ def simplify_line(coordinates, tolerance=0.1):
 @cross_origin(supports_credentials=True)
 def get_heatmap_data():
     selected_bird = request.args.get('bird')
-    filename = f'./data/{selected_bird}.csv'
+    filename = f'./app/data/{selected_bird}.csv'
     try:
         df = pd.read_csv(filename, low_memory=False)
         heatmap_data = df[['LATITUDE', 'LONGITUDE']].values.tolist()
@@ -189,3 +212,4 @@ def get_heatmap_data():
     
 if __name__ == '__main__':
     api.run(debug=True)
+    socket_io.run(api, debug=True, port=5000)
