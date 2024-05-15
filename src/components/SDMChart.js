@@ -7,7 +7,6 @@ function SDMChart({ data, prediction }) {
         <div>
             {prediction && (
                 <div>
-                    <h3>Prediction:</h3>
                     <img src={prediction ? `data:image/png;base64, ${prediction}`: "public\logo192.png"}/>
                 </div>
             )}
