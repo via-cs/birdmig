@@ -44,14 +44,11 @@ function App() {
     return imageList.find((image) => image.includes(`/${bird}.`));
   });
 
-  // Define updatePredictionVars
-  function updatePredictionVars(year, emissionRate) {
-    //setObservedYear(year);
-    //setEmissionRate(emissionRate);
 
+  function updatePredictionVars(year, emissionRate, inputBird) {
 		axios
 			.post(`${backendUrl}/prediction_input`, {
-                    bird: birdMap[selectedBird],
+                    bird: birdMap[inputBird],
                     year: year,
                     emissions: emissionRate })
 			.then((response) => {
@@ -89,6 +86,7 @@ function App() {
     setSelectedBird(birdName);
     fetchBirdInfo(birdName);
     fetchSDMData(birdName);
+    updatePredictionVars(selectedYear, selectedEmissions, birdName)
   }
 
   function fetchBirdInfo(birdName) {
@@ -195,7 +193,9 @@ function App() {
               <div className="PredictionControls">
                 <PredictionControls
                   onPredictionUpdated = {(year, emissions) => {
-                    updatePredictionVars(year, emissions)
+                    setObservedYear(year)
+                    setEmissionRate(emissions)
+                    updatePredictionVars(year, emissions, selectedBird)
                   }}
                 />
               </div>
