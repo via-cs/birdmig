@@ -202,7 +202,7 @@ def simplify_line(coordinates, tolerance=0.1):
 @cross_origin(supports_credentials=True)
 def get_heatmap_data():
     selected_bird = request.args.get('bird')
-    filename = f'./data/{selected_bird}.csv'
+    filename = f'./app/data/{selected_bird}.csv'
     try:
         df = pd.read_csv(filename, low_memory=False)
         heatmap_data = df[['LATITUDE', 'LONGITUDE']].values.tolist()
