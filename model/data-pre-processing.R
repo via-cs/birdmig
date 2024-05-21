@@ -11,17 +11,16 @@ species_list <- list("Anser_albifrons",
                      "Numenius_phaeopus",
                      "Setophaga_striata")
 export_filetype <- "geojson"
-e <- extent(-179, -50, 7, 65) # set study area extent to Americas
+e <- extent(-179, -35, -55, 85) # set study area extent to Americas
 
 # Grab Climate Data
-bioclim.data <- stack(raster("data/MIROC6/raw/historical/temperature_2014.nc"),
-                      raster("data/MIROC6/raw/historical/precipitation_2014.nc"))
+bioclim.data <- stack(raster("data/MIROC6/.netcd4/historical/temperature_2014.nc"),
+                      raster("data/MIROC6/.netcd4/historical/precipitation_2014.nc"))
 bioclim.data <- rotate(bioclim.data, left=TRUE) # convert (0, 360) to (-180, 180)
 bioclim.data <- crop(bioclim.data, e*1.25)  # crop to bg point extent
 
 # pipe GBIF data
 for (s in species_list) {
-  s = "Anser_albifrons"
   jt_raw <- read.csv(paste('data/GBIF_', s, '.csv', sep = ""),
                      header = TRUE, sep = '\t')
   jt <- data.frame(matrix(ncol = 2, nrow = length(jt_raw$decimalLongitude)))
