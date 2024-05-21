@@ -67,7 +67,7 @@ function Heatmap({ data }) {
 
   return (
     <div>
-      <div ref={mapRef} className="Map"></div>
+      <div ref={mapRef} className="TrajectoryMap"></div>
     </div>
   );
 }

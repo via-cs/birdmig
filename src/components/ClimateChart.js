@@ -102,7 +102,6 @@ class ClimateChart extends Component {
     render() {
         return (
             <div className="ClimateChart">
-                <h2>Climate Data Visualization</h2>
                 <svg ref={this.d3Container}></svg>
             </div>
         );

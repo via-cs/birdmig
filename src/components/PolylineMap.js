@@ -38,6 +38,7 @@ function PolylineMap({ selectedBird }) {
           setAllBirdIDs(response.data);
           setSelectedBirdIDs([response.data[0]]); // Initially select the first bird ID
         } else {
+          console.log(response.data);
           console.error("Error: Response data is not an array", response.data);
           setAllBirdIDs([]);
         }
@@ -158,7 +159,7 @@ function PolylineMap({ selectedBird }) {
 
   return (
     <div>
-      <div ref={mapRef} className="Map">
+      <div ref={mapRef} className="TrajectoryMap">
         <div style={{ position: "absolute", top: 0, right: 0, zIndex: 999 }}>
           <select onChange={handleDropdownChange} value={selectedBirdIDs[0]}>
             <option value="">Select {birdName} ID</option>

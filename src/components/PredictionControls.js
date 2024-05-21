@@ -1,29 +1,25 @@
 // PredictionControls.js
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function PredictionControls(props) {
-  const [year, setYear] = useState(2021) //2021 by default
-  const [co2, setEmission] = useState('SSP 245') // SSP 245 by default.
-
+  const [year, setYear] = useState(2021); //2021 by default
+  const [co2, setEmission] = useState("SSP 245"); // SSP 245 by default.
+  const [activeButton, setActiveButton] = useState(null);
   // TODO: perhaps rename these to something more meaningful for a general audience?
-  const CO2_Futures = [
-    'ssp126',
-    'ssp245',
-    'ssp370',
-    'ssp585'
-  ]
+  const CO2_Futures = ["ssp126", "ssp245", "ssp370", "ssp585"];
 
   const handleYearChange = (e) => {
     setYear(e.target.value);
     if (props.onPredictionUpdated) {
       props.onPredictionUpdated(e.target.value, co2);
     }
-  }
+  };
 
-  function handleCO2Change (emission_type) {
+  function handleCO2Change(emission_type) {
     setEmission(emission_type);
-    if(props.onPredictionUpdated) {
+    setActiveButton(emission_type);
+    if (props.onPredictionUpdated) {
       props.onPredictionUpdated(year, emission_type);
     }
   }
@@ -31,7 +27,9 @@ function PredictionControls(props) {
   return (
     <div className="PredictionControls">
       <div className="slider-container">
-        <label htmlFor="time-slider" className="slider-label">Year: {year}</label>
+        <label htmlFor="time-slider" className="slider-label">
+          Year: {year}
+        </label>
         <input
           id="time-slider"
           type="range"
@@ -43,15 +41,19 @@ function PredictionControls(props) {
       </div>
       <ul>
         {CO2_Futures.map((emission_type) => (
-            <button
-              disabled = {co2 === emission_type}
-              onClick={()=>handleCO2Change(emission_type)}>
-              {emission_type}
-            </button>
+          <button
+            key={emission_type}
+            className={`button ${
+              activeButton === emission_type ? "active" : ""
+            }`}
+            disabled={co2 === emission_type}
+            onClick={() => handleCO2Change(emission_type)}
+          >
+            {emission_type}
+          </button>
         ))}
       </ul>
     </div>
-
   );
 }
 

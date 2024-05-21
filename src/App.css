@@ -9,8 +9,8 @@
 .main-content {
   flex-grow: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Two columns */
-  grid-template-rows: 1fr 1fr; /* Two rows */
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
+  grid-template-rows: repeat(2, minmax(0, 1fr)); /* Two rows */
   gap: 20px; /* Space between grid items */
   padding: 20px 20px; /* Add side margins */
   margin-top: 60px;
@@ -23,25 +23,43 @@
   background-color: #2c3e50;
   color: white;
   width: 100%;
+  height: 15%;
   top: 0;
   left: 0;
-  position: absolute;
-  padding: 10px 15px;
+  position: fixed;
   z-index: 1000;
-  font-size: 2vmin;
-  transition: margin-top 0.5s;
+  display: flex;
+  align-items: center;
 }
+.header-title {
+  flex: 1;
+  padding: 0px 20px 0px 10px;
+  white-space: nowrap;
+}
+
+.toggle-button {
+  background-color: #2c3e50;
+  padding: 0px 10px 0px 20px;
+  color: #fff;
+  border: none;
+  font-size: 2em;
+  cursor: pointer;
+}
+
 /* Sidebar Styles */
 .sidebar {
-  flex: 0 0 200px;
+  width: 100%;
+  width: 200px;
+  height: 95%;
+  margin-top: 60px;
+  padding-top: 15%;
   background-color: #2c3e50;
   color: white;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   min-height: 100vh; /* Minimum height of the viewport */
+  overflow-x: hidden;
   overflow-y: auto; /* Allow scrolling within the sidebar if content overflows */
-  margin-top: 60px;
 }
 
 .sidebar ul {
@@ -49,7 +67,7 @@
   padding: 0;
   margin: 0;
   background-color: #2c3e50;
-  flex-grow: 0.75;
+  flex-grow: 0.5;
   display: flex;
   flex-direction: column;
 }
@@ -77,63 +95,59 @@
 }
 /* Component Styles */
 .BirdInfo,
-.SDMChart,
-.MigrationMap,
-.EnvironmentalControls,
-.ClimateDataContainer {
+.TrajectoryContainer,
+.PredictionControlsContainer,
+.ClimateContainer,
+.SDMContainer {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 60px;
-  margin-bottom: 20px; /* Margin bottom added */
-  width: 90%; /* Make all containers take up full width */
-}
-.ClimateChart {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px; /* Margin bottom added */
-  width: auto;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.1);
+  width: auto; /* Make all containers take up full width */
 }
 
-.ClimateDataContainer {
-  background-color: white;
-  padding: 20px;
-  margin-top: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px; /* Margin bottom added */
-  width: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.BirdInfo,
+.TrajectoryContainer {
+  margin-top: 60px;
+  margin-bottom: 20px;
 }
-.MigrationMap {
-  width: auto;
+
+.TrajectoryContainer {
   padding: 20px;
 }
-.Map {
+.TrajectoryMap {
   border-radius: 8px;
-  margin: 10px;
+  margin-top: 10px;
   width: 100%;
   height: 550px;
   z-index: 0;
 }
-/* Prediction Controls Styles */
+
+.PredictionControlsContainer {
+  display: grid;
+  grid-column: span 2;
+  grid-row: span 1;
+  width: auto;
+}
+.PredictionControlsHeader {
+  display: flex;
+  align-items: flex-start;
+  align-content: space-between;
+  width: 100%;
+}
+.PredictionControlsHeader h2 {
+  width: 40%;
+}
 .PredictionControls {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: flex-end;
   width: 100%;
 }
 
 .PredictionControls .slider {
-  width: auto;
+  width: 100%;
   margin: 10px 0; /* Add some vertical spacing */
 }
 
@@ -143,17 +157,32 @@
   background-color: #3498db;
   color: white;
   border-radius: 20px; /* Rounded corners */
-  margin-top: 10px;
+  margin: 0px 5px 5px 5px;
   cursor: pointer;
   outline: none;
 }
 
 .PredictionControls button:hover {
-  background-color: #2980b9;
+  background-color: #2574a8;
+}
+
+.PredictionControls button.active {
+  background-color: #2574a8;
+}
+
+.ChartsContainer {
+  background-color: transparent;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .SDMChart {
-  margin-top: 20px;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
 }
 
 /* Tabs styling */
@@ -179,7 +208,7 @@
 }
 
 .tab.active {
-  background-color: #2c3e50; /* Darker shade for active tab */
+  background-color: #2574a8; /* Darker shade for active tab */
 }
 
 .ClimateData {
@@ -193,37 +222,19 @@
   margin-bottom: 20px; /* Margin bottom added */
   width: auto;
 }
-
-.ClimateChart {
-  width: 100%;
-  height: 100%;
-}
-
-.ClimateChart svg {
-  width: 100%;
-  height: 100%;
-} /* Optional: add background color for better visibility */
-
 /* Responsive Design */
-@media (max-width: 768px) {
-  .header {
-    margin-top: 50px;
-  }
+@media (max-width: 850px) {
   .main-content {
     grid-template-columns: 1fr; /* Single column layout on small screens */
     grid-template-rows: auto auto auto auto; /* Adjust rows for stacking */
     padding: 20px; /* Reset padding for single column layout */
   }
 
-  .sidebar {
-    flex: 0 0 150px; /* Smaller width for smaller screens */
-    padding: 15px;
-  }
-
   .BirdInfo,
-  .EnvironmentalControls,
-  .MigrationMap,
-  .SDMChart {
+  .TrajectoryContainer,
+  .SDMContainer,
+  .ClimateContainer,
+  .PredictionControlsContainer {
     grid-column: 1;
   }
 
@@ -231,20 +242,17 @@
     grid-row: 1;
   }
 
-  .MigrationMap {
-    grid-row: 3;
+  .TrajectoryContainer {
+    grid-row: 2;
   }
 
-  .SDMChart {
-    grid-row: 2;
+  .PredictionControlsContainer {
+    grid-row: 3;
+  }
+  .ChartsContainer {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 500px) {
-  .header {
-    margin-top: 40px;
-  }
-  .sidebar {
-    flex: 0 0 120px; /* Even smaller width or full-width if needed */
-  }
 }
