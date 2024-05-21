@@ -35,3 +35,4 @@ yarn-error.log*
 # Too big a file
 model/outputs/models/Anser_albifrons_et_classifier_model.pkl
 model/outputs/tiff-images/*
+!*/probability_1.0.tif
