@@ -30,9 +30,11 @@ yarn-error.log*
 /model/inputs/
 /model/.R*
 .vscode
-/model/outputs/tiff-images
 /backend/flask_session
 
 # Too big a file
 model/data/geojson/Haliaeetus_leucocephalus.geojson
 model/outputs/models/Anser_albifrons_et_classifier_model.pkl
+
+*.tif
+!probability_1.0.tif
