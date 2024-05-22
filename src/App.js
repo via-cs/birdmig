@@ -16,7 +16,7 @@ import { image } from "d3";
 function App() {
     const [socketInstance, setSocketInstance] = useState("");
 	const [cookies, setCookie] = useCookies(["user"]);
-	const backendUrl = "http://localhost:5000";
+	const backendUrl = "http://localhost:8000";
 
   // Define birdMap and climateVariables
   const birdMap = {
@@ -47,13 +47,18 @@ function App() {
 
   function updatePredictionVars(year, emissionRate, inputBird) {
 		axios
-			.post(`${backendUrl}/prediction_input`, {
+			.post(`${backendUrl}/prediction`, {
                     bird: birdMap[inputBird],
                     year: year,
-                    emissions: emissionRate })
+                    emissions: emissionRate },
+                    {
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }
+                  })
 			.then((response) => {
-                console.log(response.data.prediction)
-				//setPredictionData(response.data.prediction);
+        console.log(response.data.prediction)
+				setPredictionData(response.data.prediction);
 			})
 			.catch((error) => {
 				console.error("Error sending prediction variables:", error);
@@ -147,17 +152,21 @@ function App() {
   }
 
 	useEffect(() => {
-        const socket = io(backendUrl, {
-            transports: ["websocket"],
-            cors: {
-                origin: "http://localhost:3000"
-            }
-        });
-        
-        setSocketInstance(socket)
-        socket.on("predictions", (data) => {
-            setPredictionData(data.prediction)
-        })
+    /*
+    Commented for now in case we ever need Server-sided events oncemore.
+
+    const socket = io(backendUrl, {
+      transports: ["websocket"],
+      cors: {
+        origin: "http://localhost:3000"
+      }
+    });
+    
+    setSocketInstance(socket)
+    socket.on("predictions", (data) => {
+      setPredictionData(data.prediction)
+    })
+    */
 
 	}, [selectedBird, selectedYear, selectedEmissions]);
 

@@ -1,9 +1,6 @@
-flask
-flask_cors
-pillow
-flask_Session
+fastapi
+
 python-dotenv
 jinja2
 pandas
 Shapely
-flask_socketio

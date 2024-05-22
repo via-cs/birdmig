@@ -11,7 +11,7 @@ function Heatmap({ data }) {
   const [heatmapData, setHeatmapData] = useState([]);
 
   const getHeatmapData = () => {
-    const baseUrl = "http://localhost:5000";
+    const baseUrl = "http://localhost:8000";
     axios
       .get(`${baseUrl}/get_heatmap_data?bird=${birdName}`)
       .then((response) => {

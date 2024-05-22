@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 function PredictionControls(props) {
   const [year, setYear] = useState(2021) //2021 by default
-  const [co2, setEmission] = useState('SSP 245') // SSP 245 by default.
+  const [co2, setEmission] = useState('ssp245') // SSP 245 by default.
 
   // TODO: perhaps rename these to something more meaningful for a general audience?
   const CO2_Futures = [

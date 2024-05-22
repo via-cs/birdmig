@@ -57,7 +57,7 @@
       "localhost",
       ".localhost"
     ],
-    "proxy": "https://127.0.0.1:5000"
+    "proxy": "https://127.0.0.1:8000"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
