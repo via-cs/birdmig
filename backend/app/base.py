@@ -1,7 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
@@ -17,6 +16,7 @@ from io import BytesIO
 import base64
 # DEBUGGING
 import sys
+from time import sleep
 
 app = FastAPI()
 frontend_origin = "http://localhost:3000"
@@ -78,12 +78,11 @@ class PredictionInputs(BaseModel):
   year: int
   emissions: str
     
-@app.post('/prediction')
-def predict(prediction_input: PredictionInputs):
+@app.put('/prediction')
+async def predict(prediction_input: PredictionInputs):
   selected_bird = prediction_input.bird
   selected_year = str(prediction_input.year)
   emission_Type = prediction_input.emissions
-  print(f"Data: {selected_bird}, {selected_year}, {emission_Type}")
     
   '''
   # Store the inputs into a session, cached for future utility
@@ -105,19 +104,14 @@ def predict(prediction_input: PredictionInputs):
   buffer = BytesIO()
   dataImg.save(buffer, format="png")
   
+  # Artificial delay to simulate model prediction time
+  sleep(2.5)
+  
   #If we'll need to encapsulate a file, use this:
   return {
     "prediction": base64.b64encode(buffer.getvalue()).decode(),
     "resFormat": dataImg.format
   }
-  
-  '''
-  Commented out, as server-sided events are not necessary for current implementataion.
-  
-  socket_io.emit("predictions", {
-    "prediction": base64.b64encode(buffer.getvalue()).decode(),
-    "resFormat": dataImg.format
-  })'''
     
 
 @app.get('/bird-info/{bird_name}')
@@ -229,7 +223,6 @@ def get_general_migration(selected_bird: str):
       })
     
     return {'segmented_polylines': simplified_polylines}
-    #return jsonify(segmented_polylines=simplified_polylines)
   
   except Exception as e:
     raise HTTPException(status_code= 400, detail=str(e))

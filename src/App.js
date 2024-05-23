@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { CookiesProvider, useCookies } from "react-cookie";
-import { io } from "socket.io-client";
-//import WebSocketCall from ""
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import PolylineMap from "./components/PolylineMap";
@@ -47,7 +45,7 @@ function App() {
 
   function updatePredictionVars(year, emissionRate, inputBird) {
 		axios
-			.post(`${backendUrl}/prediction`, {
+			.put(`${backendUrl}/prediction`, {
                     bird: birdMap[inputBird],
                     year: year,
                     emissions: emissionRate },
@@ -152,21 +150,6 @@ function App() {
   }
 
 	useEffect(() => {
-    /*
-    Commented for now in case we ever need Server-sided events oncemore.
-
-    const socket = io(backendUrl, {
-      transports: ["websocket"],
-      cors: {
-        origin: "http://localhost:3000"
-      }
-    });
-    
-    setSocketInstance(socket)
-    socket.on("predictions", (data) => {
-      setPredictionData(data.prediction)
-    })
-    */
 
 	}, [selectedBird, selectedYear, selectedEmissions]);
 
