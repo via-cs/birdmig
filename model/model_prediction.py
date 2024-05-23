@@ -27,7 +27,7 @@ def convert_tiffs(species, ssp, year):
     distr = rasterio.open('outputs/tiff-images/' + species + '/' + ssp + '/' + str(year) + '/probability_1.0.tif').read(1)
 
     fig = plt.figure(frameon=False)
-    fig.set_size_inches(4,2)
+    fig.set_size_inches(3,4)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
