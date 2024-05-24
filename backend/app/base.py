@@ -105,7 +105,7 @@ async def predict(prediction_input: PredictionInputs):
   dataImg.save(buffer, format="png")
   
   # Artificial delay to simulate model prediction time
-  sleep(2.5)
+  #sleep(2.5)
   
   #If we'll need to encapsulate a file, use this:
   return {

@@ -55,7 +55,7 @@ function App() {
                       }
                   })
 			.then((response) => {
-        console.log(response.data.prediction)
+                console.log(response.data.prediction)
 				setPredictionData(response.data.prediction);
 			})
 			.catch((error) => {
