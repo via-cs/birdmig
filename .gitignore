@@ -30,6 +30,7 @@ yarn-error.log*
 !/model/data/geojson
 /model/inputs/
 /model/.R*
+.vscode
 /backend/flask_session
 
 # Ignore all tiff except probability
@@ -37,4 +38,7 @@ model/outputs/tiff-images/*
 !*/probability_1.0.tif
 
 # Too big a file
-model/outputs/models/Setophaga_striata_et_classifier_model.pkl
+model/outputs/models/Anser_albifrons_et_classifier_model.pkl
+
+*.tif
+!probability_1.0.tif
