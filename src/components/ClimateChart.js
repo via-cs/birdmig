@@ -29,7 +29,7 @@ const ClimateChart = ({ selectedYear }) => {
                 setChartData({
                     labels: labels,
                     datasets: [{
-                        label: activeTab === 'temperature' ? 'Average Temperature (°F)' : 'Average Precipitation (mm)',
+                        label: activeTab === 'temperature' ? 'Average Temperature (°F)' : 'Average Precipitation (inches)',
                         data: data,
                         borderColor: 'rgba(75, 192, 192, 1)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
