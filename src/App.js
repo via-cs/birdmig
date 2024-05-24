@@ -230,25 +230,9 @@ function App() {
               <SDMChart data={sdmData} prediction={predictionData} />
             </div>
           )}
-          <div className="ClimateDataContainer">
-            <div className="ClimateData">
-              <strong>Climate Data</strong>
-              <div className="tabs">
-                {Object.keys(climateVariables).map((variable) => (
-                  <button
-                    key={variable}
-                    className={`tab ${
-                      selectedClimateVariable === variable ? "active" : ""
-                    }`}
-                    onClick={() => handleClimateVariableChange(variable)}
-                  >
-                    {variable.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {climateData && <ClimateChart data={climateData} />}
-          </div>
+           <div className="ClimateDataContainer">
+            <ClimateChart selectedYear={selectedYear} />
+           </div>
         </main>
       </CookiesProvider>
     </div>
