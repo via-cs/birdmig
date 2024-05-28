@@ -27,15 +27,7 @@ function App() {
     "Whimbrel": "whimbrel",
   };
 
-  const climateVariables = {
-    prec: "prec.json",
-    tmax: "tmax.json",
-    srad: "srad.json",
-    tmin: "tmin.json",
-    vapr: "vapr.json",
-    wind: "wind.json",
-    tavg: "tavg.json",
-  };
+  const climateVariables = ["temperature", "precipitation"];
 
   const images = require.context("./images", true);
   const imageList = images.keys().map((image) => images(image));
@@ -119,31 +111,6 @@ function App() {
         setSdmData(null);
         setLoading(false);
       });
-  }
-
-  useEffect(() => {
-    if (selectedClimateVariable) {
-      fetchClimateData(selectedClimateVariable);
-    }
-  }, [selectedClimateVariable]);
-
-  function fetchClimateData(variable) {
-    setLoading(true);
-    axios
-      .get(`${backendUrl}/json/${climateVariables[variable]}`)
-      .then((response) => {
-        setClimateData(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching climate data", error);
-        setError("Failed to fetch climate data");
-        setLoading(false);
-      });
-  }
-
-  function handleClimateVariableChange(variable) {
-    setSelectedClimateVariable(variable);
   }
 
 	useEffect(() => {
@@ -230,25 +197,9 @@ function App() {
               <SDMChart data={sdmData} prediction={predictionData} />
             </div>
           )}
-          <div className="ClimateDataContainer">
-            <div className="ClimateData">
-              <strong>Climate Data</strong>
-              <div className="tabs">
-                {Object.keys(climateVariables).map((variable) => (
-                  <button
-                    key={variable}
-                    className={`tab ${
-                      selectedClimateVariable === variable ? "active" : ""
-                    }`}
-                    onClick={() => handleClimateVariableChange(variable)}
-                  >
-                    {variable.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {climateData && <ClimateChart data={climateData} />}
-          </div>
+           <div className="ClimateDataContainer">
+            <ClimateChart selectedYear={selectedYear} />
+           </div>
         </main>
       </CookiesProvider>
     </div>
