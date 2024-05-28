@@ -7,3 +7,5 @@ jinja2
 pandas
 Shapely
 flask_socketio
+pytest
+requests
