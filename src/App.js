@@ -28,15 +28,7 @@ function App() {
     Whimbrel: "whimbrel",
   };
 
-  const climateVariables = {
-    prec: "prec.json",
-    tmax: "tmax.json",
-    srad: "srad.json",
-    tmin: "tmin.json",
-    vapr: "vapr.json",
-    wind: "wind.json",
-    tavg: "tavg.json",
-  };
+  const climateVariables = ["temperature", "precipitation"];
 
   const images = require.context("./images", true);
   const imageList = images.keys().map((image) => images(image));
@@ -160,6 +152,11 @@ function App() {
     socket.on("predictions", (data) => {
       setPredictionData(data.prediction);
     });
+
+    setSocketInstance(socket);
+    socket.on("predictions", (data) => {
+      setPredictionData(data.prediction);
+    });
   }, [selectedBird, selectedYear, selectedEmissions]);
 
   return (
@@ -236,22 +233,8 @@ function App() {
               </div>
             </div>
             <div className="ChartsContainer">
-              <div className="ClimateContainer">
-                <h2> Climate </h2>
-                <div className="tabs">
-                  {Object.keys(climateVariables).map((variable) => (
-                    <button
-                      key={variable}
-                      className={`tab ${
-                        selectedClimateVariable === variable ? "active" : ""
-                      }`}
-                      onClick={() => handleClimateVariableChange(variable)}
-                    >
-                      {variable.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-                {climateData && <ClimateChart data={climateData} />}
+              <div className="ClimateDataContainer">
+                <ClimateChart selectedYear={selectedYear} />
               </div>
               <div className="SDMContainer">
                 <h2> Species Distribution</h2>

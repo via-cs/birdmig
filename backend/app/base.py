@@ -3,6 +3,8 @@ from flask_cors import CORS, cross_origin
 from flask_session import Session
 from flask_socketio import SocketIO, emit
 from .config import AppConfig
+import requests
+import json
 import pandas as pd
 import numpy as np
 import math
@@ -82,6 +84,97 @@ bird_information_data = {
     }
 
 }
+@api.route('/temperature/<int:year>', methods=['GET'])
+def get_temperature_data(year):
+    # Set parameters
+    start = f"{year}-01-01"
+    end = f"{year}-12-31"
+
+    # Set base URL, and pull the json data down using requests
+    base_url = 'http://grid2.rcc-acis.org/GridData'
+    input_dict = {
+        "state": "CA", "grid": "loca:wmean:rcp85",
+        "sdate": start, "edate": end,
+        "elems": [{
+            "name": "avgt", "interval": "mly", "duration": "mly", "reduce": "mean", "area_reduce": "state_mean"
+        }]
+    }
+
+    # Attempt to fetch data with error handling
+    try:
+        response = requests.post(base_url, json=input_dict)
+        response.raise_for_status()  # Raise an HTTPError for bad requests (4XX, 5XX)
+        rawjson = response.content
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+        return jsonify({"error": "Failed to retrieve data"}), 500
+
+    # Load JSON data
+    try:
+        newdata = json.loads(rawjson)['data']
+    except json.JSONDecodeError as e:
+        print('JSON Decode Error:', e)
+        return jsonify({"error": "Failed to parse JSON"}), 500
+
+    # Convert the JSON data into a dataframe
+    final = pd.DataFrame()
+    for entry in newdata:
+        month_data = pd.DataFrame(entry[1], index=['avgt']).transpose()
+        month_data.insert(0, 'month', entry[0])
+        month_data = month_data.reset_index().rename(columns={'index': 'county'})
+        month_data['year'] = year
+        final = pd.concat([final, month_data])
+
+    # Group by month and calculate average temperature
+    monthly_avg = final.groupby('month').agg({'avgt': 'mean'}).reset_index()
+    monthly_avg['year'] = year
+
+    # Convert the aggregated data to a dictionary and return it
+    temperature_data = monthly_avg.to_dict(orient='records')
+    return jsonify(temperature_data)
+    
+@api.route('/precipitation/<int:year>', methods=['GET'])
+def get_precipitation_data(year):
+    start = f"{year}-01-01"
+    end = f"{year}-12-31"
+    base_url = 'http://grid2.rcc-acis.org/GridData'
+    input_dict = {
+        "state": "CA", "grid": "loca:wmean:rcp85",
+        "sdate": start, "edate": end,
+        "elems": [{
+            "name": "pcpn", "interval": [0, 1], "duration": "mly", "reduce": "sum", "area_reduce": "state_mean"
+        }]
+    }
+
+    try:
+        response = requests.post(base_url, json=input_dict)
+        response.raise_for_status()
+        rawjson = response.json()  # directly parse JSON here
+    except requests.HTTPError as e:
+        return jsonify({"error": "HTTP error", "message": str(e)}), 500
+    except requests.RequestException as e:
+        return jsonify({"error": "Request failed", "message": str(e)}), 500
+    except json.JSONDecodeError as e:
+        return jsonify({"error": "Failed to parse JSON", "message": str(e)}), 500
+
+    # Check if data is empty or not found
+    if not rawjson.get('data'):
+        return jsonify({"error": "No data found for specified parameters"}), 404
+
+    # Process and return data
+    final = pd.DataFrame()
+    for entry in rawjson['data']:
+        month_data = pd.DataFrame(entry[1], index=['pcpn']).transpose()
+        month_data.insert(0, 'month', entry[0])
+        month_data['year'] = year
+        final = pd.concat([final, month_data])
+
+    # Group by month and calculate average precipitation
+    monthly_avg = final.groupby('month').agg({'pcpn': 'mean'}).reset_index()
+    monthly_avg['year'] = year
+    precipitation_data = monthly_avg.to_dict(orient='records')
+    return jsonify(precipitation_data)
+
 @api.route('/bird-data/<bird_name>')
 @cross_origin(supports_credentials=True)
 def get_bird_data(bird_name):
