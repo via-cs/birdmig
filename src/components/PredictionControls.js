@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 function PredictionControls(props) {
   const [year, setYear] = useState(2021) //2021 by default
-  const [co2, setEmission] = useState('SSP 245') // SSP 245 by default.
+  const [co2, setEmission] = useState('ssp245') // SSP 245 by default.
 
   // TODO: perhaps rename these to something more meaningful for a general audience?
   const CO2_Futures = [
@@ -14,10 +14,9 @@ function PredictionControls(props) {
     'ssp585'
   ]
 
-  const handleYearChange = (e) => {
-    setYear(e.target.value);
-    if (props.onPredictionUpdated) {
-      props.onPredictionUpdated(e.target.value, co2);
+  function handleYearChange() {
+    if(year >= 2021 && year <= 2100 && props.onPredictionUpdated) {
+        props.onPredictionUpdated(year, co2)
     }
   }
 
@@ -38,8 +37,27 @@ function PredictionControls(props) {
           min="2021"
           max="2100"
           value={year}
-          onChange={handleYearChange}
+          onChange={(e) => {setYear(e.target.value)}}
+          onMouseUp={(e) => {handleYearChange()}}
         />
+        <input
+                id="year_input"
+                type="number"
+                value={year}
+                placeholder='Enter a year between 2021 and 2100'
+                min={2021}
+                max={2100}
+                maxLength={4}
+                minLength={4}
+                onKeyDown={(
+                    (event)=>{
+                        if (event.key === 'Enter') {
+                            handleYearChange()
+                        }                        
+                    })}
+                onChange={(e) => {setYear(e.target.value)}}
+                className='year_input'
+            />
       </div>
       <ul>
         {CO2_Futures.map((emission_type) => (
