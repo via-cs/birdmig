@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
+import requests
+import json
+
 import os
 
 #from .config import AppConfig
@@ -27,18 +30,8 @@ app.add_middleware(
   allow_methods=["*"],
   allow_headers=["*"])
 
-#templates = Jinja2Templates(directory='climate_data/json_data')
 
-'''api = Flask(__name__)
-api.config.from_object(AppConfig)
-api.secret_key = AppConfig.SECRET_KEY
-
-# Set up CORS with specific origins and allow credentials
-CORS(api, supports_credentials=True, origins=["http://localhost:3000"])
-app_session = Session(api)
-socket_io = SocketIO(api, cors_allowed_origins = "http://localhost:3000")'''
-
-DEMO_bird_data = {
+bird_data = {
   "Blackpoll Warbler": {
     "info": "Migration details about Blackpoll Warbler",
     "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
@@ -66,11 +59,119 @@ DEMO_bird_data = {
   },
 }
 
+app.get('/temperature/<int:year>')
+def get_temperature_data(year):
+    # Set parameters
+    start = f"{year}-01-01"
+    end = f"{year}-12-31"
+
+    # Set base URL, and pull the json data down using requests
+    base_url = 'http://grid2.rcc-acis.org/GridData'
+    input_dict = {
+        "state": "CA", "grid": "loca:wmean:rcp85",
+        "sdate": start, "edate": end,
+        "elems": [{
+            "name": "avgt", "interval": "mly", "duration": "mly", "reduce": "mean", "area_reduce": "state_mean"
+        }]
+    }
+
+    # Attempt to fetch data with error handling
+    try:
+        response = requests.post(base_url, json=input_dict)
+        response.raise_for_status()  # Raise an HTTPError for bad requests (4XX, 5XX)
+        rawjson = response.content
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+        raise HTTPException(
+            status_code= 500,
+            detail= "Failed to retrieve data")
+
+    # Load JSON data
+    try:
+        newdata = json.loads(rawjson)['data']
+    except json.JSONDecodeError as e:
+        print('JSON Decode Error:', e)
+        raise HTTPException(
+            status_code= 500,
+            detail= "Failed to parse JSON")
+
+    # Convert the JSON data into a dataframe
+    final = pd.DataFrame()
+    for entry in newdata:
+        month_data = pd.DataFrame(entry[1], index=['avgt']).transpose()
+        month_data.insert(0, 'month', entry[0])
+        month_data = month_data.reset_index().rename(columns={'index': 'county'})
+        month_data['year'] = year
+        final = pd.concat([final, month_data])
+
+    # Group by month and calculate average temperature
+    monthly_avg = final.groupby('month').agg({'avgt': 'mean'}).reset_index()
+    monthly_avg['year'] = year
+
+    # Convert the aggregated data to a dictionary and return it
+    return monthly_avg.to_dict(orient='records')
+
+
+#@api.route('/precipitation/<int:year>', methods=['GET'])
+@app.get('/precipitation/')
+def get_precipitation_data(year: int):
+    start = f"{year}-01-01"
+    end = f"{year}-12-31"
+    base_url = 'http://grid2.rcc-acis.org/GridData'
+    input_dict = {
+        "state": "CA", "grid": "loca:wmean:rcp85",
+        "sdate": start, "edate": end,
+        "elems": [{
+            "name": "pcpn", "interval": [0, 1], "duration": "mly", "reduce": "sum", "area_reduce": "state_mean"
+        }]
+    }
+
+    try:
+        response = requests.post(base_url, json=input_dict)
+        response.raise_for_status()
+        rawjson = response.json()  # directly parse JSON here
+    except requests.HTTPError as e:
+        raise HTTPException(
+            status_code=500,
+            headers= {"error": "HTTP error"},
+            detail= str(e))
+        
+    except requests.RequestException as e:
+        raise HTTPException(
+            status_code= 500,
+            headers= {"error": "Request failed"},
+            detail= str(e))
+        
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code= 500,
+            headers= {"error": "Failed to parse JSON"},
+            detail= str(e))
+
+    # Check if data is empty or not found
+    if not rawjson.get('data'):
+        raise HTTPException(
+            status_code= 404,
+            detail= {"error": "No data found for specified parameters"})
+
+    # Process and return data
+    final = pd.DataFrame()
+    for entry in rawjson['data']:
+        month_data = pd.DataFrame(entry[1], index=['pcpn']).transpose()
+        month_data.insert(0, 'month', entry[0])
+        month_data['year'] = year
+        final = pd.concat([final, month_data])
+
+    # Group by month and calculate average precipitation
+    monthly_avg = final.groupby('month').agg({'pcpn': 'mean'}).reset_index()
+    monthly_avg['year'] = year
+    return monthly_avg.to_dict(orient='records')
+
 
 app.get('/bird-data/{bird_name}')
 def get_bird_data(bird_name):
-  if bird_name in DEMO_bird_data:
-    return DEMO_bird_data
+  if bird_name in bird_data:
+    return bird_data
       
 
 class PredictionInputs(BaseModel):
@@ -116,7 +217,7 @@ async def predict(prediction_input: PredictionInputs):
 
 @app.get('/bird-info/{bird_name}')
 def get_bird_info(bird_name):
-  bird = DEMO_bird_data.get(bird_name)
+  bird = bird_data.get(bird_name)
   if bird:
     return {
       'name': bird_name,
@@ -130,7 +231,7 @@ def get_bird_info(bird_name):
 
 @app.get('/bird-sdm-data/{bird_name}')
 def get_bird_sdm_data(bird_name):
-  bird = DEMO_bird_data.get(bird_name)
+  bird = bird_data.get(bird_name)
   if bird:
     return {
       'name': bird_name,
