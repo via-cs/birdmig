@@ -59,11 +59,13 @@ bird_data = {
   },
 }
 
-app.get('/temperature/<int:year>')
-def get_temperature_data(year):
+
+@app.get('/temperature/{selectedYear}')
+def get_temperature_data(selectedYear: int):
+    
     # Set parameters
-    start = f"{year}-01-01"
-    end = f"{year}-12-31"
+    start = f"{selectedYear}-01-01"
+    end = f"{selectedYear}-12-31"
 
     # Set base URL, and pull the json data down using requests
     base_url = 'http://grid2.rcc-acis.org/GridData'
@@ -101,22 +103,21 @@ def get_temperature_data(year):
         month_data = pd.DataFrame(entry[1], index=['avgt']).transpose()
         month_data.insert(0, 'month', entry[0])
         month_data = month_data.reset_index().rename(columns={'index': 'county'})
-        month_data['year'] = year
+        month_data['year'] = selectedYear
         final = pd.concat([final, month_data])
 
     # Group by month and calculate average temperature
     monthly_avg = final.groupby('month').agg({'avgt': 'mean'}).reset_index()
-    monthly_avg['year'] = year
+    monthly_avg['year'] = selectedYear
 
     # Convert the aggregated data to a dictionary and return it
     return monthly_avg.to_dict(orient='records')
 
 
-#@api.route('/precipitation/<int:year>', methods=['GET'])
-@app.get('/precipitation/')
-def get_precipitation_data(year: int):
-    start = f"{year}-01-01"
-    end = f"{year}-12-31"
+@app.get('/precipitation/{selectedYear}')
+def get_precipitation_data(selectedYear: int):
+    start = f"{selectedYear}-01-01"
+    end = f"{selectedYear}-12-31"
     base_url = 'http://grid2.rcc-acis.org/GridData'
     input_dict = {
         "state": "CA", "grid": "loca:wmean:rcp85",
@@ -159,12 +160,12 @@ def get_precipitation_data(year: int):
     for entry in rawjson['data']:
         month_data = pd.DataFrame(entry[1], index=['pcpn']).transpose()
         month_data.insert(0, 'month', entry[0])
-        month_data['year'] = year
+        month_data['year'] = selectedYear
         final = pd.concat([final, month_data])
 
     # Group by month and calculate average precipitation
     monthly_avg = final.groupby('month').agg({'pcpn': 'mean'}).reset_index()
-    monthly_avg['year'] = year
+    monthly_avg['year'] = selectedYear
     return monthly_avg.to_dict(orient='records')
 
 

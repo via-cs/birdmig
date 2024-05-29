@@ -5,6 +5,7 @@ import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 
 const ClimateChart = ({ selectedYear }) => {
+
     const [activeTab, setActiveTab] = useState('temperature');
     const [chartData, setChartData] = useState({
         labels: [],
@@ -20,7 +21,8 @@ const ClimateChart = ({ selectedYear }) => {
 
     useEffect(() => {
         const endpoint = activeTab === 'temperature' ? 'temperature' : 'precipitation';
-        fetch(`http://127.0.0.1:5000/${endpoint}/${selectedYear}`)
+
+        fetch(`http://localhost:8000/${endpoint}/${selectedYear}`)
             .then(response => response.json())
             .then(jsonData => {
                 const labels = jsonData.map(item => item.month);
