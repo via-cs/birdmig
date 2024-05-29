@@ -203,10 +203,6 @@ def get_bird_sdm_data(bird_name):
         return jsonify({'name': bird_name, 'sdmData': bird['sdmData']})
     else:
         return jsonify({'error': 'Bird not found'}), 404
-    
-@api.route('/json/<filename>')
-def send_json(filename):
-    return send_from_directory('climate_data/json_data', filename)
 
 @api.route('/get_trajectory_data')
 @cross_origin(supports_credentials=True)
@@ -239,7 +235,6 @@ def get_bird_ids():
         return jsonify(bird_ids)
     except FileNotFoundError:
         return jsonify({'error': f'CSV file for {selected_bird} not found'})
-
 
 @api.route('/get_general_migration')
 @cross_origin(supports_credentials=True)

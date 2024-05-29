@@ -9,3 +9,5 @@ Shapely
 flask_socketio
 pytest
 requests
+pytest-cov
+flask_testing
