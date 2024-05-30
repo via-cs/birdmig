@@ -14,8 +14,10 @@ export_filetype <- "geojson"
 e <- extent(-179, -35, -55, 85) # set study area extent to Americas
 
 # Grab Climate Data
-bioclim.data <- stack(raster("data/MIROC6/.netcd4/historical/temperature_2014.nc"),
-                      raster("data/MIROC6/.netcd4/historical/precipitation_2014.nc"))
+#bioclim.data <- stack(raster("data/MIROC6/.netcd4/historical/tas_avg.nc"),
+#                      raster("data/MIROC6/.netcd4/historical/pr_avg.nc"))
+bioclim.data <- stack(raster("data/MIROC6/.netcd4/historical/r1i1p1f1/tas/tas_day_MIROC6_historical_r1i1p1f1_gn_2000.nc"),
+                      raster("data/MIROC6/.netcd4/historical/r1i1p1f1/pr/pr_day_MIROC6_historical_r1i1p1f1_gn_2000.nc"))
 bioclim.data <- rotate(bioclim.data, left=TRUE) # convert (0, 360) to (-180, 180)
 bioclim.data <- crop(bioclim.data, e*1.25)  # crop to bg point extent
 
@@ -62,16 +64,16 @@ for (s in species_list) {
 ## ------------------------------------------------------------------------
 
 # plot our points
-plot(bioclim.data[[1]], main='Precipitation')
+plot(bioclim.data[[1]], main='Tempeprature')
 points(bg, col='red', pch = 16,cex=.3)
 points(jt, col='black', pch = 16,cex=.3)
 plot(wrld_simpl, add=TRUE, border='dark grey')
 
 
 writeRaster(bioclim.data[[1]], 
-            paste('data/MIROC6/historical/temperature.asc', sep = ''),
+            paste('data/MIROC6/historical/temperature.tif', sep = ''),
             overwrite = TRUE)
 
 writeRaster(bioclim.data[[2]], 
-            paste('data/MIROC6/historical/precipitation.asc', sep = ''),
+            paste('data/MIROC6/historical/precipitation.tif', sep = ''),
             overwrite = TRUE)
