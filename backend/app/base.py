@@ -169,24 +169,20 @@ def get_precipitation_data(selectedYear: int):
     return monthly_avg.to_dict(orient='records')
 
 
-app.get('/bird-data/{bird_name}')
-def get_bird_data(bird_name):
-  if bird_name in bird_data:
-    return bird_data
-      
-
 class PredictionInputs(BaseModel):
   bird: str
   year: int
   emissions: str
     
 @app.put('/prediction')
-async def predict(prediction_input: PredictionInputs):
+async def get_predictions(prediction_input: PredictionInputs):
   selected_bird = prediction_input.bird
   selected_year = str(prediction_input.year)
   emission_Type = prediction_input.emissions
     
   '''
+  If the backend needs to cache the bird, year, or emissions such as recording jobs that it is performing, store it in a session. Currently unimplemented, as the backend can remain stateless.
+  
   # Store the inputs into a session, cached for future utility
   session['bird'] = input_bird#prediction_input['bird']
   session['year'] = input_year#prediction_input['year']
@@ -206,10 +202,13 @@ async def predict(prediction_input: PredictionInputs):
   buffer = BytesIO()
   dataImg.save(buffer, format="png")
   
-  # Artificial delay to simulate model prediction time
-  #sleep(2.5)
+  # FastAPI requests can handle asynchronous predictions.
+  # In practice, this would be waiting for a machine learning model to generate
+  # predictions.
+  # Simualted here with a sleep() function.
   
-  #If we'll need to encapsulate a file, use this:
+  # sleep(2.5)
+  
   return {
     "prediction": base64.b64encode(buffer.getvalue()).decode(),
     "resFormat": dataImg.format
