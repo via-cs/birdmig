@@ -14,7 +14,11 @@ COPY package*.json ./
 RUN npm install && \
     npm install d3 && \
     npm install react-cookie && \
-    npm install leaflet react-leaflet leaflet-arrowheads leaflet-polylinedecorator
+    npm install leaflet react-leaflet leaflet-arrowheads leaflet-polylinedecorator && \
+    npm install --save-dev @testing-library/react @testing-library/jest-dom jest-fetch-mock && \
+    npm install --save-dev @testing-library/jest-dom
+
+
 
 # Copy the rest of the application
 COPY . .

@@ -13,6 +13,6 @@ With pytest installed, you can run tests from the command line with the followin
 
 ```pytest tests/```
 
-And if you want to include coverage:
-```pytest --cov=. tests/```
+And if you want to include coverage reports:
+```pytest --cov=app/```
 
