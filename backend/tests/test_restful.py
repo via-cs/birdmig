@@ -159,7 +159,7 @@ def test_get_bird_ids(client):
     ]
     
     test_directory = os.getcwd()
-    os.chdir('../app')
+    os.chdir('./app')
     
     for bird in valid_birds:
         
@@ -194,7 +194,7 @@ def test_general_migration(client):
     ]
     
     test_directory = os.getcwd()
-    os.chdir('../app')
+    os.chdir('./app')
     
     for bird in valid_birds:
         
@@ -216,7 +216,7 @@ def test_get_heatmap(client):
     ]
     
     test_directory = os.getcwd()
-    os.chdir('../app')
+    os.chdir('./app')
     
     for bird in valid_birds:
         
