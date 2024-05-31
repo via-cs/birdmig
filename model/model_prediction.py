@@ -17,7 +17,7 @@ def make_prediction(species, ssp, year):
 
     target_xs, raster_info = load_targets(raster_features)
 
-    pickle_filename = "outputs/models/" + species + '_et_classifier_model.pkl'
+    pickle_filename = "outputs/models/" + species + '_rf_classifier_model.pkl'
     model = pickle.load(open(pickle_filename, 'rb'))
 
     os.makedirs('outputs/tiff-images/' + species + '/' + ssp + '/' + str(year) + '/3587', exist_ok=True)
