@@ -63,7 +63,7 @@
       "localhost",
       ".localhost"
     ],
-    "proxy": "https://127.0.0.1:5000"
+    "proxy": "https://127.0.0.1:8000"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
