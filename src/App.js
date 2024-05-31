@@ -19,7 +19,7 @@ function App() {
   // Define birdMap and climateVariables
   const birdMap = {
     "Blackpoll Warbler": "warbler",
-    "Bald Eagle": "eagle",
+    "Not So Bald Eagle": "eagle",
     "White Fronted Goose": "anser",
     "Long Billed Curlew": "curlew",
     "Whimbrel": "whimbrel",
