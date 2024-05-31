@@ -4,6 +4,7 @@ python-dotenv
 jinja2
 pandas
 Shapely
+pillow
 
 pytest
 requests
