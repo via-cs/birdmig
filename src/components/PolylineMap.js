@@ -30,7 +30,7 @@ function PolylineMap({ selectedBird }) {
   const [allBirdIDs, setAllBirdIDs] = useState([]);
 
   const fetchAllBirdIDs = useCallback(() => {
-    const baseUrl = "http://localhost:5000";
+    const baseUrl = "http://localhost:8000";
     axios
       .get(`${baseUrl}/get_bird_ids?bird=${birdName}`)
       .then((response) => {
@@ -49,7 +49,7 @@ function PolylineMap({ selectedBird }) {
   }, [birdName]);
 
   const getTrajectoryData = () => {
-    const baseUrl = "http://localhost:5000";
+    const baseUrl = "http://localhost:8000";
     const firstBirdID = selectedBirdIDs[0];
     axios
       .get(

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { CookiesProvider, useCookies } from "react-cookie";
-import { io } from "socket.io-client";
-//import WebSocketCall from ""
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import PolylineMap from "./components/PolylineMap";
@@ -16,7 +14,7 @@ import { image } from "d3";
 function App() {
     const [socketInstance, setSocketInstance] = useState("");
 	const [cookies, setCookie] = useCookies(["user"]);
-	const backendUrl = "http://localhost:5000";
+	const backendUrl = "http://localhost:8000";
 
   // Define birdMap and climateVariables
   const birdMap = {
@@ -39,13 +37,18 @@ function App() {
 
   function updatePredictionVars(year, emissionRate, inputBird) {
 		axios
-			.post(`${backendUrl}/prediction_input`, {
+			.put(`${backendUrl}/prediction`, {
                     bird: birdMap[inputBird],
                     year: year,
-                    emissions: emissionRate })
+                    emissions: emissionRate },
+                    {
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }
+                  })
 			.then((response) => {
                 console.log(response.data.prediction)
-				//setPredictionData(response.data.prediction);
+				setPredictionData(response.data.prediction);
 			})
 			.catch((error) => {
 				console.error("Error sending prediction variables:", error);
@@ -114,17 +117,6 @@ function App() {
   }
 
 	useEffect(() => {
-        const socket = io(backendUrl, {
-            transports: ["websocket"],
-            cors: {
-                origin: "http://localhost:3000"
-            }
-        });
-        
-        setSocketInstance(socket)
-        socket.on("predictions", (data) => {
-            setPredictionData(data.prediction)
-        })
 
 	}, [selectedBird, selectedYear, selectedEmissions]);
 
