@@ -239,7 +239,6 @@ def get_bird_info(bird_name):
       detail= f"data for bird {bird_name} does not exist.")
       
 
-
 @app.get('/json/{filename}')
 def send_json(filename):
   climate_file_loc = os.path.join('climate_data/json_data', filename)

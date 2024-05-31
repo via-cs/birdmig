@@ -1,10 +1,10 @@
 library(sf)
 library(raster)
-library(dismo)
 library(geodata)
 library(ncdf4)
+library(RNetCDF)
 
-e <- extent(-179, -50, 7, 65) # set study area extent to Americas
+e <- extent(-179, -35, -55, 85) # set study area extent to Americas
 
 ssp_list <- list ("ssp126", "ssp245", "ssp370", "ssp585")
 year_list <- as.list(seq(2015,2100)) 

@@ -25,6 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # custom
+.vscode
 /model/data/*
 !/model/data/geojson
 /model/inputs/
@@ -32,8 +33,11 @@ yarn-error.log*
 .vscode
 /backend/flask_session
 
+# Ignore all tiff except probability
+model/outputs/tiff-images/*
+!*/probability_1.0.tif
+
 # Too big a file
-model/data/geojson/Haliaeetus_leucocephalus.geojson
 model/outputs/models/Anser_albifrons_et_classifier_model.pkl
 
 *.tif
