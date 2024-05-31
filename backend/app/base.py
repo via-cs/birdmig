@@ -240,19 +240,10 @@ def get_bird_sdm_data(bird_name):
   else:
     raise HTTPException(status_code=404, detail='Bird not found')
 
-    
-@app.get('/json/{filename}')
-def send_json(filename):
-  climate_file_loc = os.path.join('climate_data/json_data', filename)
-  if not os.path.exists(climate_file_loc):
-    raise HTTPException(
-      status_code= 404,
-      detail= f"File path for {climate_file_loc} does not exist")
-  return FileResponse(climate_file_loc)
-
 
 @app.get('/get_trajectory_data')
 def get_trajectory_data(bird: str, birdID: str):
+    
   filename = f'./data/{bird}.csv'
   try:
     df = pd.read_csv(filename)
@@ -262,7 +253,7 @@ def get_trajectory_data(bird: str, birdID: str):
     if bird_data.empty:
       raise HTTPException(
         status_code= 404,
-        details= 'No trajectory data found for given bird ID')
+        detail= 'No trajectory data found for given bird ID')
 
     # Convert data to dictionary format
     trajectory_data = bird_data[['LATITUDE', 'LONGITUDE', 'TIMESTAMP']].to_dict(orient='records')
@@ -270,12 +261,13 @@ def get_trajectory_data(bird: str, birdID: str):
   except FileNotFoundError:
     raise HTTPException(
       status_code= 404,
-      details= f'CSV file for {bird} not found')
+      detail= f'CSV file for {filename} not found')
         
 
 @app.get('/get_bird_ids')
 def get_bird_ids(bird: str):
   filename = f'./data/{bird}.csv'
+  
   try:
     df = pd.read_csv(filename)
     bird_ids = df['ID'].unique().tolist()
@@ -283,12 +275,14 @@ def get_bird_ids(bird: str):
   except FileNotFoundError:
     raise HTTPException(
       status_code=404,
-      detail= f'CSV file for {bird} not found')
+      detail= f'CSV file for {filename} not found')
 
 
 @app.get('/get_general_migration')
 def get_general_migration(selected_bird: str):
   filename = f'./data/{selected_bird}.csv'
+  
+  print(filename)
   
   try:
     df = pd.read_csv(filename, low_memory=False)

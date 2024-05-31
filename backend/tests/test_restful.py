@@ -4,6 +4,7 @@ from fastapi.responses import Response
 from fastapi.testclient import TestClient
 
 import json
+import os
 
 from app.base import app as fast_app
 
@@ -60,10 +61,7 @@ def test_get_bird_info(client):
 def test_get_temp_data(client):
     
     response = client.get(f'/temperature/{2021}')
-    
     assert response.status_code == 200
-    # TODO: continue coverage for climate data
-    # response_body = read_response_body(response)
     
 @pytest.mark.skip(reason= "This test takes a very long time. Uncomment when doing other tests.")
 def test_valid_predictions(client):
@@ -131,9 +129,27 @@ def test_invalid_predictions(client):
                 # This should throw a file not found error.
                 assert isinstance(e, FileNotFoundError)
 
+def test_get_sdm_data(client):
+    
+    valid_birds = [
+        "Blackpoll Warbler",
+        "Bald Eagle",
+        "White Fronted Goose",
+        "Long Billed Curlew",
+        "Whimbrel"
+    ]
+    
+    for bird in valid_birds:
+        response = client.get(f'/bird-info/{bird}')
+        
+        assert response.status_code == 200
+    
+    assert client.get(f'/bird-info/bad_get').status_code == 404
+
+@pytest.mark.skip(reason= "This test takes a very long time. Uncomment when doing other tests.")
 def test_get_bird_ids(client):
     
-    # Test the 
+    # Test if the backend can retreive bird ids for all valid birds.
     valid_birds = [
         "warbler",
         "eagle",
@@ -142,5 +158,71 @@ def test_get_bird_ids(client):
         "whimbrel"
     ]
     
+    test_directory = os.getcwd()
+    os.chdir('../app')
+    
     for bird in valid_birds:
-        client.get('/get_bird_ids', )
+        
+        ids_response = client.get(f'/get_bird_ids?bird={bird}')
+        assert ids_response.status_code == 200
+        
+        ids_content = read_response_body(ids_response)
+        for id in ids_content:
+            traj_resp = client.get(f'/get_trajectory_data?bird={bird}&birdID={id}')
+            
+            assert traj_resp.status_code == 200
+            
+        # Assert that for each bird, a bad response is handled properly.
+        assert client.get(f'/get_trajectory_data?bird={bird}&birdID=BAD_ID').status_code == 404
+    
+    # Ensure that bad 'get' requests are handled properly.
+    response = client.get(f'/get_bird_ids?bird=bad_ID')
+    assert response.status_code == 404
+    
+    assert client.get(f'/get_trajectory_data?bird=BAD_ID&birdID=BAD_ID').status_code == 404
+    
+    os.chdir(test_directory)
+
+def test_general_migration(client):
+    
+    valid_birds = [
+        "warbler",
+        "eagle",
+        "anser",
+        "curlew",
+        "whimbrel"
+    ]
+    
+    test_directory = os.getcwd()
+    os.chdir('../app')
+    
+    for bird in valid_birds:
+        
+        response = client.get(f'/get_general_migration?selected_bird={bird}')
+        assert response.status_code == 200
+    
+    assert client.get(f'/get_general_migration?selected_bird=BAD_ID').status_code == 400
+    
+    os.chdir(test_directory)
+    
+    
+def test_get_heatmap(client):
+    valid_birds = [
+        "warbler",
+        "eagle",
+        "anser",
+        "curlew",
+        "whimbrel"
+    ]
+    
+    test_directory = os.getcwd()
+    os.chdir('../app')
+    
+    for bird in valid_birds:
+        
+        response = client.get(f'/get_heatmap_data?bird={bird}')
+        assert response.status_code == 200
+    
+    assert client.get(f'/get_heatmap_data?bird=BAD_ID').status_code == 400
+        
+    os.chdir(test_directory)

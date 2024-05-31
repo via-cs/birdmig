@@ -49,7 +49,7 @@ function GeneralMigrationMap({ selectedBird }) {
     const getMigrationPattern = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${baseUrl}/get_general_migration?bird=${selectedBird}`);
+        const response = await axios.get(`${baseUrl}/get_general_migration?selectedBird=${selectedBird}`);
         if (response && response.data && response.data.segmented_polylines) {
           setSegmentedPolylines(response.data.segmented_polylines);
         } else {
