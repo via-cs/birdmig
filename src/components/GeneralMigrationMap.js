@@ -72,9 +72,10 @@ function GeneralMigrationMap({ selectedBird }) {
       {error && <p>{error}</p>}
       {!loading && !error && (
         <MapContainer
-          center={mapCenter}
-          zoom={3}
-          style={{ height: "600px", width: "100%" }}
+            data-testid="map-container"
+            center={mapCenter}
+            zoom={3}
+            style={{ height: "600px", width: "100%" }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
