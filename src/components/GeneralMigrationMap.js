@@ -45,7 +45,7 @@ function GeneralMigrationMap({ selectedBird }) {
   const [mapCenter, setMapCenter] = useState([40, -100]); // Center over North America
 
   useEffect(() => {
-    const baseUrl = "http://localhost:5000";
+    const baseUrl = "http://localhost:8000";
     const getMigrationPattern = async () => {
       setLoading(true);
       try {

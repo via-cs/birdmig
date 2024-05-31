@@ -1,8 +1,8 @@
 # Usage
 
 ## To start the Flask Backend:
-- cd into /birdmig/backend
-- enter ```flask run``` in your terminal
+- cd into /birdmig/backend/app
+- enter ```uvicorn base:app --reload``` in your terminal
 
 ## To start the React Frontend:
 
