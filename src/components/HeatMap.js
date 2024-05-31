@@ -7,7 +7,6 @@ import "leaflet.heat/dist/leaflet-heat.js";
 function Heatmap({ data }) {
   const mapRef = useRef(null);
   const birdName = data;
-  console.log(birdName);
   const [heatmapData, setHeatmapData] = useState([]);
 
   const getHeatmapData = () => {
@@ -58,7 +57,6 @@ function Heatmap({ data }) {
       map
     );
 
-    console.log(map);
     // Clean up map instance if component unmounts
     return () => {
       map.remove();

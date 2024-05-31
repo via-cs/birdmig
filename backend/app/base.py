@@ -31,32 +31,12 @@ app.add_middleware(
   allow_headers=["*"])
 
 
-bird_data = {
-  "Blackpoll Warbler": {
-    "info": "Migration details about Blackpoll Warbler",
-    "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-    "timeSeriesData": {
-        "precipitation": [300, 400, 500],
-        "climate": [30, 40, 50],
-        "temperature": [60, 70, 80],
-    },
-  },
-  "Bald Eagle": {
-    "info": "Migration details about Bald Eagle",
-    "sdmData": [{"x": 1, "y": 100}, {"x": 2, "y": 200}, {"x": 3, "y": 500}],
-  },
-  "White Fronted Goose": {
-    "info": "Migration details about White Fronted Goose",
-    "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-  },
-  "Long Billed Curlew": {
-    "info": "Migration details about Long Billed Curlew",
-    "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-  },
-  "Whimbrel": {
-    "info": "Migration details about Whimbrel",
-    "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-  },
+birdsModelDirs = {
+    "warbler": "Setophaga_striata",
+    "eagle": "Haliaeetus_leucocephalus",
+    "anser": "Anser_albifrons",
+    "curlew": "Numenius_americanus",
+    "whimbrel": "Numenius_phaeopus"
 }
 
 bird_information_data = {
@@ -259,18 +239,7 @@ def get_bird_info(bird_name):
       detail= f"data for bird {bird_name} does not exist.")
       
 
-@app.get('/bird-sdm-data/{bird_name}')
-def get_bird_sdm_data(bird_name):
-  bird = bird_data.get(bird_name)
-  if bird:
-    return {
-      'name': bird_name,
-      'sdmData': bird['sdmData']
-    }
-  else:
-    raise HTTPException(status_code=404, detail='Bird not found')
 
-    
 @app.get('/json/{filename}')
 def send_json(filename):
   climate_file_loc = os.path.join('climate_data/json_data', filename)
@@ -381,3 +350,26 @@ def get_heatmap_data(bird: str):
     #api.run(debug=True)
     #socket_io.run(api, debug=True, port=8000)
 '''
+
+'''@api.route('/get_SDM_data')
+@cross_origin(supports_credentials=True)
+def get_SDM_data():
+    tiff_file_path = f"../model/outputs/tiff-images/{birdsModelDirs[session['bird']]}/{session['emissions']}/{session['year']}/probability_1.0.tif"
+    try:
+        # Open the image using Pillow
+        img = Image.open(tiff_file_path)
+        dataset = rasterio.open(tiff_file_path)
+        print(dataset.bounds)
+        # Extract data from the image
+        img_array = np.array(img)
+        response_data = {'tiff_data': img_array.tolist()}
+        # Send the TIFF data as JSON response
+        return jsonify(response_data)
+    
+    except Exception as e:
+        return f'An error occurred: {e}'
+'''
+
+if __name__ == '__main__':
+    api.run(debug=True)
+    socket_io.run(api, debug=True, port=5000)

@@ -38,8 +38,6 @@ function PolylineMap({ selectedBird }) {
           setAllBirdIDs(response.data);
           setSelectedBirdIDs([response.data[0]]); // Initially select the first bird ID
         } else {
-          console.log(response.data);
-          console.error("Error: Response data is not an array", response.data);
           setAllBirdIDs([]);
         }
       })

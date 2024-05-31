@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
-import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 
 const ClimateChart = ({ selectedYear }) => {
@@ -21,7 +20,7 @@ const ClimateChart = ({ selectedYear }) => {
   useEffect(() => {
     const endpoint =
       activeTab === "temperature" ? "temperature" : "precipitation";
-    fetch(`http://127.0.0.1:5000/${endpoint}/${selectedYear}`)
+    fetch(`http://localhost:8000/${endpoint}/${selectedYear}`)
       .then((response) => response.json())
       .then((jsonData) => {
         const labels = jsonData.map((item) => item.month);
@@ -46,11 +45,11 @@ const ClimateChart = ({ selectedYear }) => {
   }, [selectedYear, activeTab]); // Depend on activeTab as well
 
   return (
-    <div>
+    <div className="ClimateChart">
       <h2>
         Monthly Average{" "}
         {activeTab === "temperature" ? "Temperature" : "Precipitation"} in CA
-        for year {selectedYear}
+        for Year {selectedYear}
       </h2>
       <div>
         <button onClick={() => setActiveTab("temperature")}>Temperature</button>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { CookiesProvider, useCookies } from "react-cookie";
-import { io } from "socket.io-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 //import WebSocketCall from ""
@@ -12,11 +11,8 @@ import PolylineMap from "./components/PolylineMap";
 import Heatmap from "./components/HeatMap";
 import PredictionControls from "./components/PredictionControls";
 import ClimateChart from "./components/ClimateChart";
-import { image } from "d3";
 
 function App() {
-  const [socketInstance, setSocketInstance] = useState("");
-  const [cookies, setCookie] = useCookies(["user"]);
   const backendUrl = "http://localhost:8000";
 
   // Define birdMap and climateVariables
@@ -39,22 +35,25 @@ function App() {
 
   function updatePredictionVars(year, emissionRate, inputBird) {
     axios
-    .put(`${backendUrl}/prediction`, {
-            bird: birdMap[inputBird],
-            year: year,
-            emissions: emissionRate },
-            {
-                headers: {
-                'Content-Type': 'application/json'
-                }
-            })
-    .then((response) => {
-        console.log(response.data.prediction)
+      .put(
+        `${backendUrl}/prediction`,
+        {
+          bird: birdMap[inputBird],
+          year: year,
+          emissions: emissionRate,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
         setPredictionData(response.data.prediction);
-    })
-    .catch((error) => {
+      })
+      .catch((error) => {
         console.error("Error sending prediction variables:", error);
-    });
+      });
   }
 
   const [selectedBird, setSelectedBird] = useState(null);
@@ -69,8 +68,13 @@ function App() {
   const [selectedMap, setSelectedMap] = useState("Polyline");
   const [predictionData, setPredictionData] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
+  const [showChart, setShowChart] = useState(true);
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+  const toggleEmissionsChart = () => {
+    setShowChart(!showChart);
   };
 
   axios.create({ withCredentials: true });
@@ -83,7 +87,7 @@ function App() {
   function selectBird(birdName) {
     setSelectedBird(birdName);
     fetchBirdInfo(birdName);
-    fetchSDMData(birdName);
+    //fetchSDMData(birdName);
     updatePredictionVars(selectedYear, selectedEmissions, birdName);
   }
 
@@ -103,12 +107,12 @@ function App() {
       });
   }
 
-  function fetchSDMData(birdName) {
+  /* function fetchSDMData(birdName) {
     setLoading(true);
     axios
-      .get(`${backendUrl}/bird-sdm-data/${birdName}`)
+      .get(`${backendUrl}/get_SDM_data`)
       .then((response) => {
-        setSdmData(response.data.sdmData);
+        setSdmData(response.data.tiff_data);
         setLoading(false);
       })
       .catch((error) => {
@@ -117,7 +121,7 @@ function App() {
         setSdmData(null);
         setLoading(false);
       });
-  }
+  }*/
 
   useEffect(() => {
     if (selectedClimateVariable) {
@@ -144,9 +148,7 @@ function App() {
     setSelectedClimateVariable(variable);
   }
 
-  useEffect(() => {
-
-  }, [selectedBird, selectedYear, selectedEmissions]);
+  useEffect(() => {}, [selectedBird, selectedYear, selectedEmissions]);
 
   return (
     <div className="App">
@@ -158,7 +160,7 @@ function App() {
           <h1 className="header-title"> {selectedBird} </h1>
         </div>
 
-        <div>
+        <div className="sidebardiv">
           {isOpen && (
             <nav className={"sidebar"}>
               <ul>
@@ -187,17 +189,30 @@ function App() {
             </div>
           )}
           <div className="TrajectoryContainer">
-            <h2> Trajectory</h2>
-            <div className="tabs">
-              <button
-                className="tab"
-                onClick={() => setSelectedMap("Polyline")}
-              >
-                Show Individual Path
-              </button>
-              <button className="tab" onClick={() => setSelectedMap("Heatmap")}>
-                Show Aggregated Path
-              </button>
+            <div className="TrajectoryHeader">
+              <h2> Trajectory</h2>
+              <div className="tabs">
+                <button
+                  className="tab"
+                  onClick={() => setSelectedMap("Polyline")}
+                  style={{
+                    backgroundColor:
+                      selectedMap === "Polyline" ? "#2574a8" : "#3498db",
+                  }}
+                >
+                  Show Individual Path
+                </button>
+                <button
+                  className="tab"
+                  onClick={() => setSelectedMap("Heatmap")}
+                  style={{
+                    backgroundColor:
+                      selectedMap === "Heatmap" ? "#2574a8" : "#3498db",
+                  }}
+                >
+                  Show Aggregated Path
+                </button>
+              </div>
             </div>
             <div>
               {selectedMap === "Polyline" && (
@@ -222,13 +237,32 @@ function App() {
               </div>
             </div>
             <div className="ChartsContainer">
+              <div className="emissionsChart">
+                <div className="emissionsChart-iframe">
+                  <iframe
+                    src="https://cbhighcharts2019.s3.eu-west-2.amazonaws.com/CMIP6/emissions+cmip6.html"
+                    width="100%"
+                    height="500px"
+                    title="Emissions Chart"
+                  ></iframe>
+                  <span className="emissionsChart-logoContainer">
+                    <a href="https://www.carbonbrief.org">
+                      <img
+                        src="https://s3.eu-west-2.amazonaws.com/cbhighcharts2019/cb-logo-highcharts.svg"
+                        className="emissionsChart-logo"
+                        alt="Carbon Brief Logo"
+                      />
+                    </a>
+                  </span>
+                </div>
+              </div>
               <div className="ClimateDataContainer">
                 <ClimateChart selectedYear={selectedYear} />
               </div>
-              <div className="SDMContainer">
-                <h2> Species Distribution</h2>
-                <SDMChart data={sdmData} prediction={predictionData} />
-              </div>
+            </div>
+            <div className="SDMContainer">
+              <h2> Species Distribution</h2>
+              <SDMChart prediction={predictionData} />
             </div>
           </div>
         </main>
