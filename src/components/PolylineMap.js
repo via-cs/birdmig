@@ -110,21 +110,26 @@ function PolylineMap({ selectedBird }) {
     }).addTo(map);
     // Add marker for the start point
     const startTimestamp = validData[0].TIMESTAMP;
-    const startMonth = new Date(startTimestamp).toLocaleString("en-US", {
-      month: "long",
-    });
+    const startDate = new Date(startTimestamp);
+
+    const startMonth = startDate.toLocaleString("en-US", { month: "long" });
+    const startYear = startDate.getFullYear();
+
+    console.log(`Month: ${startMonth}, Year: ${startYear}`);
     const startMarker = new L.popup()
       .setLatLng(latLngs[0])
-      .setContent(`Start Point - ${startMonth}`);
+      .setContent(`Start Point - ${startMonth} ${startYear}`);
 
     // Add marker for the end point
     const endTimestamp = validData[validData.length - 1].TIMESTAMP;
-    const endMonth = new Date(endTimestamp).toLocaleString("en-US", {
+    const endDate = new Date(endTimestamp);
+    const endMonth = endDate.toLocaleString("en-US", {
       month: "long",
     });
+    const endYear = endDate.getFullYear();
     const endMarker = new L.popup()
       .setLatLng(latLngs[latLngs.length - 1])
-      .setContent(`End Point - ${endMonth}`);
+      .setContent(`End Point - ${endMonth} ${endYear}`);
 
     map.addLayer(startMarker).addLayer(endMarker);
     // Calculate bearings for each segment of the polyline

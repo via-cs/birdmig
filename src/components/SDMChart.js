@@ -2,6 +2,7 @@ import React from "react";
 
 // Inside the SDMChart component
 function SDMChart({ prediction }) {
+  console.log(prediction);
   return (
     <div>
       {prediction && (

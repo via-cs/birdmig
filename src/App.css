@@ -150,8 +150,8 @@
 .PredictionControls {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: flex-end;
 }
 
@@ -159,9 +159,11 @@
   width: 100%;
   margin: 10px 0; /* Add some vertical spacing */
 }
+.PredictionControls .slider-label {
+  font-size: 18px;
+}
 .PredictionControls ul {
   padding: 0;
-  display: inline;
 }
 
 .year_input {
@@ -169,12 +171,12 @@
   font-size: 16px;
   margin: 0px 5px 0px 5px;
   border-radius: 20px;
-  background-color: #c9c6c6;
+  background-color: #dbd8d8;
   border: none;
   text-align: center;
 }
 .year_input:focus {
-  outline-color: #5f5e5e;
+  outline-color: #949292;
 }
 
 .PredictionControls button,
@@ -192,19 +194,6 @@
   background-color: #2980b9;
 }
 
-.PredictionControls .ButtonInfo {
-  padding: 4px 10px;
-  background-color: #b5b4b4;
-  color: white;
-  border-radius: 50px; /* Rounded corners */
-  margin: 0px 5px 5px 5px;
-  cursor: pointer;
-  outline: none;
-  font-size: 16px;
-}
-.PredictionControls .ButtonInfo:hover {
-  background-color: #949292;
-}
 .ButtonExit {
   background-color: transparent;
   color: #949292;
@@ -261,7 +250,7 @@
   background-repeat: no-repeat;
   background-size: contain;
 }
-.ChartsContainer {
+.PredictionControlsBody {
   background-color: transparent;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -269,10 +258,23 @@
   margin-top: 10px;
   width: auto;
 }
-.ChartsContainer,
-.SDMContainer {
-  padding: 10px;
-  margin: 10px;
+
+.ButtonInfo,
+.ClimateChart .ButtonInfo,
+.PredictionControls .ButtonInfo {
+  padding: 3px 6px;
+  background-color: #dbd8d8;
+  color: white;
+  border-radius: 50px; /* Rounded corners */
+  margin: 0px 2px 2px 5px;
+  cursor: pointer;
+  outline: none;
+  font-size: 12px;
+}
+.ButtonInfo:hover,
+.ClimateChart .ButtonInfo:hover,
+.PredictionControls .ButtonInfo:hover {
+  background-color: #949292;
 }
 
 .ClimateChart,
@@ -330,14 +332,13 @@ button:hover {
     grid-template-rows: auto auto auto auto; /* Adjust rows for stacking */
     padding: 20px; /* Reset padding for single column layout */
   }
-  .PredictionControls {
-  }
 
   .BirdInfo,
   .TrajectoryContainer,
   .SDMContainer,
   .ClimateDataContainer,
-  .PredictionControlsContainer {
+  .PredictionControlsContainer,
+  .PredictionControlsBody {
     grid-column: 1;
   }
 
@@ -353,6 +354,7 @@ button:hover {
     grid-row: 3;
     overflow: visible;
   }
+
   .PredictionControlsHeader {
     display: flex;
     flex-direction: column;
@@ -361,7 +363,7 @@ button:hover {
   .PredictionControlModal {
     margin-top: 10px;
   }
-  .ChartsContainer {
+  .PredictionControlsBody {
     grid-template-columns: 1fr;
   }
 }

@@ -3,7 +3,7 @@ import axios from "axios";
 import "./App.css";
 import { CookiesProvider, useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faInfo } from "@fortawesome/free-solid-svg-icons";
 //import WebSocketCall from ""
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
@@ -11,6 +11,7 @@ import PolylineMap from "./components/PolylineMap";
 import Heatmap from "./components/HeatMap";
 import PredictionControls from "./components/PredictionControls";
 import ClimateChart from "./components/ClimateChart";
+import Popup from "reactjs-popup";
 
 function App() {
   const backendUrl = "http://localhost:8000";
@@ -107,21 +108,7 @@ function App() {
       });
   }
 
-  /* function fetchSDMData(birdName) {
-    setLoading(true);
-    axios
-      .get(`${backendUrl}/get_SDM_data`)
-      .then((response) => {
-        setSdmData(response.data.tiff_data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching SDM data", error);
-        setError("Error fetching SDM data");
-        setSdmData(null);
-        setLoading(false);
-      });
-  }*/
+
 
   useEffect(() => {
     if (selectedClimateVariable) {
@@ -236,33 +223,62 @@ function App() {
                 />
               </div>
             </div>
-            <div className="ChartsContainer">
-              <div className="emissionsChart">
-                <div className="emissionsChart-iframe">
-                  <iframe
-                    src="https://cbhighcharts2019.s3.eu-west-2.amazonaws.com/CMIP6/emissions+cmip6.html"
-                    width="100%"
-                    height="500px"
-                    title="Emissions Chart"
-                  ></iframe>
-                  <span className="emissionsChart-logoContainer">
-                    <a href="https://www.carbonbrief.org">
-                      <img
-                        src="https://s3.eu-west-2.amazonaws.com/cbhighcharts2019/cb-logo-highcharts.svg"
-                        className="emissionsChart-logo"
-                        alt="Carbon Brief Logo"
-                      />
-                    </a>
-                  </span>
+            <div className="PredictionControlsBody">
+              <div className="SDMContainer">
+                <h2>
+                  {" "}
+                  Species Distribution
+                  <Popup
+                    trigger={
+                      <button className="ButtonInfo">
+                        <FontAwesomeIcon icon={faInfo} />
+                      </button>
+                    }
+                    modal
+                    nested
+                  >
+                    {(close) => (
+                      <div className="PredictionControlModal">
+                        <button className="ButtonExit" onClick={() => close()}>
+                          X
+                        </button>
+                        <p>
+                          <strong>Dark green</strong> indicates a high
+                          probability that an individual bird will be there.
+                          <br />
+                          <strong>Lighter shades</strong> indicate less
+                          probability.
+                        </p>
+                      </div>
+                    )}
+                  </Popup>
+                </h2>
+                <SDMChart prediction={predictionData} />
+              </div>
+              <div className="ChartsContainer">
+                <div className="ClimateDataContainer">
+                  <ClimateChart selectedYear={selectedYear} />
+                </div>
+                <div className="emissionsChart">
+                  <div className="emissionsChart-iframe">
+                    <iframe
+                      src="https://cbhighcharts2019.s3.eu-west-2.amazonaws.com/CMIP6/emissions+cmip6.html"
+                      width="100%"
+                      height="400px"
+                      title="Emissions Chart"
+                    ></iframe>
+                    <span className="emissionsChart-logoContainer">
+                      <a href="https://www.carbonbrief.org">
+                        <img
+                          src="https://s3.eu-west-2.amazonaws.com/cbhighcharts2019/cb-logo-highcharts.svg"
+                          className="emissionsChart-logo"
+                          alt="Carbon Brief Logo"
+                        />
+                      </a>
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="ClimateDataContainer">
-                <ClimateChart selectedYear={selectedYear} />
-              </div>
-            </div>
-            <div className="SDMContainer">
-              <h2> Species Distribution</h2>
-              <SDMChart prediction={predictionData} />
             </div>
           </div>
         </main>

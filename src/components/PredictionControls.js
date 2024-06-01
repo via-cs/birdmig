@@ -68,24 +68,6 @@ function PredictionControls(props) {
             handleYearChange();
           }}
         />
-        <input
-                id="year_input"
-                type="number"
-                value={year}
-                placeholder='Enter a year between 2021 and 2100'
-                min={2021}
-                max={2100}
-                maxLength={4}
-                minLength={4}
-                onKeyDown={(
-                    (event)=>{
-                        if (event.key === 'Enter') {
-                            handleYearChange()
-                        }                        
-                    })}
-                onChange={(e) => {setYear(e.target.value)}}
-                className='year_input'
-            />
       </div>
       <ul>
         {CO2_Futures.map((emission_type) => (
