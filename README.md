@@ -45,4 +45,3 @@ This will not only test your components but also provide a detailed report of yo
 ## Writing New Tests
 Test files are located alongside the components they are testing, with a `.test.js` or `.test.jsx` file extension. For example, if you have a component in `src/components/MyComponent.js`, its tests should be in `src/components/MyComponent.test.js`.
 
-

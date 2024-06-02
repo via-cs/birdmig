@@ -38,7 +38,6 @@ function PolylineMap({ selectedBird }) {
           setAllBirdIDs(response.data);
           setSelectedBirdIDs([response.data[0]]); // Initially select the first bird ID
         } else {
-          console.error("Error: Response data is not an array", response.data);
           setAllBirdIDs([]);
         }
       })
@@ -111,21 +110,26 @@ function PolylineMap({ selectedBird }) {
     }).addTo(map);
     // Add marker for the start point
     const startTimestamp = validData[0].TIMESTAMP;
-    const startMonth = new Date(startTimestamp).toLocaleString("en-US", {
-      month: "long",
-    });
+    const startDate = new Date(startTimestamp);
+
+    const startMonth = startDate.toLocaleString("en-US", { month: "long" });
+    const startYear = startDate.getFullYear();
+
+    console.log(`Month: ${startMonth}, Year: ${startYear}`);
     const startMarker = new L.popup()
       .setLatLng(latLngs[0])
-      .setContent(`Start Point - ${startMonth}`);
+      .setContent(`Start Point - ${startMonth} ${startYear}`);
 
     // Add marker for the end point
     const endTimestamp = validData[validData.length - 1].TIMESTAMP;
-    const endMonth = new Date(endTimestamp).toLocaleString("en-US", {
+    const endDate = new Date(endTimestamp);
+    const endMonth = endDate.toLocaleString("en-US", {
       month: "long",
     });
+    const endYear = endDate.getFullYear();
     const endMarker = new L.popup()
       .setLatLng(latLngs[latLngs.length - 1])
-      .setContent(`End Point - ${endMonth}`);
+      .setContent(`End Point - ${endMonth} ${endYear}`);
 
     map.addLayer(startMarker).addLayer(endMarker);
     // Calculate bearings for each segment of the polyline
@@ -158,7 +162,7 @@ function PolylineMap({ selectedBird }) {
 
   return (
     <div>
-      <div ref={mapRef} className="Map">
+      <div ref={mapRef} className="TrajectoryMap">
         <div style={{ position: "absolute", top: 0, right: 0, zIndex: 999 }}>
           <select onChange={handleDropdownChange} value={selectedBirdIDs[0]}>
             <option value="">Select {birdName} ID</option>
