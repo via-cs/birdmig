@@ -7,3 +7,5 @@ Shapely
 
 pytest
 requests
+pytest-cov
+flask_testing

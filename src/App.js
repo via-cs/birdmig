@@ -2,19 +2,19 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { CookiesProvider, useCookies } from "react-cookie";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faInfo } from "@fortawesome/free-solid-svg-icons";
+//import WebSocketCall from ""
 import BirdInfo from "./components/BirdInfo";
 import SDMChart from "./components/SDMChart";
 import PolylineMap from "./components/PolylineMap";
 import Heatmap from "./components/HeatMap";
-import GeneralMigrationMap from "./components/GeneralMigrationMap";
 import PredictionControls from "./components/PredictionControls";
 import ClimateChart from "./components/ClimateChart";
-import { image } from "d3";
+import Popup from "reactjs-popup";
 
 function App() {
-    const [socketInstance, setSocketInstance] = useState("");
-	const [cookies, setCookie] = useCookies(["user"]);
-	const backendUrl = "http://localhost:8000";
+  const backendUrl = "http://localhost:8000";
 
   // Define birdMap and climateVariables
   const birdMap = {
@@ -22,7 +22,7 @@ function App() {
     "Bald Eagle": "eagle",
     "White Fronted Goose": "anser",
     "Long Billed Curlew": "curlew",
-    "Whimbrel": "whimbrel",
+    Whimbrel: "whimbrel",
   };
 
   const climateVariables = ["temperature", "precipitation"];
@@ -34,26 +34,28 @@ function App() {
     return imageList.find((image) => image.includes(`/${bird}.`));
   });
 
-
   function updatePredictionVars(year, emissionRate, inputBird) {
-		axios
-			.put(`${backendUrl}/prediction`, {
-                    bird: birdMap[inputBird],
-                    year: year,
-                    emissions: emissionRate },
-                    {
-                      headers: {
-                        'Content-Type': 'application/json'
-                      }
-                  })
-			.then((response) => {
-                console.log(response.data.prediction)
-				setPredictionData(response.data.prediction);
-			})
-			.catch((error) => {
-				console.error("Error sending prediction variables:", error);
-			});
-	}
+    axios
+      .put(
+        `${backendUrl}/prediction`,
+        {
+          bird: birdMap[inputBird],
+          year: year,
+          emissions: emissionRate,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        setPredictionData(response.data.prediction);
+      })
+      .catch((error) => {
+        console.error("Error sending prediction variables:", error);
+      });
+  }
 
   const [selectedBird, setSelectedBird] = useState(null);
   const [birdInfo, setBirdInfo] = useState(null);
@@ -64,11 +66,17 @@ function App() {
   const [selectedEmissions, setEmissionRate] = useState("ssp245");
   const [climateData, setClimateData] = useState(null);
   const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
-  /* const [showPolylineMap, setShowPolylineMap] = useState(true);
-  const [showHeatMap, setShowHeatMap] = useState(false);
-  const [showSDM, setShowSDM] = useState(false);*/
   const [selectedMap, setSelectedMap] = useState("Polyline");
   const [predictionData, setPredictionData] = useState(null);
+  const [isOpen, setIsOpen] = useState(true);
+  const [showChart, setShowChart] = useState(true);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+  const toggleEmissionsChart = () => {
+    setShowChart(!showChart);
+  };
 
   axios.create({ withCredentials: true });
   axios.defaults.withCredentials = true;
@@ -80,8 +88,8 @@ function App() {
   function selectBird(birdName) {
     setSelectedBird(birdName);
     fetchBirdInfo(birdName);
-    fetchSDMData(birdName);
-    updatePredictionVars(selectedYear, selectedEmissions, birdName)
+    //fetchSDMData(birdName);
+    updatePredictionVars(selectedYear, selectedEmissions, birdName);
   }
 
   function fetchBirdInfo(birdName) {
@@ -100,80 +108,98 @@ function App() {
       });
   }
 
-  function fetchSDMData(birdName) {
+
+
+  useEffect(() => {
+    if (selectedClimateVariable) {
+      fetchClimateData(selectedClimateVariable);
+    }
+  }, [selectedClimateVariable]);
+
+  function fetchClimateData(variable) {
     setLoading(true);
     axios
-      .get(`${backendUrl}/bird-sdm-data/${birdName}`)
+      .get(`${backendUrl}/json/${climateVariables[variable]}`)
       .then((response) => {
-        setSdmData(response.data.sdmData);
+        setClimateData(response.data);
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching SDM data", error);
-        setError("Error fetching SDM data");
-        setSdmData(null);
+        console.error("Error fetching climate data", error);
+        setError("Failed to fetch climate data");
         setLoading(false);
       });
   }
 
-	useEffect(() => {
+  function handleClimateVariableChange(variable) {
+    setSelectedClimateVariable(variable);
+  }
 
-	}, [selectedBird, selectedYear, selectedEmissions]);
+  useEffect(() => {}, [selectedBird, selectedYear, selectedEmissions]);
 
   return (
     <div className="App">
       <CookiesProvider>
         <div className="header">
-          <h1> {selectedBird} </h1>
+          <button className="toggle-button" onClick={toggleSidebar}>
+            <FontAwesomeIcon icon={faBars} />
+          </button>
+          <h1 className="header-title"> {selectedBird} </h1>
         </div>
-        
-        <nav className="sidebar">
-          <ul>
-            {Object.keys(birdMap).map((bird, index) => (
-              <li key={bird} onClick={() => selectBird(bird)}>
-                {bird}
-                {orderedImageList[index] && (
-                  <img
-                    className="image"
-                    src={orderedImageList[index]}
-                    alt={`${index}`}
-                  />
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
+
+        <div className="sidebardiv">
+          {isOpen && (
+            <nav className={"sidebar"}>
+              <ul>
+                {Object.keys(birdMap).map((bird, index) => (
+                  <li key={bird} onClick={() => selectBird(bird)}>
+                    {bird}
+                    {orderedImageList[index] && (
+                      <img
+                        className="image"
+                        src={orderedImageList[index]}
+                        alt={`${index}`}
+                      />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </div>
         <main className="main-content">
           {loading && <p>Loading...</p>}
           {error && <p>Error: {error}</p>}
           {birdInfo && (
             <div className="BirdInfo">
               <BirdInfo data={birdInfo} />
-              <div className="PredictionControls">
-                <PredictionControls
-                  onPredictionUpdated = {(year, emissions) => {
-                    setObservedYear(year)
-                    setEmissionRate(emissions)
-                    updatePredictionVars(year, emissions, selectedBird)
-                  }}
-                />
-              </div>
             </div>
           )}
-          <div className="MigrationMap">
-            <div className="tabs">
-              <button
-                className="tab"
-                onClick={() => setSelectedMap("Polyline")}
-              >
-                Show Single Bird Trajectory
-              </button>
-              <button className="tab" onClick={() => setSelectedMap("Heatmap")}>
-                Show General Bird Trajectory
-              </button>
-              <button className="tab" onClick={() => setSelectedMap("SDM")}>
-                Show Species Distribution Map
-              </button>
+          <div className="TrajectoryContainer">
+            <div className="TrajectoryHeader">
+              <h2> Trajectory</h2>
+              <div className="tabs">
+                <button
+                  className="tab"
+                  onClick={() => setSelectedMap("Polyline")}
+                  style={{
+                    backgroundColor:
+                      selectedMap === "Polyline" ? "#2574a8" : "#3498db",
+                  }}
+                >
+                  Show Individual Path
+                </button>
+                <button
+                  className="tab"
+                  onClick={() => setSelectedMap("Heatmap")}
+                  style={{
+                    backgroundColor:
+                      selectedMap === "Heatmap" ? "#2574a8" : "#3498db",
+                  }}
+                >
+                  Show Aggregated Path
+                </button>
+              </div>
             </div>
             <div>
               {selectedMap === "Polyline" && (
@@ -184,14 +210,77 @@ function App() {
               )}
             </div>
           </div>
-          {sdmData && (
-            <div className="SDMChart">
-              <SDMChart data={sdmData} prediction={predictionData} />
+          <div className="PredictionControlsContainer">
+            <div className="PredictionControlsHeader">
+              <h2> Prediction Controls</h2>
+              <div className="PredictionControls">
+                <PredictionControls
+                  onPredictionUpdated={(year, emissions) => {
+                    setObservedYear(year);
+                    setEmissionRate(emissions);
+                    updatePredictionVars(year, emissions, selectedBird);
+                  }}
+                />
+              </div>
             </div>
-          )}
-           <div className="ClimateDataContainer">
-            <ClimateChart selectedYear={selectedYear} />
-           </div>
+            <div className="PredictionControlsBody">
+              <div className="SDMContainer">
+                <h2>
+                  {" "}
+                  Species Distribution
+                  <Popup
+                    trigger={
+                      <button className="ButtonInfo">
+                        <FontAwesomeIcon icon={faInfo} />
+                      </button>
+                    }
+                    modal
+                    nested
+                  >
+                    {(close) => (
+                      <div className="PredictionControlModal">
+                        <button className="ButtonExit" onClick={() => close()}>
+                          X
+                        </button>
+                        <p>
+                          <strong>Dark green</strong> indicates a high
+                          probability that an individual bird will be there.
+                          <br />
+                          <strong>Lighter shades</strong> indicate less
+                          probability.
+                        </p>
+                      </div>
+                    )}
+                  </Popup>
+                </h2>
+                <SDMChart prediction={predictionData} />
+              </div>
+              <div className="ChartsContainer">
+                <div className="ClimateDataContainer">
+                  <ClimateChart selectedYear={selectedYear} />
+                </div>
+                <div className="emissionsChart">
+                  <div className="emissionsChart-iframe">
+                    <iframe
+                      src="https://cbhighcharts2019.s3.eu-west-2.amazonaws.com/CMIP6/emissions+cmip6.html"
+                      width="100%"
+                      height="400px"
+                      title="Emissions Chart"
+                    ></iframe>
+                    <span className="emissionsChart-logoContainer">
+                      <a href="https://www.carbonbrief.org">
+                        <img
+                          src="https://s3.eu-west-2.amazonaws.com/cbhighcharts2019/cb-logo-highcharts.svg"
+                          className="emissionsChart-logo"
+                          alt="Carbon Brief Logo"
+                        />
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </main>
       </CookiesProvider>
     </div>
