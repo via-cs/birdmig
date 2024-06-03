@@ -51,8 +51,6 @@ for species in tqdm(species_list):
       # Fit Model
       model.fit(X, y)
 
-      #pyimpute.evaluate_clf(model, train_xs, train_y)
-
       os.makedirs('outputs/models/', exist_ok=True)
-      filename = species + '_et_classifier_model.pkl'
+      filename = species + '_rf_classifier_model.pkl'
       pickle.dump(model, open('outputs/models/' + filename, 'wb'))
