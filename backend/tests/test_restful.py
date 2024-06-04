@@ -63,8 +63,11 @@ def test_get_temp_data(client):
     response = client.get(f'/temperature/{2021}')
     assert response.status_code == 200
     
-@pytest.mark.skip(reason= "This test takes a very long time. Uncomment when doing other tests.")
+#@pytest.mark.skip(reason= "This test takes a very long time. Uncomment when doing other tests.")
 def test_valid_predictions(client):
+    
+    test_directory = os.getcwd()
+    os.chdir('./app')
     
     valid_birds = [
         "warbler",
@@ -83,6 +86,8 @@ def test_valid_predictions(client):
             'ssp370',
             'ssp585'
         ]
+        '''
+        uncomment to test every possible SSP and every possible year.
         
         for ssp in ssps:
             
@@ -98,7 +103,18 @@ def test_valid_predictions(client):
                 response_body = read_response_body(response)
                 
                 assert response.status_code == 200
-                assert response_body['resFormat'] == "PNG"
+                assert response_body['resFormat'] == "PNG"'''
+    payload = {
+                    "bird": "warbler",
+                    "year": 2025,
+                    "emissions": 'ssp245',
+                }
+                
+    response = client.put('/prediction', json= payload)    
+    assert response.status_code == 200
+    
+    os.chdir(test_directory)
+        
 
 def test_invalid_predictions(client):
         
@@ -146,7 +162,7 @@ def test_get_sdm_data(client):
     
     assert client.get(f'/bird-info/bad_get').status_code == 404
 
-@pytest.mark.skip(reason= "This test takes a very long time. Uncomment when doing other tests.")
+#@pytest.mark.skip(reason= "This test takes a very long time. Uncomment when doing other tests.")
 def test_get_bird_ids(client):
     
     # Test if the backend can retreive bird ids for all valid birds.
@@ -167,10 +183,9 @@ def test_get_bird_ids(client):
         assert ids_response.status_code == 200
         
         ids_content = read_response_body(ids_response)
-        for id in ids_content:
-            traj_resp = client.get(f'/get_trajectory_data?bird={bird}&birdID={id}')
+        traj_resp = client.get(f'/get_trajectory_data?bird={bird}&birdID={ids_content[0]}')
             
-            assert traj_resp.status_code == 200
+        assert traj_resp.status_code == 200
             
         # Assert that for each bird, a bad response is handled properly.
         assert client.get(f'/get_trajectory_data?bird={bird}&birdID=BAD_ID').status_code == 404
