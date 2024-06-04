@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 import requests
@@ -13,6 +13,8 @@ import os
 import pandas as pd
 import numpy as np
 from shapely.geometry import LineString
+import rasterio
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 
 from PIL import Image
 from io import BytesIO
@@ -31,34 +33,47 @@ app.add_middleware(
   allow_headers=["*"])
 
 
-bird_data = {
-  "Blackpoll Warbler": {
-    "info": "Migration details about Blackpoll Warbler",
-    "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-    "timeSeriesData": {
-        "precipitation": [300, 400, 500],
-        "climate": [30, 40, 50],
-        "temperature": [60, 70, 80],
-    },
-  },
-  "Bald Eagle": {
-    "info": "Migration details about Bald Eagle",
-    "sdmData": [{"x": 1, "y": 100}, {"x": 2, "y": 200}, {"x": 3, "y": 500}],
-  },
-  "White Fronted Goose": {
-    "info": "Migration details about White Fronted Goose",
-    "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-  },
-  "Long Billed Curlew": {
-    "info": "Migration details about Long Billed Curlew",
-    "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-  },
-  "Whimbrel": {
-    "info": "Migration details about Whimbrel",
-    "sdmData": [{"x": 1, "y": 300}, {"x": 2, "y": 600}, {"x": 3, "y": 800}],
-  },
+birdsModelDirs = {
+    "warbler": "Setophaga_striata",
+    "eagle": "Haliaeetus_leucocephalus",
+    "anser": "Anser_albifrons",
+    "curlew": "Numenius_americanus",
+    "whimbrel": "Numenius_phaeopus"
 }
 
+bird_information_data = {
+    "Blackpoll Warbler": {
+      "scientific_name" : "Setophaga Striata",
+      "general": "The Blackpoll Warbler, named for the male's black forehead and crown, has the longest migration of any North American warbler. Each fall, most Blackpolls migrate more than 2,000 miles across open water without stopping, sometimes flying for more than 80 hours straight until they reach their Amazon wintering grounds.",
+      "migration": "Blackpolls have an “elliptical” migration, traveling a different route in the fall and in the spring. Other birds known to have an elliptical migration pattern include the American Golden-Plover and the Connecticut Warbler, which is the only other North American warbler species known to winter in the Amazonian lowlands. As in many of their tribe, including the Chestnut-sided and Bay-breasted Warblers, male Blackpoll Warblers sport much more subdued coloration as they head south in fall. Gone is the distinctive white cheek and black cap.",
+      "source": "https://abcbirds.org/bird/blackpoll-warbler/",
+    },
+    "Bald Eagle" : {
+      "scientific_name": "Haliaeetus Leucocephalus",
+      "general": "The majestic Bald Eagle is the only eagle species found solely in North America.The Bald Eagle's Latin name accurately reflects its appearance and habits: Hali and aiētos mean “sea eagle,” and leuco and cephalos mean “white head.” The use of the word \"Bald\" in its English name does not mean hairless; rather, it derives from the Middle English word “balde,” which means shining white.",
+      "migration": "The Bald Eagle is a North American specialty, found from Alaska through Canada into the lower 48 U.S. states, even moving as far south as northern Mexico during the winter. It is considered a partial migrant — individuals in the northern parts of the range often move south during extremely cold weather, as this species needs open water to hunt.",
+      "source": "https://abcbirds.org/bird/bald-eagle/",
+    },
+    "White Fronted Goose" : {
+      "scientific_name": "Anser Albifrons",
+      "general": "The greater white-fronted goose is a species of goose related to the smaller lesser white-fronted goose. It is named for the patch of white feathers bordering the base of its bill, in fact albifrons comes from the Latin albus \"white\" and frons \"forehead\". In Europe it has been known as the white-fronted goose; in North America it is known as the greater white-fronted goose, and this name is also increasingly adopted internationally. Even more distinctive are the salt-and-pepper markings on the breast of adult birds, which is why the goose is colloquially called the \"specklebelly\" in North America.",
+      "migration": "The Pacific white-fronted goose migrate south down the Pacific coast, staging primarily in the Klamath Basin of southern Oregon and northern California and wintering, eventually, in California's Central Valley. The tule goose is somewhat rare and has been since the latter half of the 19th century, presumably it was affected by destruction of its wintering habitat due to human settlement.",
+      "source": "https://en.wikipedia.org/wiki/Greater_white-fronted_goose",
+    },
+    "Long Billed Curlew": {
+      "scientific_name": "Numenius Americanus",
+      "general": "The eye-catching Long-billed Curlew is North America's largest shorebird, but like the Mountain Plover and Buff-breasted Sandpiper, it's very often found away from the shore. Its genus Numenius is named from the Greek word noumenios, meaning “of the new moon” — bestowed upon curlews because their long, curved bills were thought to resemble a sickle-shaped new moon. The birds' lengthy bills, longest in females, also engendered some interesting folk names such as \"sicklebird,\" \"old smoker,\" and \"candlestick bird.\"",
+      "migration": "This species is a short- to medium-distance migrant, moving south in flocks to winter along the U.S. West Coast, south into Mexico, Guatemala, and Honduras. Small numbers winter in Florida and along the southeastern Atlantic shore.",
+      "source": "https://abcbirds.org/bird/long-billed-curlew/",
+    },
+    "Whimbrel" : {
+      "scientific_name": "Numenius Phaeopus",
+      "general": "The Eurasian or common whimbrel (Numenius phaeopus), also known as the white-rumped whimbrel in North America, is a wader in the large family Scolopacidae. It is one of the most widespread of the curlews, breeding across much of subarctic Asia and Europe as far south as Scotland. This species and the Hudsonian whimbrel have recently been split, although some taxonomic authorities still consider them to be conspecific.",
+      "migration": "The whimbrel is a migratory bird, wintering on coasts in southern North America and South America. It is also a coastal bird during migration. It is fairly gregarious outside the breeding season.",
+      "source" : "https://en.wikipedia.org/wiki/Hudsonian_whimbrel",
+    }
+
+}
 
 @app.get('/temperature/{selectedYear}')
 def get_temperature_data(selectedYear: int):
@@ -179,23 +194,6 @@ async def get_predictions(prediction_input: PredictionInputs):
   selected_bird = prediction_input.bird
   selected_year = str(prediction_input.year)
   emission_Type = prediction_input.emissions
-    
-  '''
-  If the backend needs to cache the bird, year, or emissions such as recording jobs that it is performing, store it in a session. Currently unimplemented, as the backend can remain stateless.
-  
-  # Store the inputs into a session, cached for future utility
-  session['bird'] = input_bird#prediction_input['bird']
-  session['year'] = input_year#prediction_input['year']
-  session['emissions'] = input_emission#prediction_input['emissions']'''
-  
-  birdsModelDirs = {
-    "warbler": "Setophaga_striata",
-    "eagle": "Haliaeetus_leucocephalus",
-    "anser": "Anser_albifrons",
-    "curlew": "Numenius_americanus",
-    "whimbrel": "Numenius_phaeopus"
-  }
-  
   # For image data:
   output_path = f"../../model/outputs/png-images/{birdsModelDirs[selected_bird]}/{emission_Type}/{selected_year}.png"
   dataImg = Image.open(output_path)
@@ -217,11 +215,12 @@ async def get_predictions(prediction_input: PredictionInputs):
 
 @app.get('/bird-info/{bird_name}')
 def get_bird_info(bird_name):
-  bird = bird_data.get(bird_name)
+  bird = bird_information_data.get(bird_name)
   if bird:
     return {
-      'name': bird_name,
-      'info': bird['info']
+        'scientific_name' : bird["scientific_name"],
+        'general': bird["general"],
+        'migration': bird["migration"]
     }
   else:
     raise HTTPException(
@@ -239,6 +238,14 @@ def get_bird_sdm_data(bird_name):
     }
   else:
     raise HTTPException(status_code=404, detail='Bird not found')
+@app.get('/json/{filename}')
+def send_json(filename):
+  climate_file_loc = os.path.join('climate_data/json_data', filename)
+  if not os.path.exists(climate_file_loc):
+    raise HTTPException(
+      status_code= 404,
+      detail= f"File path for {climate_file_loc} does not exist")
+  return FileResponse(climate_file_loc)
 
 
 @app.get('/get_trajectory_data')
@@ -339,9 +346,67 @@ def get_heatmap_data(bird: str):
     except Exception as e:
       raise HTTPException(status_code=400, detail= str(e))
 
+source_epsg = 'epsg:4326'  # Input coordinates in EPSG 4326 (WGS84)
+target_epsg = 'epsg:3587' 
     
-'''if __name__ == '__main__':
-    uvicorn.run(app, port= 8000)
-    #api.run(debug=True)
-    #socket_io.run(api, debug=True, port=8000)
+@app.get('/get_SDM_data')
+def get_SDM_data(prediction_input: PredictionInputs):
+  selected_bird = prediction_input.bird
+  selected_year = str(prediction_input.year)
+  emission_Type = prediction_input.emissions
+
+  tiff_file_path = f"../model/outputs/tiff-images/{birdsModelDirs[selected_bird]}/{emission_Type}/{selected_year}/probability_1.0.tif"
+
+  with rasterio.open(tiff_file_path) as src:
+      # Read the data from the TIFF file
+      data = src.read(1)  # Assuming a single band for simplicity
+
+        # Get the transformation parameters for the reprojected image
+      transform, width, height = calculate_default_transform(src.crs, target_epsg, src.width, src.height, *src.bounds)
+
+        # Reproject the image
+      data_reprojected = np.empty((height, width), dtype=data.dtype)
+      reproject(
+          source=data,
+          destination=data_reprojected,
+          src_transform=src.transform,
+          src_crs=src.crs,
+          dst_transform=transform,
+          dst_crs=target_epsg,
+          resampling=Resampling.nearest
+      )
+
+    # Convert numpy array to list for JSON serialization
+  data_list = data_reprojected.tolist()
+
+  # Prepare data to send to frontend
+  converted_data = {'data': data_list}
+
+  # Convert data to JSON
+  json_data = json.dumps(converted_data)
+
+  # Send converted data to frontend
+  return JSONResponse(content=converted_data)
+
+'''@api.route('/get_SDM_data')
+@cross_origin(supports_credentials=True)
+def get_SDM_data():
+    tiff_file_path = f"../model/outputs/tiff-images/{birdsModelDirs[session['bird']]}/{session['emissions']}/{session['year']}/probability_1.0.tif"
+    try:
+        # Open the image using Pillow
+        img = Image.open(tiff_file_path)
+        dataset = rasterio.open(tiff_file_path)
+        print(dataset.bounds)
+        # Extract data from the image
+        img_array = np.array(img)
+        response_data = {'tiff_data': img_array.tolist()}
+        # Send the TIFF data as JSON response
+        return jsonify(response_data)
+    
+    except Exception as e:
+        return f'An error occurred: {e}'
 '''
+
+if __name__ == '__main__':
+    api.run(debug=True)
+    socket_io.run(api, debug=True, port=5000)

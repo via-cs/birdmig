@@ -40,5 +40,11 @@ model/outputs/tiff-images/*
 # Too big a file
 model/outputs/models/Anser_albifrons_et_classifier_model.pkl
 
+# Ignore all tifs except probability_1.0.tif
 *.tif
 !probability_1.0.tif
+
+# Ignore all TeX files except .tex and .pdf
+/techdoc/*
+!techdoc/tech-doc.pdf
+!techdoc/tech-doc.tex
