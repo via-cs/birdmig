@@ -1,4 +1,3 @@
-import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
@@ -18,8 +17,6 @@ from rasterio.warp import calculate_default_transform, reproject, Resampling
 from PIL import Image
 from io import BytesIO
 import base64
-
-from time import sleep
 
 app = FastAPI()
 frontend_origin = "http://localhost:3000"

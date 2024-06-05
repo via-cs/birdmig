@@ -62,7 +62,11 @@ def test_get_temp_data(client):
     response = client.get(f'/temperature/{2021}')
     assert response.status_code == 200
     
-#@pytest.mark.skip(reason= "This test takes a very long time. Uncomment when doing other tests.")
+def test_get_precip_data(client):
+  
+  response = client.get(f'/precipitation/{2021}')
+  assert response.status_code == 200
+    
 def test_valid_predictions(client):
     
     test_directory = os.getcwd()
