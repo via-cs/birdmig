@@ -1,8 +1,12 @@
 # Usage
 
 ## To start the Flask Backend:
-- cd into /birdmig/backend/app
-- enter ```uvicorn base:app --reload``` in your terminal
+- ```cd``` into ```/birdmig/backend/app```
+- Run the backend
+  - To run the backend for showcase and documentation purposes, enter ```fastapi dev base.py``` in your terminal.
+    - Access docs by navigating to ```localhost:8000/docs``` on your web browser
+  - To run the backend for debugging purposes, run ```uvicorn base:app --reload``` in your terminal.
+    - Note that this only runs the backend. It can not be navigated to on the web browser, nor will documentation be available.
 
 ## To start the React Frontend:
 
