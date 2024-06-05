@@ -9,7 +9,6 @@ import json
 
 import os
 
-#from .config import AppConfig
 import pandas as pd
 import numpy as np
 from shapely.geometry import LineString
@@ -19,8 +18,7 @@ from rasterio.warp import calculate_default_transform, reproject, Resampling
 from PIL import Image
 from io import BytesIO
 import base64
-# DEBUGGING
-import sys
+
 from time import sleep
 
 app = FastAPI()
@@ -202,10 +200,7 @@ async def get_predictions(prediction_input: PredictionInputs):
   
   # FastAPI requests can handle asynchronous predictions.
   # In practice, this would be waiting for a machine learning model to generate
-  # predictions.
-  # Simualted here with a sleep() function.
-  
-  # sleep(2.5)
+  # predictions. In this version, waiting wasn't necessary, so it returns immediately.
   
   return {
     "prediction": base64.b64encode(buffer.getvalue()).decode(),
@@ -226,18 +221,8 @@ def get_bird_info(bird_name):
     raise HTTPException(
       status_code= 404,
       detail= f"data for bird {bird_name} does not exist.")
-      
-
-@app.get('/bird-sdm-data/{bird_name}')
-def get_bird_sdm_data(bird_name):
-  bird = bird_data.get(bird_name)
-  if bird:
-    return {
-      'name': bird_name,
-      'sdmData': bird['sdmData']
-    }
-  else:
-    raise HTTPException(status_code=404, detail='Bird not found')
+  
+  
 @app.get('/json/{filename}')
 def send_json(filename):
   climate_file_loc = os.path.join('climate_data/json_data', filename)
@@ -283,51 +268,6 @@ def get_bird_ids(bird: str):
     raise HTTPException(
       status_code=404,
       detail= f'CSV file for {filename} not found')
-
-
-@app.get('/get_general_migration')
-def get_general_migration(selected_bird: str):
-  filename = f'./data/{selected_bird}.csv'
-  
-  print(filename)
-  
-  try:
-    df = pd.read_csv(filename, low_memory=False)
-    
-    # Convert TIMESTAMP column to datetime
-    df['TIMESTAMP'] = pd.to_datetime(df['TIMESTAMP'])
-    
-    # Group by ID and get the start and end months for each group
-    grouped = df.groupby('ID')
-    print(grouped)
-    simplified_polylines = []
-    for _, group in grouped:
-      # Sort by timestamp
-      group = group.sort_values(by='TIMESTAMP')
-      
-      # Get coordinates
-      coordinates = list(zip(group['LATITUDE'], group['LONGITUDE']))
-      
-      # Apply Douglas-Peucker algorithm for simplification
-      simplified_line = simplify_line(coordinates)
-      
-      # Calculate direction for simplified line
-      start_point = simplified_line[0]
-      end_point = simplified_line[-1]
-      delta_lat = end_point[0] - start_point[0]
-      delta_lon = end_point[1] - start_point[1]
-      direction = np.arctan2(delta_lat, delta_lon) * (180 / np.pi)
-      
-      # Append simplified line with direction to simplified_polylines
-      simplified_polylines.append({
-          'coordinates': simplified_line,
-          'direction': direction
-      })
-    
-    return {'segmented_polylines': simplified_polylines}
-  
-  except Exception as e:
-    raise HTTPException(status_code= 400, detail=str(e))
 
         
 def simplify_line(coordinates, tolerance=0.1):
@@ -387,26 +327,3 @@ def get_SDM_data(prediction_input: PredictionInputs):
 
   # Send converted data to frontend
   return JSONResponse(content=converted_data)
-
-'''@api.route('/get_SDM_data')
-@cross_origin(supports_credentials=True)
-def get_SDM_data():
-    tiff_file_path = f"../model/outputs/tiff-images/{birdsModelDirs[session['bird']]}/{session['emissions']}/{session['year']}/probability_1.0.tif"
-    try:
-        # Open the image using Pillow
-        img = Image.open(tiff_file_path)
-        dataset = rasterio.open(tiff_file_path)
-        print(dataset.bounds)
-        # Extract data from the image
-        img_array = np.array(img)
-        response_data = {'tiff_data': img_array.tolist()}
-        # Send the TIFF data as JSON response
-        return jsonify(response_data)
-    
-    except Exception as e:
-        return f'An error occurred: {e}'
-'''
-
-if __name__ == '__main__':
-    api.run(debug=True)
-    socket_io.run(api, debug=True, port=5000)
