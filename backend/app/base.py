@@ -263,12 +263,6 @@ def get_bird_ids(bird: str):
       status_code=404,
       detail= f'CSV file for {filename} not found')
 
-'''        
-def simplify_line(coordinates, tolerance=0.1):
-  line = LineString(coordinates)
-  simplified_line = line.simplify(tolerance, preserve_topology=False)
-  return list(zip(*simplified_line.xy))'''
-
 
 @app.get('/get_heatmap_data')
 def get_heatmap_data(bird: str):
