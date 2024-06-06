@@ -8,6 +8,7 @@ function Heatmap({ data }) {
   const mapRef = useRef(null);
   const birdName = data;
   const [heatmapData, setHeatmapData] = useState([]);
+  const mapInstance = useRef(null);
 
   const getHeatmapData = () => {
     const baseUrl = "http://localhost:8000";
@@ -30,13 +31,15 @@ function Heatmap({ data }) {
     if (!heatmapData || !Array.isArray(heatmapData)) return;
     if (!mapRef.current) return;
     // Initialize Leaflet map
-    const map = L.map(mapRef.current).setView([40, -100], 2);
-
+    //const map = L.map(mapRef.current).setView([40, -100], 2);
+    if(!mapInstance.current) {
+        mapInstance.current=L.map(mapRef.current).setView([40, -100], 2);
+    }
     // Add tile layer
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
+    }).addTo(mapInstance.current);
 
     // Convert heatmap data to LatLng array
     const latLngArray = heatmapData.map((point) => [
@@ -53,13 +56,16 @@ function Heatmap({ data }) {
     };
 
     // Create heatmap layer
-    L.heatLayer(latLngArray, { radius: 20, gradient: customGradient }).addTo(
+    /*L.heatLayer(latLngArray, { radius: 20, gradient: customGradient }).addTo(
       map
-    );
+    );*/
+    const heatLayer = L.heatLayer(latLngArray, { radius: 20, gradient: customGradient }).addTo(
+        mapInstance.current
+      );
 
     // Clean up map instance if component unmounts
     return () => {
-      map.remove();
+      mapInstance.current.removeLayer(heatLayer);
     };
   }, [heatmapData]);
 
