@@ -203,31 +203,6 @@ async def get_predictions(prediction_input: PredictionInputs):
     "prediction": base64.b64encode(buffer.getvalue()).decode(),
     "resFormat": dataImg.format
   }
-    
-
-@app.get('/bird-info/{bird_name}')
-def get_bird_info(bird_name):
-  bird = bird_information_data.get(bird_name)
-  if bird:
-    return {
-        'scientific_name' : bird["scientific_name"],
-        'general': bird["general"],
-        'migration': bird["migration"]
-    }
-  else:
-    raise HTTPException(
-      status_code= 404,
-      detail= f"data for bird {bird_name} does not exist.")
-  
-  
-@app.get('/json/{filename}')
-def send_json(filename):
-  climate_file_loc = os.path.join('climate_data/json_data', filename)
-  if not os.path.exists(climate_file_loc):
-    raise HTTPException(
-      status_code= 404,
-      detail= f"File path for {climate_file_loc} does not exist")
-  return FileResponse(climate_file_loc)
 
 
 @app.get('/get_trajectory_data')

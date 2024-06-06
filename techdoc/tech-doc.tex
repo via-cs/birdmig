@@ -87,10 +87,18 @@ change the Climate and SDM Charts. In addition to the components, the sidebar an
 up in src/App.css. 
 
 \subsubsection*{FastAPI}
-TODO
+The middleware and backend of the website was developed using python and FastAPI, in the file base.py located in the subfolder backend/app. The FastAPI backend primarily serves the purpose of quickly retrieving data and sending it to the front end as requested, allowing the front end user-interface to remain lightweight and easy to load quickly. FastAPI was used to build the backend due to its ease in creating end points for a frontend application to call, natively supporting features such as delayed requests and an intuitive way of passing arguments to the FastAPI backend.
+The backend is defined predominantly by functions that handle various requests the front end makes in order to retrieve data to display. These functions and their functions are discussed in greater detail in the following section for RestFUL API.
 
 \subsubsection*{RestFUL}
-TODO
+RestFUL API was used to define how the end points were set up, partially due to built-in compatibility with FastAPI, but also due to its simple and intuitive interface. While RestFUL API primarily defines 4 primary methods for GET, PUT, POST, and DELETE, the final application was operational with a stateless backend, meaning only GET and PUT requests were used.
+In the file base.py, GET and PUT requests were used to define the following end points:
+- get_temperature_data(): a GET end point that in turn performs a POST request to grid2.rcc-acis.org to obtain temperature data for the state of California throughout a year, which is specified per the user's request.
+- get_precipitation_data(): a GET end point that in turn performs a POST request to grid2.rcc-acis.org to obtain precipitation data for the state of California throughout a year, which is specified per the user's request.
+- get_predictions(): a PUT end point that retrieves the pre-computed predictions the Species Distribution Model makes about a specified bird, for a specified year based on specified emission data. While a GET request would have sufficed for its current utility, a PUT request was preferred as this could be expanded to implement a machine learning model to generate predictions dynamically should such a feature be planned in the future.
+- get_trajectory_data(): a GET end point that retrieves a csv file containing the migration trajectory of a specific bird, identified by its unique bird ID, that can be used to generate individual trajectory maps of an individual bird. The trajectory information is discussed later in the subsection for Leaflet.
+- get_bird_ids(): a GET end point that returns all unique bird IDs per a given species. This is used to by the front end component PolylineMap.js to search for a specified bird ID.
+- get_heatmap_data(): a GET end point that retrieves heatmap data of a bird species, to display the aggregated paths of all birds catalogued for that species on the front end with HeatMap.js, as a heat map. This is discussed in further detail in the Leaflet subsection.
 
 \subsubsection*{Leaflet}
 Leaflet was used to map bird migration patterns in two ways under the "Trajectory" component. The first map, "Individual Path", is created in src/components/PolylineMap.js.

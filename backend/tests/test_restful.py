@@ -30,33 +30,6 @@ def client(app):
     
     yield TestClient(app)
     
-    
-def test_get_bird_info(client):
-    
-    valid_birds = {
-        "Blackpoll Warbler" : "Setophaga Striata",
-        "Bald Eagle" : "Haliaeetus Leucocephalus",
-        "White Fronted Goose" : "Anser Albifrons",
-        "Long Billed Curlew" : "Numenius Americanus",
-        "Whimbrel" : "Numenius Phaeopus"
-    }
-        
-    # Test for each bird that exists    
-    for bird in valid_birds:
-        
-        response = client.get(f'/bird-info/{bird}')
-        
-        assert response.status_code == 200
-        
-        # Decode the response body.
-        response_body = read_response_body(response)
-        assert response_body['scientific_name'] == valid_birds[bird]
-        
-    # Test an invalid entry
-    response = client.get(f'/bird-info/Invalid_Bird')
-    
-    assert response.status_code == 404
-    
 def test_get_temp_data(client):
     
     response = client.get(f'/temperature/{2021}')
