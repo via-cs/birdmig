@@ -276,12 +276,19 @@
 .PredictionControls .ButtonInfo:hover {
   background-color: #949292;
 }
-
 .ClimateChart,
 .SDMChart {
-  width: 100%;
+  width: 90%;
   height: 100%;
   border-radius: 8px;
+}
+.SDM {
+  display: flex;
+  flex-direction: row;
+}
+.legend {
+  width: 10%;
+  height: 10%;
 }
 
 /* Tabs styling */

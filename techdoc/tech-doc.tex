@@ -79,7 +79,12 @@ TODO
 \subsection{APIs}
 
 \subsubsection*{React}
-TODO
+Reactjs was used to created the frontend, and the main component is found under src/App.js. In App.js, there are calls to the backend to gather data for the various components
+located in the src/components folder. In the components folder, there is BirdInfo.js which returns the summary of the desired bird. There are four graphs: ClimateChart.js,
+HeatMap.js, PolylineMap.js, and SDMchart.js. Those four files contain the code to display the average temperature and prediction graph, the Trajectory graphs discussed more 
+in the Leaflet subsection, and the png of the SDM output. Also in components folder is PredictionControl.js which contains the code to display the year slider and SSP buttons that 
+change the Climate and SDM Charts. In addition to the components, the sidebar and header are created in App.js which allows users to view different birds. All the styling is written 
+up in src/App.css. 
 
 \subsubsection*{FastAPI}
 TODO
@@ -88,7 +93,13 @@ TODO
 TODO
 
 \subsubsection*{Leaflet}
-TODO
+Leaflet was used to map bird migration patterns in two ways under the "Trajectory" component. The first map, "Individual Path", is created in src/components/PolylineMap.js.
+The function fetches data from the csv files under the data folder in backend/app. The function first fetches all the tagged Bird IDs from the csv for the desired bird. Then,
+all the trajectories for the first Bird ID are fetched from the backend and drawn on OpenStreetMap using Leaflet.  Arrows are calculated between two points in calculateBearings 
+function and added onto the map as well. 
+The second map, "Aggregated Path", is created in src/component/HeatMap.js. The function fetches all the latitude and longitude coordinates from the csv of the desired bird in 
+the backend/app/data folder. Using Leaflet and the Leaflet plugin, L.heatLayer, a heat layer is generated showing the combined trajectory path of all the tagged birds on top of 
+OpenStreetMap layer.  
 
 \subsection{Usage}
 Insight into how the website should be used

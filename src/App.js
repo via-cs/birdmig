@@ -108,8 +108,6 @@ function App() {
       });
   }
 
-
-
   useEffect(() => {
     if (selectedClimateVariable) {
       fetchClimateData(selectedClimateVariable);
@@ -224,40 +222,57 @@ function App() {
               </div>
             </div>
             <div className="PredictionControlsBody">
-              <div className="SDMContainer">
-                <h2>
-                  {" "}
-                  Species Distribution
-                  <Popup
-                    trigger={
-                      <button className="ButtonInfo">
-                        <FontAwesomeIcon icon={faInfo} />
-                      </button>
-                    }
-                    modal
-                    nested
-                  >
-                    {(close) => (
-                      <div className="PredictionControlModal">
-                        <button className="ButtonExit" onClick={() => close()}>
-                          X
-                        </button>
-                        <p>
-                          <strong>Dark green</strong> indicates a high
-                          probability that an individual bird will be there.
-                          <br />
-                          <strong>Lighter shades</strong> indicate less
-                          probability.
-                        </p>
-                      </div>
-                    )}
-                  </Popup>
-                </h2>
-                <SDMChart prediction={predictionData} />
-              </div>
               <div className="ChartsContainer">
-                <div className="ClimateDataContainer">
-                  <ClimateChart selectedYear={selectedYear} />
+                <div className="SDMContainer">
+                  <h2>
+                    {" "}
+                    Species Distribution
+                    <Popup
+                      trigger={
+                        <button className="ButtonInfo">
+                          <FontAwesomeIcon icon={faInfo} />
+                        </button>
+                      }
+                      modal
+                      nested
+                    >
+                      {(close) => (
+                        <div className="PredictionControlModal">
+                          <button
+                            className="ButtonExit"
+                            onClick={() => close()}
+                          >
+                            X
+                          </button>
+                          <h1>Species Distribution Models (SDM)</h1>
+                          <p>
+                            Species distribution models (SDM) model the
+                            distribution of a species as a function of
+                            environmental conditions. This means that when given
+                            a certain year’s climate data, a trained SDM can
+                            predict where a species might be located, or how
+                            their habitats may change.
+                          </p>
+                          <p>
+                            The graph shown below indicates the probability that
+                            a species might be found in a location, given the
+                            appropriate climate data.
+                          </p>
+                          <ul>
+                            <li>
+                              Darker colors represent a high probability that
+                              the species will be found in that location
+                            </li>
+                            <li>
+                              Lighter colors represent a low probability that
+                              the species will be found in that location
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </Popup>
+                  </h2>
+                  <SDMChart prediction={predictionData} />
                 </div>
                 <div className="emissionsChart">
                   <div className="emissionsChart-iframe">
@@ -278,6 +293,9 @@ function App() {
                     </span>
                   </div>
                 </div>
+              </div>
+              <div className="ClimateDataContainer">
+                <ClimateChart selectedYear={selectedYear} />
               </div>
             </div>
           </div>
