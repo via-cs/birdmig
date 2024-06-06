@@ -10,9 +10,6 @@ import os
 
 import pandas as pd
 import numpy as np
-from shapely.geometry import LineString
-import rasterio
-from rasterio.warp import calculate_default_transform, reproject, Resampling
 
 from PIL import Image
 from io import BytesIO
@@ -265,12 +262,6 @@ def get_bird_ids(bird: str):
     raise HTTPException(
       status_code=404,
       detail= f'CSV file for {filename} not found')
-
-        
-def simplify_line(coordinates, tolerance=0.1):
-  line = LineString(coordinates)
-  simplified_line = line.simplify(tolerance, preserve_topology=False)
-  return list(zip(*simplified_line.xy))
 
 
 @app.get('/get_heatmap_data')
