@@ -48,3 +48,4 @@ model/outputs/models/Anser_albifrons_et_classifier_model.pkl
 /techdoc/*
 !techdoc/tech-doc.pdf
 !techdoc/tech-doc.tex
+backend/app/base.py

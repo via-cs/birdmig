@@ -27,12 +27,8 @@ COPY app/data/ /code/data/
 
 COPY app/models/ /code/models/
 
-# Set environment variables
-ENV FLASK_APP=app/base.py
-ENV FLASK_RUN_HOST=0.0.0.0
-
 # Expose the port the app runs on
 EXPOSE 8000
 
 # Command to run the application
-CMD ["flask", "run"]
+CMD ["fastapi", "dev", "base.py"]
