@@ -12,15 +12,18 @@ import pickle
 filetype = 'geojson'
 species_list = ['Anser_albifrons', 'Haliaeetus_leucocephalus', 'Numenius_americanus', 'Numenius_phaeopus', 'Setophaga_striata']
 
-def load_data(species, n):
+def load_data(species, n=None):
       # Load species data
-      pa_raw = gpd.GeoDataFrame.from_file('data/geojson/' + species + '.' + filetype)
+      pa_raw = gpd.GeoDataFrame.from_file('input/geojson/' + species + '.' + filetype)
 
-      sample_size = n
-      pa = pa_raw.sample(n=sample_size, random_state=1)
+      if n:
+            sample_size = n
+            pa = pa_raw.sample(n=sample_size, random_state=1)
+      else: 
+            pa = pa_raw
 
       # Load climate data
-      raster_features = sorted(glob.glob('data/MIROC6/historical/*.tif'))
+      raster_features = sorted(glob.glob('input/historical/*.tif'))
 
       # Load training vectors
       train_xs, train_y = pyimpute.load_training_vector(pa, raster_features, response_field='CLASS')
@@ -36,7 +39,7 @@ def load_data(species, n):
       return train_xs, train_y
 
 for species in tqdm(species_list):
-      X, y = load_data(species, 20000)
+      X, y = load_data(species)
 
       # Create extra trees models
       model = RandomForestClassifier()
@@ -45,12 +48,12 @@ for species in tqdm(species_list):
       k = 5
       kf = model_selection.KFold(n_splits=k)
       accuracy_scores = model_selection.cross_val_score(model, X, y, cv=kf, scoring='accuracy')
-      print("extra-trees %d-fold Cross Validation Accuracy: %0.2f (+/- %0.2f)"
+      print(species + " %d-fold Cross Validation Accuracy: %0.2f (+/- %0.2f)"
             % (k, accuracy_scores.mean() * 100, accuracy_scores.std() * 200))
 
       # Fit Model
       model.fit(X, y)
 
-      os.makedirs('outputs/models/', exist_ok=True)
+      os.makedirs('output/models/', exist_ok=True)
       filename = species + '_rf_classifier_model.pkl'
-      pickle.dump(model, open('outputs/models/' + filename, 'wb'))
+      pickle.dump(model, open('output/models/' + filename, 'wb'))
