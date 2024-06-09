@@ -10,6 +10,8 @@ ssp_list <- list ("ssp126", "ssp245", "ssp370", "ssp585")
 year_list <- as.list(seq(2015,2100)) 
 feature_list <- list ("tas", "pr")
 
+setwd(here()) # Set working directory to root folder
+
 for (s in ssp_list) {
   for (y in year_list) {
     for (f in feature_list) {
@@ -23,9 +25,9 @@ for (s in ssp_list) {
   
       # write rasters to /data folder
       if (f == "pr") {
-        file_save = "precipitation.asc"
+        file_save = "precipitation.tif"
       } else {
-        file_save = "temperature.asc"
+        file_save = "temperature.tif"
       }
       
       cidr <- getwd()
