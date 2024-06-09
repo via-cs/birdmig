@@ -30,9 +30,29 @@ This technical document will overview how each of these components work, as well
 
 \subsection{Datasets}
 
+The species distribution model (SDM) uses two datasets, one for climate data and one for species distribution data.
+
+\subsubsection*{Climate Data}
+Climate scenarios used were from the NEX-GDDP-CMIP6 dataset, prepared by the
+Climate Analytics Group and NASA Ames Research Center using the NASA Earth
+Exchange and distributed by the NASA Center for Climate Simulation (NCCS).
+\\\\
+\textit{
+Thrasher, B., Wang, W., Michaelis, A. et al. NASA Global Daily Downscaled
+Projections, CMIP6. Sci Data 9, 262 (2022). https://doi.org/10.1038/s41597-022-01393-4
+\\\\
+Thrasher, B., Wang, W., Michaelis, A. Nemani, R. (2021). NEX-GDDP-CMIP6. NASA
+Center for Climate Simulation. https://doi.org/10.7917/OFSG3345}
+
+\subsubsection*{Species Distribution Data}
+The occurence datasets for our bird species come from the Global Biodiversity Information Facility (GBIF). The citations for each dataset is below.
+\\\\
+\textit{**GBIF CITATIONS HERE**}
+
 \subsection{R Processing}
 
 \subsubsection*{Libraries}
+
 \begin{itemize}
 	\item \textit{dismo}: Methods for species distribution modeling, that is, predicting the environmental similarity of any site to that of the locations of known occurrences of a species.
 	\item \textit{sf}: Support for simple features, a standardized way to encode spatial vector data. Binds to 'GDAL' for reading and writing data, to 'GEOS' for geometrical operations, and to 'PROJ' for projection conversions and datum transformations. Uses by default the 's2' package for spherical geometry operations on ellipsoidal (long/lat) coordinates.
@@ -40,12 +60,6 @@ This technical document will overview how each of these components work, as well
 	\item \textit{sp}: Classes and methods for spatial data; the classes document where the spatial location information resides, for 2D or 3D data. Utility functions are provided, e.g. for plotting data as maps, spatial selection, as well as methods for retrieving coordinates, for subsetting, print, summary, etc.
 	\item \textit{ncdf4}: Provides a high-level R interface to data files written using Unidata's netCDF library (version 4 or earlier), which are binary data files that are portable across platforms and include metadata information in addition to the data sets.
 \end{itemize}
-
-\subsubsection*{Input}
-TODO
-
-\subsubsection*{Output}
-TODO
 
 \subsubsection*{Process}
 TODO
