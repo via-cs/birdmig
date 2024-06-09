@@ -34,11 +34,15 @@ yarn-error.log*
 /backend/flask_session
 
 # Ignore data files
-data/
+data/*
+!data/png-images
 
-# Ignore all tifs except probability_1.0.tif
+# Ignore all TIFFs
 *.tif
-!probability_1.0.tif
+
+# Ignore model input/output
+model/input
+model/output
 
 # Ignore all TeX files except .tex and .pdf
 /techdoc/*
