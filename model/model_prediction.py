@@ -34,8 +34,8 @@ def create_pngs(species, ssp, year):
 
     ax.imshow(distr, cmap="Greens", interpolation='nearest', aspect='auto')
     
-    os.makedirs('../data/png-images/' + species + '/' + ssp, exist_ok=True)
-    fig.savefig('../data/png-images/' + species + '/' + ssp + '/' + str(year) + '.png', dpi = 200)
+    os.makedirs('../public/png-images/' + species + '/' + ssp, exist_ok=True)
+    fig.savefig('../public/png-images/' + species + '/' + ssp + '/' + str(year) + '.png', dpi = 200)
 
     plt.close(fig)
 
