@@ -68,12 +68,12 @@ the above section. These can be downloaded from the Box folder.
 All output is saved in `/model/input/future` for future climate data. The data
 is now ready for use for prediction (see section model_prediction.py)
 
-## Running the SDM
+## The Species Distribution Model
 
-1. Open `birdmid-sdm.ipynb`
-2. Ensure you are running a version of python that supports pip installation
-   (for example, Anaconda3)
-3. Run all cells
-    - Everything required by model should be in the github
-    - Necessary files can always be procured by running `data-pre-processing.R`
-      with necessary input files
+The general code structure is notated in `birdmid-sdm.ipynb`. The actual scripts
+used for SDM training and predicting are `model_train.py` and
+`model_predict.py` respectively. 
+
+### Using `model_train.py`
+
+### Using `model_predict.py`
