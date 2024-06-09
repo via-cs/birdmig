@@ -12,13 +12,13 @@ species_list <- list("Anser_albifrons",
 export_filetype <- "geojson"
 e <- extent(-179, -35, -55, 85) # set study area extent to Americas
 
+setwd(here()) # Set working directory to repository root folder
+
 # Grab Climate Data
-#bioclim.data <- stack(raster("data/MIROC6/.netcd4/historical/tas_avg.nc"),
-#                      raster("data/MIROC6/.netcd4/historical/pr_avg.nc"))
-bioclim.data <- stack(raster("data/MIROC6/.netcd4/historical/r1i1p1f1/tas/tas_day_MIROC6_historical_r1i1p1f1_gn_2000.nc"),
-                      raster("data/MIROC6/.netcd4/historical/r1i1p1f1/pr/pr_day_MIROC6_historical_r1i1p1f1_gn_2000.nc"))
+bioclim.data <- stack(raster("data/NEX-GDDP-CMIP6/historical/r1i1p1f1/tas/tas_day_MIROC6_historical_r1i1p1f1_gn_2000.nc"),
+                      raster("data/NEX-GDDP-CMIP6/historical/r1i1p1f1/pr/pr_day_MIROC6_historical_r1i1p1f1_gn_2000.nc"))
 bioclim.data <- rotate(bioclim.data, left=TRUE) # convert (0, 360) to (-180, 180)
-bioclim.data <- crop(bioclim.data, e*1.25)  # crop to bg point extent
+bioclim.data <- crop(bioclim.data, e*1.25) # crop to bg point extent
 
 # pipe GBIF data
 for (s in species_list) {
