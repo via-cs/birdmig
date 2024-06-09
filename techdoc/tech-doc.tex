@@ -26,14 +26,20 @@ Our Senior Capstone project is comprised of two components:
 
 This technical document will overview how each of these components work, as well as the required data and file structure for them to operate correctly.
 
-\newpage
-
 \section{Species Distribution Model}
+
+\subsection{Datasets}
 
 \subsection{R Processing}
 
 \subsubsection*{Libraries}
-TODO
+\begin{itemize}
+	\item \textit{dismo}: Methods for species distribution modeling, that is, predicting the environmental similarity of any site to that of the locations of known occurrences of a species.
+	\item \textit{sf}: Support for simple features, a standardized way to encode spatial vector data. Binds to 'GDAL' for reading and writing data, to 'GEOS' for geometrical operations, and to 'PROJ' for projection conversions and datum transformations. Uses by default the 's2' package for spherical geometry operations on ellipsoidal (long/lat) coordinates.
+	\item \textit{raster}: Reading, writing, manipulating, analyzing and modeling of spatial data. 
+	\item \textit{sp}: Classes and methods for spatial data; the classes document where the spatial location information resides, for 2D or 3D data. Utility functions are provided, e.g. for plotting data as maps, spatial selection, as well as methods for retrieving coordinates, for subsetting, print, summary, etc.
+	\item \textit{ncdf4}: Provides a high-level R interface to data files written using Unidata's netCDF library (version 4 or earlier), which are binary data files that are portable across platforms and include metadata information in addition to the data sets.
+\end{itemize}
 
 \subsubsection*{Input}
 TODO

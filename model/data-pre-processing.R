@@ -1,7 +1,6 @@
 library(sf)
 library(raster)
 library(dismo)
-library(geodata)
 library(ncdf4)
 
 # Parameters
