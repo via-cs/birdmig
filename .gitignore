@@ -29,20 +29,20 @@ yarn-error.log*
 /model/data/*
 !/model/data/geojson
 /model/inputs/
-/model/.R*
+.R*
 .vscode
 /backend/flask_session
 
-# Ignore all tiff except probability
-model/outputs/tiff-images/*
-!*/probability_1.0.tif
+# Ignore data files
+data/*
+!data/png-images
 
-# Too big a file
-model/outputs/models/Anser_albifrons_et_classifier_model.pkl
-
-# Ignore all tifs except probability_1.0.tif
+# Ignore all TIFFs
 *.tif
-!probability_1.0.tif
+
+# Ignore model input/output
+model/input
+model/output
 
 # Ignore all TeX files except .tex and .pdf
 /techdoc/*

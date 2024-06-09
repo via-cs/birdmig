@@ -26,20 +26,40 @@ Our Senior Capstone project is comprised of two components:
 
 This technical document will overview how each of these components work, as well as the required data and file structure for them to operate correctly.
 
-\newpage
-
 \section{Species Distribution Model}
+
+\subsection{Datasets}
+
+The species distribution model (SDM) uses two datasets, one for climate data and one for species distribution data.
+
+\subsubsection*{Climate Data}
+Climate scenarios used were from the NEX-GDDP-CMIP6 dataset, prepared by the
+Climate Analytics Group and NASA Ames Research Center using the NASA Earth
+Exchange and distributed by the NASA Center for Climate Simulation (NCCS).
+\\\\
+\textit{
+Thrasher, B., Wang, W., Michaelis, A. et al. NASA Global Daily Downscaled
+Projections, CMIP6. Sci Data 9, 262 (2022). https://doi.org/10.1038/s41597-022-01393-4
+\\\\
+Thrasher, B., Wang, W., Michaelis, A. Nemani, R. (2021). NEX-GDDP-CMIP6. NASA
+Center for Climate Simulation. https://doi.org/10.7917/OFSG3345}
+
+\subsubsection*{Species Distribution Data}
+The occurence datasets for our bird species come from the Global Biodiversity Information Facility (GBIF). The citations for each dataset is below.
+\\\\
+\textit{**GBIF CITATIONS HERE**}
 
 \subsection{R Processing}
 
 \subsubsection*{Libraries}
-TODO
 
-\subsubsection*{Input}
-TODO
-
-\subsubsection*{Output}
-TODO
+\begin{itemize}
+	\item \textit{dismo}: Methods for species distribution modeling, that is, predicting the environmental similarity of any site to that of the locations of known occurrences of a species.
+	\item \textit{sf}: Support for simple features, a standardized way to encode spatial vector data. Binds to 'GDAL' for reading and writing data, to 'GEOS' for geometrical operations, and to 'PROJ' for projection conversions and datum transformations. Uses by default the 's2' package for spherical geometry operations on ellipsoidal (long/lat) coordinates.
+	\item \textit{raster}: Reading, writing, manipulating, analyzing and modeling of spatial data. 
+	\item \textit{sp}: Classes and methods for spatial data; the classes document where the spatial location information resides, for 2D or 3D data. Utility functions are provided, e.g. for plotting data as maps, spatial selection, as well as methods for retrieving coordinates, for subsetting, print, summary, etc.
+	\item \textit{ncdf4}: Provides a high-level R interface to data files written using Unidata's netCDF library (version 4 or earlier), which are binary data files that are portable across platforms and include metadata information in addition to the data sets.
+\end{itemize}
 
 \subsubsection*{Process}
 TODO
@@ -93,12 +113,15 @@ The backend is defined predominantly by functions that handle various requests t
 \subsubsection*{RestFUL}
 RestFUL API was used to define how the end points were set up, partially due to built-in compatibility with FastAPI, but also due to its simple and intuitive interface. While RestFUL API primarily defines 4 primary methods for GET, PUT, POST, and DELETE, the final application was operational with a stateless backend, meaning only GET and PUT requests were used.
 In the file base.py, GET and PUT requests were used to define the following end points:
-- get_temperature_data(): a GET end point that in turn performs a POST request to grid2.rcc-acis.org to obtain temperature data for the state of California throughout a year, which is specified per the user's request.
-- get_precipitation_data(): a GET end point that in turn performs a POST request to grid2.rcc-acis.org to obtain precipitation data for the state of California throughout a year, which is specified per the user's request.
-- get_predictions(): a PUT end point that retrieves the pre-computed predictions the Species Distribution Model makes about a specified bird, for a specified year based on specified emission data. While a GET request would have sufficed for its current utility, a PUT request was preferred as this could be expanded to implement a machine learning model to generate predictions dynamically should such a feature be planned in the future.
-- get_trajectory_data(): a GET end point that retrieves a csv file containing the migration trajectory of a specific bird, identified by its unique bird ID, that can be used to generate individual trajectory maps of an individual bird. The trajectory information is discussed later in the subsection for Leaflet.
-- get_bird_ids(): a GET end point that returns all unique bird IDs per a given species. This is used to by the front end component PolylineMap.js to search for a specified bird ID.
-- get_heatmap_data(): a GET end point that retrieves heatmap data of a bird species, to display the aggregated paths of all birds catalogued for that species on the front end with HeatMap.js, as a heat map. This is discussed in further detail in the Leaflet subsection.
+
+\begin{itemize}
+	\item get\_temperature\_data(): a GET end point that in turn performs a POST request to grid2.rcc-acis.org to obtain temperature data for the state of California throughout a year, which is specified per the user's request.
+	\item get\_precipitation\_data(): a GET end point that in turn performs a POST request to grid2.rcc-acis.org to obtain precipitation data for the state of California throughout a year, which is specified per the user's request.
+	\item get\_predictions(): a PUT end point that retrieves the pre-computed predictions the Species Distribution Model makes about a specified bird, for a specified year based on specified emission data. While a GET request would have sufficed for its current utility, a PUT request was preferred as this could be expanded to implement a machine learning model to generate predictions dynamically should such a feature be planned in the future.
+	\item get\_trajectory\_data(): a GET end point that retrieves a csv file containing the migration trajectory of a specific bird, identified by its unique bird ID, that can be used to generate individual trajectory maps of an individual bird. The trajectory information is discussed later in the subsection for Leaflet.
+	\item get\_bird\_ids(): a GET end point that returns all unique bird IDs per a given species. This is used to by the front end component PolylineMap.js to search for a specified bird ID.
+	\item get\_heatmap\_data(): a GET end point that retrieves heatmap data of a bird species, to display the aggregated paths of all birds catalogued for that species on the front end with HeatMap.js, as a heat map. This is discussed in further detail in the Leaflet subsection.
+\end{itemize}
 
 \subsubsection*{Leaflet}
 Leaflet was used to map bird migration patterns in two ways under the "Trajectory" component. The first map, "Individual Path", is created in src/components/PolylineMap.js.
