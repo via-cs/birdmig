@@ -1,7 +1,7 @@
 library(sf)
 library(raster)
 library(ncdf4)
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+setwd(getSrcDirectory(function(){})[1]) # Set working directory to file location
 
 e <- extent(-179, -35, -55, 85) # set study area extent to Americas
 

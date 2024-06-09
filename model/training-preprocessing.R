@@ -2,7 +2,7 @@ library(sf)
 library(raster)
 library(dismo)
 library(ncdf4)
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+setwd(getSrcDirectory(function(){})[1]) # Set working directory to file location
 
 # Parameters
 species_list <- list("Anser_albifrons",
