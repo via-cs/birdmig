@@ -153,9 +153,27 @@ the backend/app/data folder. Using Leaflet and the Leaflet plugin, L.heatLayer, 
 OpenStreetMap layer.  
 
 \subsection{Usage}
-Insight into how the website should be used
+The website is designed to serve as an interactive tool for ornithologists, researchers, and bird watching enthusiasts. It allows users to:
+
+\begin{itemize}
+    \item Retrieve detailed information about various bird species, including their scientific names, general characteristics, and migration patterns.
+    \item View and interact with climate data visualizations to understand how different climate variables such as temperature and precipitation affect bird migration.
+    \item Predict future distributions of bird species using species distribution models (SDM) based on selected climate scenarios and years.
+    \item Explore bird migration trajectories either as individual paths or aggregated heatmaps, providing a visual understanding of migration routes and densities.
+\end{itemize}
+
+Users can interact with various controls to select different birds, years, and emission scenarios, and the application dynamically updates the information and predictions displayed.
 
 \subsection{Design}
-Insight into how the website was designed
+The website is developed using a React frontend and a FastAPI backend, leveraging modern web technologies and frameworks to ensure a responsive and intuitive user experience. Key design features include:
+
+\begin{itemize}
+    \item \textbf{Modular Design:} The application is structured into several independent components like BirdInfo, SDMChart, and PolylineMap. Each component encapsulates a particular feature of the web app, facilitating seperation of concerns, readability, and scalability.
+    \item \textbf{Data-Driven Interactions:} By integrating with external APIs and processing data through Python-based FastAPI, the application provides real-time data interactions and updates.
+    \item \textbf{User-Centric Interfaces:} Emphasis on usability and accessibility, with interactive charts, maps, and dynamic controls that cater to both novice users and experienced researchers.
+\end{itemize}
+
+The application's architecture is designed to handle high volumes of data efficiently, utilizing caching and asynchronous data fetching to optimize performance and user experience.
+
 
 \end{document}
