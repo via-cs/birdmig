@@ -40,7 +40,7 @@ def create_pngs(species, ssp, year):
     plt.close(fig)
 
 for species in tqdm(species_list, desc="Species"):
-        for ssp in tqdm(ssp_list, desc="ssp"):
-            for year in tqdm(year_list, desc="Years"):
-                make_prediction(species, ssp, year)
-                create_pngs(species, ssp, year)
+    for ssp in tqdm(ssp_list, desc="ssp"):
+        for year in tqdm(year_list, desc="Years"):
+            make_prediction(species, ssp, year)
+            create_pngs(species, ssp, year)
