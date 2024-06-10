@@ -3,6 +3,7 @@
 \usepackage{titlesec}
 \usepackage{authblk}
 \usepackage[colorlinks=true, urlcolor=blue, linkcolor=black]{hyperref}
+\usepackage{fancyvrb}
 
 \title{Visual Analytics of the Impacts of Climate Change on 
 Migratory Bird Habitats \\
@@ -147,7 +148,42 @@ Required libraries include \texttt{os, tqdm, glob, pyimpute, pickle, rasterio, m
 Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data.
 
 \subsubsection{SDM Training}
+The model is trained by associating presence/absence data with zonal averages for temperature and precipitation. In other words, the model learns what zonal environmental factors typically correlate to a presence or absence of a species. When given a file containing possible future climate readings, the model can then predict how the distribution of a species may react to that climate.
+\\\\
+Training models for each bird species goes as follows:
+\begin{enumerate}
+	\item Data is loaded into training vectors using the \texttt{load\_data()} function
+	\item The random forest classifier is chosen for model training
+	\item Classifier's accuracy is measured by averaging K-fold evaluation (k=5)
+	\item Model is fit with training vectors and saved to a pickle file
+\end{enumerate}
 
+\noindent Random forest was chosen for the model because it showed the highest and most consistent accuracy when compared to other classifiers (extra trees, SVM, xgboost, lightgbm) See \texttt{model/birdmig\_sdm.ipynb}.
+\\\\
+A description of the \texttt{load\_data()} function is as follows:
+\begin{Verbatim}[tabsize=4]
+load_data():
+	Parameters:
+		species: string representing species name
+		n: optional int representing sample size (default=None)
+	Return:
+		train_xs: 2D array of floats where each inner array represents 
+				  zonal averages for temperature and precipitation 
+		train_y:  array whose values represent presence or absence & 
+				  are indexed to correlate to each array in train_xs
+				  
+	load_data() loads appropriate files from /model/input/ into training 
+	vectors for SDM training. It takes an optional n parameter that
+	randomly samples the presence/absence data in order to reduce the
+	size of the training vector.
+	
+	load_data() primarily wraps the load_training_vectors() function 
+	from pyimpute, which is responsible for finding the zonal averages
+	to begin with. load_data() is also responsible for postprocessing 
+	these vectors, removing NaN values to avoid training errors.
+\end{Verbatim}
+
+\noindent \texttt{model\_train.py} is set up such that it trains and saves models for each bird species in a loop, tracking the process using \texttt{tqdm}. If a custom species is desired, the \texttt{species\_list} variable must be modified to reflect it (ensure that the custom bird species has already undergone R preprocessing). These models are saved to \texttt{/model/output/models} via the \texttt{pickle} library.
 
 \subsubsection{SDM Predicting}
 
