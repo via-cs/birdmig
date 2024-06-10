@@ -2,7 +2,7 @@
 \usepackage{graphicx} % Required for inserting images
 \usepackage{titlesec}
 \usepackage{authblk}
-\usepackage{hyperref} 
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=black]{hyperref}
 
 \title{Visual Analytics of the Impacts of Climate Change on 
 Migratory Bird Habitats \\
@@ -20,7 +20,7 @@ Migratory Bird Habitats \\
 
 \newpage
 
-\section{Introduction}
+\section*{Introduction}
 Our Senior Capstone project is comprised of two components:
 
 \begin{enumerate}
@@ -38,22 +38,23 @@ The species distribution model (SDM) uses two datasets, one for climate data and
 
 \subsubsection*{Climate Data}
 
+NEX-GDDP-CMIP6 datasets are granular by year and offered for four (future) Shared Socioeconomic Pathways (SSP). These dastasets are offered in NETCDF (.nc) format. 
+Descriptions of each SSP can be found \href{https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change/}{at this link}.
+\\\\
 Climate scenarios used were from the NEX-GDDP-CMIP6 dataset, prepared by the
 Climate Analytics Group and NASA Ames Research Center using the NASA Earth
 Exchange and distributed by the NASA Center for Climate Simulation (NCCS).
 \\\\
 \textit{
 Thrasher, B., Wang, W., Michaelis, A. et al. NASA Global Daily Downscaled
-Projections, CMIP6. Sci Data 9, 262 (2022). https://doi.org/10.1038/s41597-022-01393-4
+Projections, CMIP6. Sci Data 9, 262 (2022). \url{https://doi.org/10.1038/s41597-022-01393-4}
 \\\\
 Thrasher, B., Wang, W., Michaelis, A. Nemani, R. (2021). NEX-GDDP-CMIP6. NASA
-Center for Climate Simulation. https://doi.org/10.7917/OFSG3345}
-\\\\
-NEX-GDDP-CMIP6 datasets are granular by year and in NETCDF (.nc) format.
+Center for Climate Simulation. \url{https://doi.org/10.7917/OFSG3345}}
 
 \subsubsection*{Species Distribution Data}
 
-The occurence datasets for our bird species come from the Global Biodiversity Information Facility (GBIF). The citations for each dataset is below.
+The occurrence datasets for our bird species come from the Global Biodiversity Information Facility (GBIF). The citations for each dataset is below.
 \textit{
 \begin{itemize}
     \item Numenius americanus Bechstein, 1812 in GBIF Secretariat (2023). GBIF Backbone Taxonomy. Checklist dataset \url{https://doi.org/10.15468/39omei} accessed via GBIF.org on 2024-06-09.
@@ -69,20 +70,64 @@ GBIF datasets are in .csv format.
 
 Pre-processing is necessary to transform raw datasets into a form factor that is usable by our SDM.
 This pre-processing step uses R due to its specialty in working with biological and spatial data.
+\\\\
+There are two different R scripts, one for preprocessing training data and another for preprocessing prediction data. These scripts are named \texttt{training-preprocessing.R} and \texttt{prediction-preprocessing.R} respectively.
 
-\subsubsection*{Libraries}
+\subsubsection*{Packages}
 
 \begin{itemize}
 	\item \textit{dismo}: Methods for species distribution modeling, that is, predicting the environmental similarity of any site to that of the locations of known occurrences of a species.
 	\item \textit{sf}: Support for simple features, a standardized way to encode spatial vector data. Binds to 'GDAL' for reading and writing data, to 'GEOS' for geometrical operations, and to 'PROJ' for projection conversions and datum transformations. Uses by default the 's2' package for spherical geometry operations on ellipsoidal (long/lat) coordinates.
 	\item \textit{raster}: Reading, writing, manipulating, analyzing and modeling of spatial data. 
-	\item \textit{sp}: Classes and methods for spatial data; the classes document where the spatial location information resides, for 2D or 3D data.
 	\item \textit{ncdf4}: Provides a high-level R interface to data files written using Unidata's netCDF library (version 4 or earlier), which are binary data files that are portable across platforms and include metadata information in addition to the data sets.
 \end{itemize}
 
-\subsubsection*{Process}
+\subsubsection*{Prerequisites}
 
-There are two different R scripts, one for preprocessing training data and another for preprocessing prediction data. These are named respectively as \texttt{training preprocessing.R} and \texttt{prediction preprocessing.R}
+The R scripts were developed using the latest version of R as of June 9, 2024 (v4.4.0). Different versions of R including v4.4.0 can be found at \url{https://cran.r-project.org/bin/windows/base/old/}. Versions older than v4.3.2 are not guaranteed to work.
+\\\\
+RStudio is recommended to run the R scripts. Running the scripts from an independent R terminal could work in theory, but is not tested. RStudio can be installed from \url{https://posit.co/download/rstudio-desktop/}
+\\\\
+The above packages should either be installed with RStudio's built-in package installer or by running the command \texttt{install.packages(c("sf", "raster", "dismo", "ncdf4"))} in an R terminal.
+\\\\
+Both of these scripts require datasets that can be downloaded from the Box folder at \url{www.google.com}. The \texttt{data} folder from the above link should be placed in the root folder of the repository. 
+
+\subsubsection*{Running the Scripts}
+
+If the above prerequisites are met, then the R scripts should run without issue. To do this in RStudio, open the desired script and click the "Source" button.
+\\\\
+If a custom species is desired, the species CSV must be downloaded from GBIF and stored under \texttt{/data/GBIF/[species name].csv}. Furthermore, the \texttt{species\_list} variable in \texttt{training-preprocessing.R} must be altered to reflect the new species. 
+
+\subsubsection*{Script Descriptions}
+See above for section for instructions on obtaining the appropriate inputs.
+\\\\
+\texttt{\underline{{training-preprocessing.R}}}
+\begin{verbatim}
+	Input:	
+			* Species datasets (.csv)
+			* Historical climate datasets (.nc)
+	Output:
+			* Presence/absence files (.geojson)
+			* Historical climate raster files (.tif)
+\end{verbatim}
+
+Presence/absence files are created by using 1) occurrences from the species CSV file as presences and 2) an equal number of climate points from the climate NetCDF file as pseudo-absences. Pseudo-absences are used due to lack of real absence data. GeoJSON files are stored under \texttt{/model/input/geojson}.
+
+Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries.
+
+All outputs are cropped to the extent variable \texttt{e}. Default \texttt{e} is set to both Americas.
+\\\\
+\texttt{\underline{prediction-preprocessing.R}}
+\begin{verbatim}
+	Input:	
+			* Future climate datasets (.nc)
+	Output:
+			* Future climate raster files (.tif)
+\end{verbatim}
+
+Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries.
+Unlike the climate rasters for model training (of which there are only two), there exists a pair of future rasters for each year for each SSP model, making a total of 680 raster files.
+Raster files are cropped to the extent variable \texttt{e}. Default \texttt{e} is set to both Americas.
 
 \subsection{Model Training}
 
