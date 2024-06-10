@@ -64,7 +64,7 @@ The occurrence datasets for our bird species come from the Global Biodiversity I
     \item Numenius phaeopus subsp. phaeopus in GBIF Secretariat (2023). GBIF Backbone Taxonomy. Checklist dataset \url{https://doi.org/10.15468/39omei} accessed via GBIF.org on 2024-06-09.
 \end{itemize}
 }
-GBIF datasets are in .csv format.
+GBIF datasets are downloaded in .csv format.
 
 \subsection{R Preprocessing}
 
@@ -96,7 +96,7 @@ Both of these scripts require datasets that can be downloaded from the Box folde
 
 If the above prerequisites are met, then the R scripts should run without issue. To do this in RStudio, open the desired script and click the "Source" button.
 \\\\
-If a custom species is desired, the species CSV must be downloaded from GBIF and stored under \texttt{/data/GBIF/[species name].csv}. Furthermore, the \texttt{species\_list} variable in \texttt{training-preprocessing.R} must be altered to reflect the new species. 
+If a custom species is desired, the species CSV must be downloaded from GBIF and stored under \texttt{/data/GBIF/[species name].csv}. Furthermore, the \texttt{species\_list} parameter in \texttt{training-preprocessing.R} must be altered to reflect the new species. 
 
 \subsubsection*{Script Descriptions}
 See above for section for instructions on obtaining the appropriate inputs.
@@ -106,6 +106,9 @@ See above for section for instructions on obtaining the appropriate inputs.
 	Input:	
 			* Species datasets (.csv)
 			* Historical climate datasets (.nc)
+	Parameters:
+			* species_list: an array of strings describing the desired species 
+			* e: extent variable that describes longitude/latitude boundaries 
 	Output:
 			* Presence/absence files (.geojson)
 			* Historical climate raster files (.tif)
@@ -113,7 +116,7 @@ See above for section for instructions on obtaining the appropriate inputs.
 
 Presence/absence files are created by using 1) occurrences from the species CSV file as presences and 2) an equal number of climate points from the climate NetCDF file as pseudo-absences. Pseudo-absences are used due to lack of real absence data. GeoJSON files are stored under \texttt{/model/input/geojson}.
 
-Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries.
+Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries. TIFF files are stored under \texttt{/model/input/historical}.
 
 All outputs are cropped to the extent variable \texttt{e}. Default \texttt{e} is set to both Americas.
 \\\\
@@ -121,41 +124,32 @@ All outputs are cropped to the extent variable \texttt{e}. Default \texttt{e} is
 \begin{verbatim}
 	Input:	
 			* Future climate datasets (.nc)
+	Parameters:
+			* e: extent variable that describes longitude/latitude boundaries 
 	Output:
 			* Future climate raster files (.tif)
 \end{verbatim}
 
 Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries.
-Unlike the climate rasters for model training (of which there are only two), there exists a pair of future rasters for each year for each SSP model, making a total of 680 raster files.
+Unlike the climate rasters for model training (of which there are only two), there exists a pair of future rasters for each year for each SSP model, making a total of 680 raster files. 
+TIFF files are stored under \texttt{/model/input/future}, organized by SSP model and year.
 Raster files are cropped to the extent variable \texttt{e}. Default \texttt{e} is set to both Americas.
 
-\subsection{Model Training}
+\subsection{Species Distribution Modeling in Python}
 
-\subsubsection*{Libraries}
-TODO
+The SDM was tested and developed in Jupyter Notebook (see \texttt{birdmig-sdm.ipynb}) and implemented in python script (see \texttt{model-train.py} and \texttt{model-predict.py}). Python script was used over Jupyter Notebook for implementation due to ease of use with loops and terminal.
 
-\subsubsection*{Input}
-TODO
+\subsubsection*{Requirements}
+Python scripts were developed using Python 3.10.12, which can be found \href{https://www.python.org/downloads/}{at this link}. While you may use newer versions of Python, they are not guaranteed to work.
+\\\\
+Required libraries include \texttt{os, tqdm, glob, pyimpute, pickle, rasterio, matplotlib, geopandas, sklearn, numpy,} and \texttt{pandas}. These libraries can be installed in a Python terminal using \texttt{pip}.
+\\\\
+Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data.
 
-\subsubsection*{Output}
-TODO
+\subsubsection{SDM Training}
 
-\subsubsection*{Process}
-TODO
 
-\subsection{Model Prediction}
-
-\subsubsection*{Libraries}
-TODO
-
-\subsubsection*{Input}
-TODO
-
-\subsubsection*{Output}
-TODO
-
-\subsubsection*{Process}
-TODO
+\subsubsection{SDM Predicting}
 
 \newpage
 
