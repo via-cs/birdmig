@@ -183,11 +183,23 @@ load_data():
 	these vectors, removing NaN values to avoid training errors.
 \end{Verbatim}
 
-\noindent \texttt{model\_train.py} is set up such that it trains and saves models for each bird species in a loop, tracking the process using \texttt{tqdm}. If a custom species is desired, the \texttt{species\_list} variable must be modified to reflect it (ensure that the custom bird species has already undergone R preprocessing). These models are saved to \texttt{/model/output/models} via the \texttt{pickle} library.
+\noindent \texttt{model\_train.py} is set up in such a way that it trains and saves models for each bird species in a loop, tracking the process using \texttt{tqdm}. If a custom species is desired, the \texttt{species\_list} variable must be modified to reflect it (ensure that the custom bird species has already undergone R preprocessing). These models are saved to \texttt{/model/output/models} via the \texttt{pickle} library.
 
 \subsubsection{SDM Predicting}
 
-\newpage
+SDM prediction takes place in \texttt{/model/model\_predict.py}. Its prototyping can again be found in \texttt{/model/birdmig\_sdm.ipynb}
+\\\\
+Species distribution prediction uses the following process:
+\begin{enumerate}
+	\item Future climate rasters are loaded from \texttt{/model/input/future} and processed into an appropriate form factor
+	\item Pickle files for each species is loaded from \texttt{/model/output/models}
+	\item \texttt{impute()} from \texttt{pyimpute} is used to create distribution predictions in the form of TIFF images for each climate raster.
+	\item TIFF images are converted to PNGs for use in the web application and stored in \texttt{/public/png-images}
+\end{enumerate}
+
+\noindent There exists a future climate raster for each year (2015-2100) for each SSP (ssp126, ssp245, ssp370, ssp585). These rasters are used to predict distribution for five species, making a total of 1,720 images.
+\\\\
+\texttt{model\_predict.py} is comprised of a triple-nested for loop (species > ssp > year) and two functions, \texttt{make\_predictions()} and \texttt{create\_pngs()}. The former function is responsible for steps 1-3 listed above, while the latter function is responsible for step 4. TIFF images are converted to PNG through the use of \texttt{matplotlib}, and are saved in high resolution.
 
 \section{Web Application}
 
