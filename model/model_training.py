@@ -54,6 +54,6 @@ for species in tqdm(species_list):
       # Fit Model
       model.fit(X, y)
 
-      os.makedirs('output/models/', exist_ok=True)
+      os.makedirs('../data/models/', exist_ok=True)
       filename = species + '_rf_classifier_model.pkl'
       pickle.dump(model, open('output/models/' + filename, 'wb'))
