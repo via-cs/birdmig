@@ -35,7 +35,7 @@ This technical document will overview how each of these components work, as well
 
 \subsection{Datasets}
 
-The species distribution model (SDM) uses two datasets, one for climate data and one for species distribution data.
+The species distribution model (SDM) uses two datasets, one for climate data and one for species distribution data. 
 
 \subsubsection*{Climate Data}
 
@@ -92,7 +92,7 @@ RStudio is recommended to run the R scripts. Running the scripts from an indepen
 \\\\
 The above packages should either be installed with RStudio's built-in package installer or by running the command \texttt{install.packages(c("sf", "raster", "dismo", "ncdf4"))} in an R terminal.
 \\\\
-Both of these scripts require datasets that can be downloaded from the Box folder at \url{www.google.com}. The \texttt{data} folder from the above link should be placed in the root folder of the repository. 
+Both of these scripts require datasets that can be downloaded from the Box folder at \url{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}. The \texttt{data} folder from the above link should be placed in the root folder of the repository. 
 
 \subsubsection*{Running the Scripts}
 
@@ -146,7 +146,7 @@ Python scripts were developed using Python 3.10.12, which can be found \href{htt
 \\\\
 Required libraries include \texttt{os, tqdm, glob, pyimpute, pickle, rasterio, matplotlib, geopandas, sklearn, numpy,} and \texttt{pandas}. These libraries can be installed in a Python terminal using \texttt{pip}.
 \\\\
-Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data. \texttt{geojson} and \texttt{historical} are required for model training, while \texttt{future} and the output of the model training is required for model predicting.
+Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data. \texttt{geojson} and \texttt{historical} are required for model training, while \texttt{future} and \texttt{/data/pickle} is required for model predicting. Example pickle files can be found at the Box link \href{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}{here}.
 
 \subsubsection{SDM Training}
 The model is trained by associating presence/absence data with zonal averages for temperature and precipitation. In other words, the model learns what zonal environmental factors typically correlate to a presence or absence of a species. When given a file containing possible future climate readings, the model can then predict how the distribution of a species may react to that climate.
