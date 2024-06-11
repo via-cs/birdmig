@@ -72,7 +72,8 @@ GBIF datasets are downloaded in .csv format.
 Pre-processing is necessary to transform raw datasets into a form factor that is usable by our SDM.
 This pre-processing step uses R due to its specialty in working with biological and spatial data.
 \\\\
-There are two different R scripts, one for preprocessing training data and another for preprocessing prediction data. These scripts are named \texttt{training-preprocessing.R} and \texttt{prediction-preprocessing.R} respectively.
+There are two different R scripts, one for preprocessing training data and another for preprocessing prediction data. These scripts are named \\
+\texttt{\href{run:../model/preprocess\_training.R}{preprocess\_training.R}} and \texttt{\href{run:../model/preprocess\_prediction.R}{preprocess\_prediction.R}} respectively.
 
 \subsubsection*{Packages}
 
@@ -100,7 +101,7 @@ If the above prerequisites are met, then the R scripts should run without issue.
 If a custom species is desired, the species CSV must be downloaded from GBIF and stored under \texttt{/data/GBIF/[species name].csv}. Furthermore, the \texttt{species\_list} parameter in \texttt{training-preprocessing.R} must be altered to reflect the new species. 
 
 \subsubsection*{Script Descriptions}
-See above for section for instructions on obtaining the appropriate inputs.
+See the above section for instructions on obtaining the appropriate inputs.
 \\\\
 \texttt{\underline{{training-preprocessing.R}}}
 \begin{verbatim}
@@ -138,14 +139,14 @@ Raster files are cropped to the extent variable \texttt{e}. Default \texttt{e} i
 
 \subsection{Species Distribution Modeling in Python}
 
-The SDM was tested and developed in Jupyter Notebook (see \texttt{birdmig-sdm.ipynb}) and implemented in python script (see \texttt{model-train.py} and \texttt{model-predict.py}). Python script was used over Jupyter Notebook for implementation due to ease of use with loops and terminal.
+The SDM was prototyped in Jupyter Notebook (see \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}) and implemented in python script (see \texttt{\href{run:../model/model\_training.py}{model\_training.py}} and \texttt{\href{run:../model/model\_prediction.py}{model\_prediciton.py}}). Python scripts were used over Jupyter Notebook for implementation due to ease of use with loops and terminal.
 
 \subsubsection*{Requirements}
 Python scripts were developed using Python 3.10.12, which can be found \href{https://www.python.org/downloads/}{at this link}. While you may use newer versions of Python, they are not guaranteed to work.
 \\\\
 Required libraries include \texttt{os, tqdm, glob, pyimpute, pickle, rasterio, matplotlib, geopandas, sklearn, numpy,} and \texttt{pandas}. These libraries can be installed in a Python terminal using \texttt{pip}.
 \\\\
-Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data.
+Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data. \texttt{geojson} and \texttt{historical} are required for model training, while \texttt{future} and the output of the model training is required for model predicting.
 
 \subsubsection{SDM Training}
 The model is trained by associating presence/absence data with zonal averages for temperature and precipitation. In other words, the model learns what zonal environmental factors typically correlate to a presence or absence of a species. When given a file containing possible future climate readings, the model can then predict how the distribution of a species may react to that climate.
@@ -158,7 +159,7 @@ Training models for each bird species goes as follows:
 	\item Model is fit with training vectors and saved to a pickle file
 \end{enumerate}
 
-\noindent Random forest was chosen for the model because it showed the highest and most consistent accuracy when compared to other classifiers (extra trees, SVM, xgboost, lightgbm) See \texttt{model/birdmig\_sdm.ipynb}.
+\noindent Random forest was chosen for the model because it showed the highest and most consistent accuracy when compared to other classifiers (extra trees, SVM, xgboost, lightgbm) See \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}.
 \\\\
 A description of the \texttt{load\_data()} function is as follows:
 \begin{Verbatim}[tabsize=4]
@@ -183,11 +184,11 @@ load_data():
 	these vectors, removing NaN values to avoid training errors.
 \end{Verbatim}
 
-\noindent \texttt{model\_train.py} is set up in such a way that it trains and saves models for each bird species in a loop, tracking the process using \texttt{tqdm}. If a custom species is desired, the \texttt{species\_list} variable must be modified to reflect it (ensure that the custom bird species has already undergone R preprocessing). These models are saved to \texttt{/model/output/models} via the \texttt{pickle} library.
+\noindent \texttt{\href{run:../model/model\_training.py}{model\_training.py}} is set up in such a way that it trains and saves models for each bird species in a loop, tracking the process using \texttt{tqdm}. If a custom species is desired, the \texttt{species\_list} variable must be modified to reflect it (ensure that the custom bird species has already undergone R preprocessing). These models are saved to \texttt{/model/output/models} via the \texttt{pickle} library.
 
 \subsubsection{SDM Predicting}
 
-SDM prediction takes place in \texttt{/model/model\_predict.py}. Its prototyping can again be found in \texttt{/model/birdmig\_sdm.ipynb}
+SDM prediction takes place in \texttt{\href{run:../model/model\_prediction.py}{model\_prediciton.py}}. Its prototyping can again be found in \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}.
 \\\\
 Species distribution prediction uses the following process:
 \begin{enumerate}
@@ -199,25 +200,45 @@ Species distribution prediction uses the following process:
 
 \noindent There exists a future climate raster for each year (2015-2100) for each SSP (ssp126, ssp245, ssp370, ssp585). These rasters are used to predict distribution for five species, making a total of 1,720 images.
 \\\\
-\texttt{model\_predict.py} is comprised of a triple-nested for loop (species > ssp > year) and two functions, \texttt{make\_predictions()} and \texttt{create\_pngs()}. The former function is responsible for steps 1-3 listed above, while the latter function is responsible for step 4. TIFF images are converted to PNG through the use of \texttt{matplotlib}, and are saved in high resolution.
+\texttt{\href{run:../model/model\_prediction.py}{model\_prediciton.py}} is comprised of a triple-nested for loop (species > ssp > year) and two functions, \texttt{make\_predictions()} and \texttt{create\_pngs()}. The former function is responsible for steps 1-3 listed above, while the latter function is responsible for step 4. TIFF images are converted to PNG through the use of \texttt{matplotlib}, and are saved in high resolution.
 
 \section{Web Application}
 
 \subsection{APIs}
 
-\subsubsection*{React}
-Reactjs was used to created the frontend, and the main component is found under src/App.js. In App.js, there are calls to the backend to gather data for the various components
-located in the src/components folder. In the components folder, there is BirdInfo.js which returns the summary of the desired bird. There are four graphs: ClimateChart.js,
-HeatMap.js, PolylineMap.js, and SDMchart.js. Those four files contain the code to display the average temperature and prediction graph, the Trajectory graphs discussed more 
-in the Leaflet subsection, and the png of the SDM output. Also in components folder is PredictionControl.js which contains the code to display the year slider and SSP buttons that 
-change the Climate and SDM Charts. In addition to the components, the sidebar and header are created in App.js which allows users to view different birds. All the styling is written 
-up in src/App.css. 
+\subsubsection{React}
+Reactjs was used to created the frontend, and the main component is found under \texttt{/src/App.js}. In App.js, there are calls to the backend to gather data for the various components
+located in the \texttt{/src/components} folder. These components include:
+\begin{itemize}
+	\item \texttt{BirdInfo.js}: returns the summary of the desired bird
+	\item \texttt{ClimateChart.js}: returns temperature and precipitation graphs
+	\item \texttt{HeatMap.js}: returns heatmap graph (see Leaflet section)
+	\item \texttt{PolylineMap.js}: return bird trajectory graph (see Leaflet section)
+	\item \texttt{SDMchart.js}: returns png of SDM output
+	\item \texttt{PredictionControl.js}: contains code to display the year slider and SSP buttons that change the Climate and SDM Charts
+\end{itemize}
 
-\subsubsection*{FastAPI}
-The middleware and backend of the website was developed using python and FastAPI, in the file base.py located in the subfolder backend/app. The FastAPI backend primarily serves the purpose of quickly retrieving data and sending it to the front end as requested, allowing the front end user-interface to remain lightweight and easy to load quickly. FastAPI was used to build the backend due to its ease in creating end points for a frontend application to call, natively supporting features such as delayed requests and an intuitive way of passing arguments to the FastAPI backend.
+\noindent In addition to these components, the sidebar and header are created in \texttt{App.js} which allows users to view different birds. All the styling is written up in \texttt{/src/App.css}. 
+
+
+\subsubsection{Leaflet}
+Leaflet was used to map bird migration patterns in two ways under the "Trajectory" component. 
+
+The first map, "Individual Path", is created in \texttt{/src/components/PolylineMap.js}.
+The function fetches data from the csv files under  \texttt{/backend/app/data}. The function first fetches all the tagged Bird IDs from the CSV for the desired bird. Then,
+all the trajectories for the first Bird ID are fetched from the backend and drawn on OpenStreetMap using Leaflet.  Arrows are calculated between two points in \texttt{calculateBearings} 
+function and added onto the map as well. 
+
+The second map, "Aggregated Path", is created in \texttt{/src/component/HeatMap.js}. The function fetches all the latitude and longitude coordinates from the CSV of the desired bird in 
+the \texttt{/backend/app/data} folder. Using Leaflet and the Leaflet plugin, \texttt{L.heatLayer}, a heat layer is generated showing the combined trajectory path of all the tagged birds on top of 
+OpenStreetMap layer.  
+
+\subsubsection{FastAPI}
+The middleware and backend of the website was developed using python and FastAPI, in the file \texttt{base.py} located under \texttt{/backend/app}. The FastAPI backend primarily serves the purpose of quickly retrieving data and sending it to the front end as requested, allowing the front end user-interface to remain lightweight and easy to load quickly. FastAPI was used to build the backend due to its ease in creating end points for a frontend application to call, natively supporting features such as delayed requests and an intuitive way of passing arguments to the FastAPI backend.
+
 The backend is defined predominantly by functions that handle various requests the front end makes in order to retrieve data to display. These functions and their functions are discussed in greater detail in the following section for RestFUL API.
 
-\subsubsection*{RestFUL}
+\subsubsection{RestFUL}
 RestFUL API was used to define how the end points were set up, partially due to built-in compatibility with FastAPI, but also due to its simple and intuitive interface. While RestFUL API primarily defines 4 primary methods for GET, PUT, POST, and DELETE, the final application was operational with a stateless backend, meaning only GET and PUT requests were used.
 In the file base.py, GET and PUT requests were used to define the following end points:
 
@@ -229,15 +250,6 @@ In the file base.py, GET and PUT requests were used to define the following end 
 	\item \texttt{get\_bird\_ids()}: a GET end point that returns all unique bird IDs per a given species. This is used to by the front end component PolylineMap.js to search for a specified bird ID.
 	\item \texttt{get\_heatmap\_data()}: a GET end point that retrieves heatmap data of a bird species, to display the aggregated paths of all birds catalogued for that species on the front end with HeatMap.js, as a heat map. This is discussed in further detail in the Leaflet subsection.
 \end{itemize}
-
-\subsubsection*{Leaflet}
-Leaflet was used to map bird migration patterns in two ways under the "Trajectory" component. The first map, "Individual Path", is created in src/components/PolylineMap.js.
-The function fetches data from the csv files under the data folder in backend/app. The function first fetches all the tagged Bird IDs from the csv for the desired bird. Then,
-all the trajectories for the first Bird ID are fetched from the backend and drawn on OpenStreetMap using Leaflet.  Arrows are calculated between two points in calculateBearings 
-function and added onto the map as well. 
-The second map, "Aggregated Path", is created in src/component/HeatMap.js. The function fetches all the latitude and longitude coordinates from the csv of the desired bird in 
-the backend/app/data folder. Using Leaflet and the Leaflet plugin, L.heatLayer, a heat layer is generated showing the combined trajectory path of all the tagged birds on top of 
-OpenStreetMap layer.  
 
 \subsection{Usage}
 The website is designed to serve as an interactive tool for ornithologists, researchers, and bird watching enthusiasts. It allows users to:
