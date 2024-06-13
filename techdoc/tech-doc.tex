@@ -251,6 +251,41 @@ In the file base.py, GET and PUT requests were used to define the following end 
 	\item \texttt{get\_heatmap\_data()}: a GET end point that retrieves heatmap data of a bird species, to display the aggregated paths of all birds catalogued for that species on the front end with HeatMap.js, as a heat map. This is discussed in further detail in the Leaflet subsection.
 \end{itemize}
 
+\subsection*{Trajectory Map Preprocessing}
+To project trajectory maps on the frontend, tracking data from online data repository, \href{https://www.movebank.org/cms/movebank-main} {Movebank}, was saved in CSV files. These files are preprocessed using \texttt{process\_trajectory\_data.py} located in the Box folder under "Processing Trajectory Data". This script takes in an input CSV and the name of the output CSV to be created.
+The code processes the input CSV to only keep the columns utilized on the frontend into the output CSV. The columns utilized on the frontend are renamed to create standardized CSV files for the frontend. The script performs these steps:
+\begin{itemize}
+    \item Defines a dictionary \texttt{new\_columns} for renaming columns.
+    \item Defines a list \texttt{keep\_columns} to specify which columns to retain.
+    \item Reads the input CSV file into a DataFrame.
+    \item Renames the columns using the \texttt{new\_columns} dictionary.
+    \item Filters the DataFrame to keep only the specified columns.
+    \item Sorts the DataFrame by the \texttt{'TIMESTAMP'} column.
+    \item Drops rows with missing values in \texttt{'LATITUDE'} and \texttt{'LONGITUDE'} columns.
+    \item Writes the processed DataFrame to the output CSV file.
+    \item Prints the output file name, the processed DataFrame, and the range of \texttt{'TIMESTAMP'} values.
+\end{itemize}
+
+To run the script, use the following command in the terminal:
+
+\begin{lstlisting}[language=bash]
+python process_bird_data.py <input_file> <output_file>
+\end{lstlisting}
+
+Replace \texttt{<input\_file>} with the path to your input CSV file and \texttt{<output\_file>} with the path where you want to save the processed CSV file.
+
+Example:
+
+\begin{lstlisting}[language=bash]
+python process_bird_data.py bird_data.csv processed_bird_data.csv
+\end{lstlisting}
+
+\subsubsection*{Leaflet}
+Leaflet was utilized to delineate bird migration patterns in two distinct manners within the "Trajectory" component. The initial map, "Individual Path," is constructed in \texttt{src/components/PolylineMap.js}. The process involves fetching data from CSV files located in the \texttt{data} directory within \texttt{public/trajectory_data}. Initially, all tagged Bird IDs are retrieved from the CSV for the specified bird. Subsequently, the trajectories for the first Bird ID are fetched from the backend and depicted on OpenStreetMap utilizing Leaflet. Additionally, arrows are computed between two points in the \texttt{calculateBearings} function and integrated onto the map.
+
+The second map, "Aggregated Path," is generated in \texttt{src/components/HeatMap.js}. This function retrieves all latitude and longitude coordinates from the CSV of the desired bird in the \texttt{public/trajectory_data} directory. Employing Leaflet and the Leaflet plugin, \texttt{L.heatLayer}, a heat layer is generated to illustrate the combined trajectory path of all tagged birds atop the OpenStreetMap layer.
+
+
 \subsection{Usage}
 The website is designed to serve as an interactive tool for ornithologists, researchers, and bird watching enthusiasts. It allows users to:
 
