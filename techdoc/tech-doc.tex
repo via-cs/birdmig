@@ -4,6 +4,7 @@
 \usepackage{authblk}
 \usepackage[colorlinks=true, urlcolor=blue, linkcolor=black]{hyperref}
 \usepackage{fancyvrb}
+\usepackage{listings}
 
 \title{Visual Analytics of the Impacts of Climate Change on 
 Migratory Bird Habitats \\
@@ -221,18 +222,6 @@ located in the \texttt{/src/components} folder. These components include:
 \noindent In addition to these components, the sidebar and header are created in \texttt{App.js} which allows users to view different birds. All the styling is written up in \texttt{/src/App.css}. 
 
 
-\subsubsection{Leaflet}
-Leaflet was used to map bird migration patterns in two ways under the "Trajectory" component. 
-
-The first map, "Individual Path", is created in \texttt{/src/components/PolylineMap.js}.
-The function fetches data from the csv files under  \texttt{/backend/app/data}. The function first fetches all the tagged Bird IDs from the CSV for the desired bird. Then,
-all the trajectories for the first Bird ID are fetched from the backend and drawn on OpenStreetMap using Leaflet.  Arrows are calculated between two points in \texttt{calculateBearings} 
-function and added onto the map as well. 
-
-The second map, "Aggregated Path", is created in \texttt{/src/component/HeatMap.js}. The function fetches all the latitude and longitude coordinates from the CSV of the desired bird in 
-the \texttt{/backend/app/data} folder. Using Leaflet and the Leaflet plugin, \texttt{L.heatLayer}, a heat layer is generated showing the combined trajectory path of all the tagged birds on top of 
-OpenStreetMap layer.  
-
 \subsubsection{FastAPI}
 The middleware and backend of the website was developed using python and FastAPI, in the file \texttt{base.py} located under \texttt{/backend/app}. The FastAPI backend primarily serves the purpose of quickly retrieving data and sending it to the front end as requested, allowing the front end user-interface to remain lightweight and easy to load quickly. FastAPI was used to build the backend due to its ease in creating end points for a frontend application to call, natively supporting features such as delayed requests and an intuitive way of passing arguments to the FastAPI backend.
 
@@ -251,8 +240,8 @@ In the file base.py, GET and PUT requests were used to define the following end 
 	\item \texttt{get\_heatmap\_data()}: a GET end point that retrieves heatmap data of a bird species, to display the aggregated paths of all birds catalogued for that species on the front end with HeatMap.js, as a heat map. This is discussed in further detail in the Leaflet subsection.
 \end{itemize}
 
-\subsection*{Trajectory Map Preprocessing}
-To project trajectory maps on the frontend, tracking data from online data repository, \href{https://www.movebank.org/cms/movebank-main} {Movebank}, was saved in CSV files. These files are preprocessed using \texttt{process\_trajectory\_data.py} located in the Box folder under "Processing Trajectory Data". This script takes in an input CSV and the name of the output CSV to be created.
+\subsection{Trajectory Map Preprocessing}
+To project trajectory maps on the frontend, tracking data from online data repository, \href{https://www.movebank.org/cms/movebank-main} {Movebank}, was saved in CSV files. These files are preprocessed using \texttt{process\_trajectory\_data.py} located in the Box folder linked above. This script takes in an input CSV and the name of the output CSV to be created.
 The code processes the input CSV to only keep the columns utilized on the frontend into the output CSV. The columns utilized on the frontend are renamed to create standardized CSV files for the frontend. The script performs these steps:
 \begin{itemize}
     \item Defines a dictionary \texttt{new\_columns} for renaming columns.
@@ -280,10 +269,12 @@ Example:
 python process_bird_data.py bird_data.csv processed_bird_data.csv
 \end{lstlisting}
 
-\subsubsection*{Leaflet}
-Leaflet was utilized to delineate bird migration patterns in two distinct manners within the "Trajectory" component. The initial map, "Individual Path," is constructed in \texttt{src/components/PolylineMap.js}. The process involves fetching data from CSV files located in the \texttt{data} directory within \texttt{public/trajectory_data}. Initially, all tagged Bird IDs are retrieved from the CSV for the specified bird. Subsequently, the trajectories for the first Bird ID are fetched from the backend and depicted on OpenStreetMap utilizing Leaflet. Additionally, arrows are computed between two points in the \texttt{calculateBearings} function and integrated onto the map.
+\subsubsection{Leaflet}
+Leaflet was utilized to delineate bird migration patterns in two distinct manners within the "Trajectory" component. 
 
-The second map, "Aggregated Path," is generated in \texttt{src/components/HeatMap.js}. This function retrieves all latitude and longitude coordinates from the CSV of the desired bird in the \texttt{public/trajectory_data} directory. Employing Leaflet and the Leaflet plugin, \texttt{L.heatLayer}, a heat layer is generated to illustrate the combined trajectory path of all tagged birds atop the OpenStreetMap layer.
+The initial map, "Individual Path," is constructed in \texttt{/src/components/PolylineMap.js}. The process involves fetching data from CSV files located in the \texttt{data} directory within \texttt{/public/trajectory\_data}. Initially, all tagged Bird IDs are retrieved from the CSV for the specified bird. Subsequently, the trajectories for the first Bird ID are fetched from the backend and depicted on OpenStreetMap utilizing Leaflet. Additionally, arrows are computed between two points in the \texttt{calculateBearings} function and integrated onto the map.
+
+The second map, "Aggregated Path," is generated in \texttt{/src/components/HeatMap.js}. This function retrieves all latitude and longitude coordinates from the CSV of the desired bird in the \texttt{/public/trajectory\_data} directory. Employing Leaflet and the Leaflet plugin, \texttt{L.heatLayer}, a heat layer is generated to illustrate the combined trajectory path of all tagged birds atop the OpenStreetMap layer.
 
 
 \subsection{Usage}
