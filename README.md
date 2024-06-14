@@ -10,7 +10,16 @@
 
 ## To start the React Frontend:
 
-- cd into /birdmig
+- ```cd``` into ```/birdmig```
+- If the front end was never run before, run the following commands:
+  ```
+  npm install &&
+  npm install d3 &&
+  npm install react-cookie &&
+  npm install leaflet react-leaflet leaflet-arrowheads leaflet-polylinedecorator &&
+  npm install --save-dev @testing-library/react @testing-library/jest-dom jest-fetch-mock &&
+  npm install --save-dev @testing-library/jest-dom
+  ```
 - enter ```npm start``` in your terminal
 
 # To run Docker with all applications
