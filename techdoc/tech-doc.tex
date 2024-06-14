@@ -342,12 +342,16 @@ The website is developed using a React front end and a FastAPI back end, leverag
 The application's architecture is designed to handle high volumes of data efficiently, utilizing caching and asynchronous data fetching to optimize performance and user experience.
 
 \subsection{FAQ}
+
 The necessary ReactJS components are installed, but the front end application is still causing an error.
+
 \begin{itemize}
     \item Ensure that all necessary Reactjs libraries have been installed in the project directory using the \texttt{npm install} command.
     \item If the front end still does not start, the React cache may need to be cleared. In a Windows or Linux terminal, navigate to the root folder of the project using the \texttt{cd} command, and run the command npm  cache clean --force to clear the React cache, and then execute \texttt{npm install}.
 \end{itemize}
+
 The terminals that house the front end and/or back end have been closed without terminating the program, and now the corresponding end point of the application will not start.
+
 \begin{itemize}
     \item Restart the device, and ensure that the back end and front end applications have fully terminated before closing the terminals. This can be forced by forcing a SIGINT on the program with \texttt{control + C} on either the Windows or Linux terminal.
 \end{itemize}
