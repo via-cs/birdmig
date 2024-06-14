@@ -1,9 +1,11 @@
 # Usage
 
 ## To start the Flask Backend:
-- ```cd``` into ```/birdmig/backend/app```
+- Ensure all requirements are installed
+  - This can be done by running `pip install -r requirements.txt` in `/backend`
 - Run the backend
-  - To run the backend for showcase and documentation purposes, enter ```fastapi dev base.py``` in your terminal.
+  - ```cd``` into ```/backend/app```
+  - Run the command ```fastapi dev base.py``` in your terminal in order to start the backend.
     - Access docs by navigating to ```localhost:8000/docs``` on your web browser
   - To run the backend for debugging purposes, run ```uvicorn base:app --reload``` in your terminal.
     - Note that this only runs the backend. It can not be navigated to on the web browser, nor will documentation be available.
@@ -11,16 +13,8 @@
 ## To start the React Frontend:
 
 - ```cd``` into ```/birdmig```
-- If the front end was never run before, run the following commands:
-  ```
-  npm install &&
-  npm install d3 &&
-  npm install react-cookie &&
-  npm install leaflet react-leaflet leaflet-arrowheads leaflet-polylinedecorator &&
-  npm install --save-dev @testing-library/react @testing-library/jest-dom jest-fetch-mock &&
-  npm install --save-dev @testing-library/jest-dom
-  ```
-- enter ```npm start``` in your terminal
+- Run the command ```npm install``` to install required packages
+- Run ```npm start``` in your terminal to start the front end
 
 # To run Docker with all applications
 - Ensure that the Docker daemon is running
