@@ -147,7 +147,7 @@ Python scripts were developed using Python 3.10.12, which can be found \href{htt
 \\\\
 Required libraries include \texttt{os, tqdm, glob, pyimpute, pickle, rasterio, matplotlib, geopandas, sklearn, numpy,} and \texttt{pandas}. These libraries can be installed in a Python terminal using \texttt{pip}.
 \\\\
-Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data. \texttt{geojson} and \texttt{historical} are required for model training, while \texttt{future} and \texttt{/data/pickle} is required for model predicting. Example pickle files can be found at the Box link \href{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}{here}.
+Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data. \texttt{geojson} and \texttt{historical} are required for model training, while \texttt{future} and \texttt{/data/models} is required for model predicting. Example pickle files under \texttt{/data/models} can be found at the Box link \href{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}{here}.
 
 \subsubsection{SDM Training}
 The model is trained by associating presence/absence data with zonal averages for temperature and precipitation. In other words, the model learns what zonal environmental factors typically correlate to a presence or absence of a species. When given a file containing possible future climate readings, the model can then predict how the distribution of a species may react to that climate.
@@ -201,14 +201,14 @@ Species distribution prediction uses the following process:
 
 \noindent There exists a future climate raster for each year (2015-2100) for each SSP (ssp126, ssp245, ssp370, ssp585). These rasters are used to predict distribution for five species, making a total of 1,720 images.
 \\\\
-\texttt{\href{run:../model/model\_prediction.py}{model\_prediciton.py}} is comprised of a triple-nested for loop (species > ssp > year) and two functions, \texttt{make\_predictions()} and \texttt{create\_pngs()}. The former function is responsible for steps 1-3 listed above, while the latter function is responsible for step 4. TIFF images are converted to PNG through the use of \texttt{matplotlib}, and are saved in high resolution.
+\texttt{\href{run:../model/model\_prediction.py}{model\_prediciton.py}} is comprised of a triple-nested for loop (species \verb|->| ssp \verb|->| year) and two functions, \texttt{make\_predictions()} and \texttt{create\_pngs()}. The former function is responsible for steps 1-3 listed above, while the latter function is responsible for step 4. TIFF images are converted to PNG through the use of \texttt{matplotlib}, and are saved in high resolution.
 
 \section{Web Application}
 
 \subsection{APIs}
 
 \subsubsection{React}
-Reactjs was used to created the front end, and the main component is found under \texttt{/src/App.js}. In App.js, there are calls to the back end to gather data for the various components
+React.js was used to created the front end, and the main component is found under \texttt{/src/App.js}. In App.js, there are calls to the back end to gather data for the various components
 located in the \texttt{/src/components} folder. These components include:
 \begin{itemize}
 	\item \texttt{BirdInfo.js}: returns the summary of the desired bird
@@ -282,16 +282,6 @@ The website is designed to serve as an interactive tool for ornithologists, rese
 
 \subsubsection{Requirements}
 
-The front end of the application was implemented with ReactJS. For ReactJS to work, first Node.js must be installed. Information on how to do so can be found \href{https://nodejs.org/en/learn/getting-started/how-to-install-nodejs}{here}. Once Node.js is installed, download ReactJS and Leaflet. Running the following lines of code in the project root directory in either the Linux command line or the Windows terminal will install the dependencies to run the front end:
-\begin{verbatim}
-    npm install 
-    npm install d3 
-    npm install react-cookie 
-    npm install leaflet react-leaflet leaflet-arrowheads leaflet-polylinedecorator 
-    npm install --save-dev @testing-library/react @testing-library/jest-dom jest-fetch-mock 
-    npm install --save-dev @testing-library/jest-dom
-\end{verbatim}
-
 The backend developed primarily with Python 3.12, but also functions on Python 3.11. It relies primarily on FastAPI for functionality, while unit testing is done using the \texttt{pytest} python module. Ensure that the correct Python version (Python 3.12 or Python 3.11) is installed, and ensure the following Python modules are installed:
 
 \begin{verbatim}
@@ -306,7 +296,10 @@ The backend developed primarily with Python 3.12, but also functions on Python 3
     pytest
 \end{verbatim}
 
-All these modules are able to be installed using the command \texttt{pip install}.
+\noindent These modules can be installed by running the command \texttt{pip install -r requirements.txt} in \texttt{/backend}.
+\\\\
+The front end of the application was implemented with React.js. For React.js to work, first Node.js must be installed. Information on how to do so can be found \href{https://nodejs.org/en/learn/getting-started/how-to-install-nodejs}{here}. Once Node.js is installed, download React.js and Leaflet. Alternatively, running \texttt{npm install} in terminal will install the dependencies required to run the front end.
+
 
 \subsubsection{Process/Steps}
 \begin{enumerate}
@@ -315,17 +308,16 @@ All these modules are able to be installed using the command \texttt{pip install
     \item Start the backend first by following the following steps:
     \begin{enumerate}
         \item In the terminal dedicated to the back end, run the \texttt{cd} command until the current working directory of the terminal is \texttt{"project root"/backend/app}. for example, if the project is located in a folder called \texttt{birdmigration}, the working directory of the back end terminal should be \texttt{birdmigration/backend/app}.
-        \item If the back end is being run for the f
-        \item In this terminal, run the command \texttt{fastapi dev base.py}.
+        \item In this directory, run the command \texttt{fastapi dev base.py}.
         \item To access documentation of the back end, use a web browser and navigate to \url{localhost:8000/docs}
         \item The back end should update automatically with saved modifications to the file. To terminate the back end, terminate the program with a SIGINT using \texttt{control + C}, if using either a Linux or Windows command terminal.
     \end{enumerate}
     \item Once the back end is initialized, the front end of the application may be started.
     \begin{enumerate}
-        \item In the terminal dedicated to running the front end, ensure the current working directory of the terminal is the root folder for the project. This can be checked by using the command \texttt{ls}, and seeing if the folder \texttt{"project root"/src}\texttt is listed.
-        \item If this is the first time the front end is being started, run the command \texttt{npm install} to ensure that all the necessary Reactjs components and shortcut commands are installed and functional in this directory.
-        \item Once the shortcut commands for Reactjs are installed (refer to the prior step), run the command \texttt{npm start}.
-        \item After a couple seconds of loading the front end application, the front end should open automatically in a new web browser window. If this window is either closed or does not open, use a web browser to navigate to \texttt{http://localhost:3000} to observe the front end User Interface.
+        \item In the terminal dedicated to running the front end, ensure the current working directory of the terminal is the root folder for the project. This can be checked by using the command \texttt{ls}, and seeing if the folder \texttt{"project root"/src} is listed.
+        \item Run the command \texttt{npm install} to ensure that all the necessary React.js components and shortcut commands are installed and functional in this directory.
+        \item Once the shortcut commands for React.js are installed (refer to the prior step), run the command \texttt{npm start}.
+        \item After a frew minutes, the front end should open automatically in a new web browser window. If this window is either closed or does not open, use a web browser to navigate to \texttt{http://localhost:3000} to observe the front end User Interface.
     \end{enumerate}
     \item Do not close either terminal unless their respective application is fully terminated. If a new terminal is started and another instance of either the front end or the back end is already running, a restart of the device may be required.
 \end{enumerate}
@@ -343,17 +335,24 @@ The application's architecture is designed to handle high volumes of data effici
 
 \subsection{FAQ}
 
-The necessary ReactJS components are installed, but the front end application is still causing an error.
+\noindent \textit{The necessary React.js components are installed, but the front end application is still causing an error.}
 
 \begin{itemize}
-    \item Ensure that all necessary Reactjs libraries have been installed in the project directory using the \texttt{npm install} command.
+    \item Ensure that all necessary React.js libraries have been installed in the project directory using the \texttt{npm install} command.
     \item If the front end still does not start, the React cache may need to be cleared. In a Windows or Linux terminal, navigate to the root folder of the project using the \texttt{cd} command, and run the command npm  cache clean --force to clear the React cache, and then execute \texttt{npm install}.
 \end{itemize}
 
-The terminals that house the front end and/or back end have been closed without terminating the program, and now the corresponding end point of the application will not start.
+\noindent \textit{The terminals that house the front end and/or back end have been closed without terminating the program, and now the corresponding end point of the application will not start.}
 
 \begin{itemize}
     \item Restart the device, and ensure that the back end and front end applications have fully terminated before closing the terminals. This can be forced by forcing a SIGINT on the program with \texttt{control + C} on either the Windows or Linux terminal.
+\end{itemize}
+
+\noindent \textit{Running FastAPI on \texttt{base.py} fails due to missing packages}.
+
+\begin{itemize}
+	\item Ensure your terminal is in the \texttt{/backend/app} directory.
+	\item Ensure that all required python packages are installed. This can be done by running \texttt{pip install -r requirements.txt} in \texttt{/backend}
 \end{itemize}
 
 \end{document}
