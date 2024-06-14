@@ -36,7 +36,7 @@ function PolylineMap({ selectedBird }) {
       .then((response) => {
         if (Array.isArray(response.data)) {
           setAllBirdIDs(response.data);
-          setSelectedBirdIDs([response.data[0]]); // Initially select the first bird ID
+          setSelectedBirdIDs([response.data[0]]);
         } else {
           setAllBirdIDs([]);
         }
@@ -47,7 +47,7 @@ function PolylineMap({ selectedBird }) {
       });
   }, [birdName]);
 
-  const getTrajectoryData = () => {
+  const getTrajectoryData = useCallback(() => {
     const baseUrl = "http://localhost:8000";
     const firstBirdID = selectedBirdIDs[0];
     axios
@@ -61,14 +61,13 @@ function PolylineMap({ selectedBird }) {
         console.error("Error fetching trajectory data", error);
         setTrajectoryData({});
       });
-  };
+  }, [birdName, selectedBirdIDs]);
 
   const handleDropdownChange = (event) => {
     setSelectedBirdIDs([event.target.value]);
   };
 
   useEffect(() => {
-    // Fetch all available bird IDs and populate the dropdown options
     fetchAllBirdIDs();
   }, [fetchAllBirdIDs]);
 
@@ -76,14 +75,13 @@ function PolylineMap({ selectedBird }) {
     if (selectedBirdIDs.length > 0) {
       getTrajectoryData();
     }
-  }, [selectedBirdIDs, birdName]);
+  }, [selectedBirdIDs, getTrajectoryData]);
 
   useEffect(() => {
     if (!trajectoryData || !Array.isArray(trajectoryData)) return;
     if (!mapRef.current) return;
 
-    // Initialize Leaflet map centered over North America
-    var map = L.map(mapRef.current).setView([40, -100], 2); // Centered over North America
+    var map = L.map(mapRef.current).setView([40, -100], 2);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -103,12 +101,11 @@ function PolylineMap({ selectedBird }) {
       parseFloat(d.LONGITUDE),
     ]);
 
-    // Create polyline and add it to the map with a specific color
     const polyline = L.polyline(latLngs, {
       color: "darkblue",
       weight: 4,
     }).addTo(map);
-    // Add marker for the start point
+
     const startTimestamp = validData[0].TIMESTAMP;
     const startDate = new Date(startTimestamp);
 
@@ -120,7 +117,6 @@ function PolylineMap({ selectedBird }) {
       .setLatLng(latLngs[0])
       .setContent(`Start Point - ${startMonth} ${startYear}`);
 
-    // Add marker for the end point
     const endTimestamp = validData[validData.length - 1].TIMESTAMP;
     const endDate = new Date(endTimestamp);
     const endMonth = endDate.toLocaleString("en-US", {
@@ -132,7 +128,7 @@ function PolylineMap({ selectedBird }) {
       .setContent(`End Point - ${endMonth} ${endYear}`);
 
     map.addLayer(startMarker).addLayer(endMarker);
-    // Calculate bearings for each segment of the polyline
+
     const bearings = [];
     for (let i = 0; i < latLngs.length - 1; i += 150) {
       const startPoint = L.latLng(latLngs[i]);
@@ -141,7 +137,6 @@ function PolylineMap({ selectedBird }) {
       bearings.push(bearing);
     }
 
-    // Create polyline decorator and add it to the map
     L.polylineDecorator(polyline, {
       patterns: bearings.map((bearing, index) => ({
         offset: 10,
@@ -149,12 +144,11 @@ function PolylineMap({ selectedBird }) {
         symbol: L.Symbol.arrowHead({
           pixelSize: 6,
           polygon: false,
-          pathOptions: { color: "blue" }, // Customize arrow color if needed
+          pathOptions: { color: "blue" },
         }),
       })),
     }).addTo(map);
 
-    // Clean up map instance if component unmounts
     return () => {
       map.remove();
     };

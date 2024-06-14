@@ -1,5 +1,3 @@
-// PredictionControls.js
-
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +7,6 @@ function PredictionControls(props) {
   const [year, setYear] = useState(2021); //2021 by default
   const [co2, setEmission] = useState("ssp245"); // SSP 245 by default.
 
-  // TODO: perhaps rename these to something more meaningful for a general audience?
   const CO2_Futures = ["ssp126", "ssp245", "ssp370", "ssp585"];
   const CO2_Display = {
     ssp126: "SSP1-2.6",

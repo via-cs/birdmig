@@ -187,7 +187,9 @@ async def get_predictions(prediction_input: PredictionInputs):
   selected_year = str(prediction_input.year)
   emission_Type = prediction_input.emissions
   # For image data:
-  output_path = f"../../model/outputs/png-images/{birdsModelDirs[selected_bird]}/{emission_Type}/{selected_year}.png"
+  base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+  output_path = os.path.join(base_dir, 'public', 'png-images', birdsModelDirs[selected_bird], emission_Type, f'{selected_year}.png')
+
   dataImg = Image.open(output_path)
   buffer = BytesIO()
   dataImg.save(buffer, format="png")
@@ -229,8 +231,8 @@ def send_json(filename):
 
 @app.get('/get_trajectory_data')
 def get_trajectory_data(bird: str, birdID: str):
-    
-  filename = f'./data/{bird}.csv'
+  base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+  filename = os.path.join(base_dir, 'public', 'trajectory_data', f'{bird}.csv')
   try:
     df = pd.read_csv(filename)
     df['ID'] = df['ID'].astype(str)
@@ -252,8 +254,8 @@ def get_trajectory_data(bird: str, birdID: str):
 
 @app.get('/get_bird_ids')
 def get_bird_ids(bird: str):
-  filename = f'./data/{bird}.csv'
-  
+  base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+  filename = os.path.join(base_dir, 'public', 'trajectory_data', f'{bird}.csv')  
   try:
     df = pd.read_csv(filename)
     bird_ids = df['ID'].unique().tolist()
@@ -266,7 +268,8 @@ def get_bird_ids(bird: str):
 
 @app.get('/get_heatmap_data')
 def get_heatmap_data(bird: str):
-    filename = f'./data/{bird}.csv'
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    filename = os.path.join(base_dir, 'public', 'trajectory_data', f'{bird}.csv')
     try:
         df = pd.read_csv(filename, low_memory=False)
         heatmap_data = df[['LATITUDE', 'LONGITUDE']].values.tolist()

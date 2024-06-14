@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
-import { CookiesProvider, useCookies } from "react-cookie";
+import { CookiesProvider } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faInfo } from "@fortawesome/free-solid-svg-icons";
 //import WebSocketCall from ""
@@ -16,7 +16,6 @@ import Popup from "reactjs-popup";
 function App() {
   const backendUrl = "http://localhost:8000";
 
-  // Define birdMap and climateVariables
   const birdMap = {
     "Blackpoll Warbler": "warbler",
     "Bald Eagle": "eagle",
@@ -24,8 +23,6 @@ function App() {
     "Long Billed Curlew": "curlew",
     Whimbrel: "whimbrel",
   };
-
-  const climateVariables = ["temperature", "precipitation"];
 
   const images = require.context("./images", true);
   const imageList = images.keys().map((image) => images(image));
@@ -59,23 +56,16 @@ function App() {
 
   const [selectedBird, setSelectedBird] = useState(null);
   const [birdInfo, setBirdInfo] = useState(null);
-  const [sdmData, setSdmData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedYear, setObservedYear] = useState(2021);
   const [selectedEmissions, setEmissionRate] = useState("ssp245");
-  const [climateData, setClimateData] = useState(null);
-  const [selectedClimateVariable, setSelectedClimateVariable] = useState("");
   const [selectedMap, setSelectedMap] = useState("Polyline");
   const [predictionData, setPredictionData] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
-  const [showChart, setShowChart] = useState(true);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
-  };
-  const toggleEmissionsChart = () => {
-    setShowChart(!showChart);
   };
 
   axios.create({ withCredentials: true });
@@ -88,7 +78,6 @@ function App() {
   function selectBird(birdName) {
     setSelectedBird(birdName);
     fetchBirdInfo(birdName);
-    //fetchSDMData(birdName);
     updatePredictionVars(selectedYear, selectedEmissions, birdName);
   }
 
@@ -106,31 +95,6 @@ function App() {
         setBirdInfo(null);
         setLoading(false);
       });
-  }
-
-  useEffect(() => {
-    if (selectedClimateVariable) {
-      fetchClimateData(selectedClimateVariable);
-    }
-  }, [selectedClimateVariable]);
-
-  function fetchClimateData(variable) {
-    setLoading(true);
-    axios
-      .get(`${backendUrl}/json/${climateVariables[variable]}`)
-      .then((response) => {
-        setClimateData(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching climate data", error);
-        setError("Failed to fetch climate data");
-        setLoading(false);
-      });
-  }
-
-  function handleClimateVariableChange(variable) {
-    setSelectedClimateVariable(variable);
   }
 
   useEffect(() => {}, [selectedBird, selectedYear, selectedEmissions]);

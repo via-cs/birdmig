@@ -46,7 +46,7 @@ const ClimateChart = ({ selectedYear }) => {
         });
       })
       .catch((error) => console.error("Error fetching data:", error));
-  }, [selectedYear, activeTab]); // Depend on activeTab as well
+  }, [selectedYear, activeTab]); 
 
   return (
     <div className="ClimateChart">
