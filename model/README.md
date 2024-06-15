@@ -74,6 +74,4 @@ The general code structure is notated in `birdmid-sdm.ipynb`. The actual scripts
 used for SDM training and predicting are `model_train.py` and
 `model_predict.py` respectively. 
 
-### Using `model_train.py`
-
-### Using `model_predict.py`
+In order to run the SDM model, see the technical document located at `/techdoc/tech-doc.pdf`
