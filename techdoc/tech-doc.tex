@@ -99,12 +99,12 @@ Both of these scripts require datasets that can be downloaded from the Box folde
 
 If the above prerequisites are met, then the R scripts should run without issue. To do this in RStudio, open the desired script and click the "Source" button.
 \\\\
-If a custom species is desired, the species CSV must be downloaded from GBIF and stored under \texttt{/data/GBIF/[species name].csv}. Furthermore, the \texttt{species\_list} parameter in \texttt{training-preprocessing.R} must be altered to reflect the new species. 
+If a custom species is desired, the species CSV must be downloaded from GBIF and stored under \texttt{/data/GBIF/[species name].csv}. Furthermore, the \texttt{species\_list} parameter in \texttt{preprocess\_train.R} must be altered to reflect the new species. 
 
 \subsubsection*{Script Descriptions}
 See the above section for instructions on obtaining the appropriate inputs.
 \\\\
-\texttt{\underline{{training-preprocessing.R}}}
+\texttt{\underline{{preprocess\_train.R}}}
 \begin{Verbatim}[tabsize=4]
 	Input:	
 		Species datasets (.csv)
@@ -123,7 +123,7 @@ Climate raster files are converted from NetCDF to TIFF format for compatibility 
 
 All outputs are cropped to the extent variable \texttt{e}. Default \texttt{e} is set to both Americas.
 \\\\
-\texttt{\underline{prediction-preprocessing.R}}
+\texttt{\underline{preprocess\_predict.R}}
 \begin{Verbatim}[tabsize=4]
 	Input:	
 		Future climate datasets (.nc)

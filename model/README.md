@@ -17,7 +17,7 @@ Before running the SDM, data must be preprocessed into a form factor fit for mod
 These R scripts require four libraries: `raster`, `dismo`, `sf`, and
 `ncdf4`
 
-1. Open `preprocessing-train.R`
+1. Open `preprocess-train.R`
 2. Set working directory by going to **Session > Set Working Directory > To source file location**
 3. Install packages by going to **Tools > Install packages**
     - Under *Install from:*, use *Repository* for each of the listed packages
@@ -42,7 +42,7 @@ place in the `/data/` folder like so:
 Ensure that the climate and desired species datasets are placed according to
 the above section
     
-1. In `preprocessing_train.R`,
+1. In `preprocess_train.R`,
     - Include [scientific name] in `species_list`
         - Alternatively, replace all names by [scientific name] if you only want
           the one processed
@@ -59,7 +59,7 @@ the model.
 Ensure that the future climate datasets are placed according to
 the above section. These can be downloaded from the Box folder.
     
-1. In `preprocessing_predict.R`,
+1. In `preprocess_predict.R`,
     - change value for `e` to desired latitude & longitude (default set to
       Americas)
     
