@@ -10,13 +10,14 @@ Before running the SDM, data must be preprocessed into a form factor fit for mod
 2. Install RStudio from https://posit.co/download/rstudio-desktop/
     - RStudio makes debugging easier, as you can view variables, run lines
       seperately, and run an instance of R cmd 
+    - Alternatively, install the Rscript package for command line use
 
 ### Library dependencies
 
-These R scripts requires four libraries: `raster`, `dismo`, `sf`, and
+These R scripts require four libraries: `raster`, `dismo`, `sf`, and
 `ncdf4`
 
-1. Open `training-preprocessing.R`
+1. Open `preprocessing-train.R`
 2. Set working directory by going to **Session > Set Working Directory > To source file location**
 3. Install packages by going to **Tools > Install packages**
     - Under *Install from:*, use *Repository* for each of the listed packages
@@ -26,9 +27,8 @@ These R scripts requires four libraries: `raster`, `dismo`, `sf`, and
     ```
 
 ### Getting the data
-Data can be found in the included Box folder at **[insert link here]**. This
-data includes the species CSV's used for this project, as well as the climate
-datasets indexed by year and SSP.
+Data can be found in the included Box folder at [this link](https://ucdavis.app.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz). This
+folder includes the species CSV's used for this project, the climate datasets indexed by year and SSP, and a script for processing migration patterns (see the technical document under `techdoc/tech-doc.pdf`).
 
 To use this data, download the `/data` folder from the above link and place it
 in the root directory of this repository after cloning.
@@ -42,7 +42,7 @@ place in the `/data/` folder like so:
 Ensure that the climate and desired species datasets are placed according to
 the above section
     
-1. In `training-preprocessing.R`,
+1. In `preprocessing_train.R`,
     - Include [scientific name] in `species_list`
         - Alternatively, replace all names by [scientific name] if you only want
           the one processed
@@ -53,13 +53,13 @@ the above section
 
 All output is saved in `/model/input/geojson/` and `/model/input/historical/`
 for species and climate data respectively. The data is now ready for training
-the model (see section model_train.py)
+the model.
 
 ### Prediction preprocessing
 Ensure that the future climate datasets are placed according to
 the above section. These can be downloaded from the Box folder.
     
-1. In `prediction-preprocessing.R`,
+1. In `preprocessing_predict.R`,
     - change value for `e` to desired latitude & longitude (default set to
       Americas)
     
@@ -69,9 +69,11 @@ All output is saved in `/model/input/future` for future climate data. The data
 is now ready for use for prediction (see section model_prediction.py)
 
 ## The Species Distribution Model
+If the required data is correctly preprocessed (see above), then these scripts should be easily run in any terminal:
 
-The general code structure is notated in `birdmid-sdm.ipynb`. The actual scripts
-used for SDM training and predicting are `model_train.py` and
-`model_predict.py` respectively. 
+```
+python3 model/model_train.py
+python3 model/model_predict.py
+```
 
-In order to run the SDM model, see the technical document located at `/techdoc/tech-doc.pdf`
+These commands can be run seperately if the necessary preprocessed data exists. For more information, see the technical document at `/techdoc/tech-doc.pdf`

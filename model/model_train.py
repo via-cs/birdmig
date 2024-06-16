@@ -9,12 +9,14 @@ import numpy as np
 import pandas as pd
 import pickle
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
 filetype = 'geojson'
 species_list = ['Anser_albifrons', 'Haliaeetus_leucocephalus', 'Numenius_americanus', 'Numenius_phaeopus', 'Setophaga_striata']
 
 def load_data(species, n=None):
       # Load species data
-      pa_raw = gpd.GeoDataFrame.from_file('input/geojson/' + species + '.' + filetype)
+      pa_raw = gpd.GeoDataFrame.from_file(dir_path + '/input/geojson/' + species + '.' + filetype)
 
       if n:
             sample_size = n
@@ -23,7 +25,7 @@ def load_data(species, n=None):
             pa = pa_raw
 
       # Load climate data
-      raster_features = sorted(glob.glob('input/historical/*.tif'))
+      raster_features = sorted(glob.glob(dir_path + '/input/historical/*.tif'))
 
       # Load training vectors
       train_xs, train_y = pyimpute.load_training_vector(pa, raster_features, response_field='CLASS')
@@ -54,6 +56,6 @@ for species in tqdm(species_list):
       # Fit Model
       model.fit(X, y)
 
-      os.makedirs('../data/models/', exist_ok=True)
-      filename = species + '_rf_classifier_model.pkl'
-      pickle.dump(model, open('output/models/' + filename, 'wb'))
+      os.makedirs(dir_path + '/../data/models/', exist_ok=True)
+      pickle_filename = species + '_rf_classifier_model.pkl'
+      pickle.dump(model, open(dir_path + "/../data/models/" + pickle_filename, 'wb'))

@@ -1,25 +1,32 @@
 # Usage
 
-## To start the Flask Backend:
-- Ensure all requirements are installed
-  - This can be done by running `pip install -r requirements.txt` in `/backend`
-- Run the backend
-  - ```cd``` into ```/backend/app```
-  - Run the command ```fastapi dev base.py``` in your terminal in order to start the backend.
-    - Access docs by navigating to ```localhost:8000/docs``` on your web browser
-  - To run the backend for debugging purposes, run ```uvicorn base:app --reload``` in your terminal.
+## Prerequisites
+
+Your terminal should be running commands in the root directory of this project.
+
+Ensure that your terminal supports both `pip` and `npm` commands.
+
+## Starting the backend
+```
+pip install -r backend/requirements.txt
+fastapi dev backend/app/base.py
+```
+  - Access docs by navigating to ```localhost:8000/docs``` on your web browser
+  - To run the backend for debugging purposes, run ```uvicorn backend.app.base:app --reload``` in your terminal.
     - Note that this only runs the backend. It can not be navigated to on the web browser, nor will documentation be available.
 
-## To start the React Frontend:
+## Starting the frontend
 
-- ```cd``` into ```/birdmig```
-- Run the command ```npm install``` to install required packages
-- Run ```npm start``` in your terminal to start the front end
+```
+npm install
+npm start
+```
+- These commands should install all required packages for the webpage, as well as start the frontend. The webpage should automatically open in your default browser under the tab "Birdmig".
+  - This process may take a few minutes.
 
 # To run Docker with all applications
 - Ensure that the Docker daemon is running
   - Opening the Docker desktop app is the easiest way to ensure this step
-- ```cd``` into ```/birdmig```
 - Build and run the containers with the command: ```docker-compose up -d --no-deps --build```
 - Go to ```http://localhost:3000``` to observe changes.
 

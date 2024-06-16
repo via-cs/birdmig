@@ -74,7 +74,7 @@ Pre-processing is necessary to transform raw datasets into a form factor that is
 This pre-processing step uses R due to its specialty in working with biological and spatial data.
 \\\\
 There are two different R scripts, one for preprocessing training data and another for preprocessing prediction data. These scripts are named \\
-\texttt{\href{run:../model/preprocess\_training.R}{preprocess\_training.R}} and \texttt{\href{run:../model/preprocess\_prediction.R}{preprocess\_prediction.R}} respectively.
+\texttt{\href{run:../model/preprocess\_train.R}{preprocess\_train.R}} and \texttt{\href{run:../model/preprocess\_predict.R}{preprocess\_predict.R}} respectively.
 
 \subsubsection*{Packages}
 
@@ -93,7 +93,7 @@ RStudio is recommended to run the R scripts. Running the scripts from an indepen
 \\\\
 The above packages should either be installed with RStudio's built-in package installer or by running the command \texttt{install.packages(c("sf", "raster", "dismo", "ncdf4"))} in an R terminal.
 \\\\
-Both of these scripts require datasets that can be downloaded from the Box folder at \url{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}. The \texttt{data} folder from the above link should be placed in the root folder of the repository. 
+Both of these scripts require datasets that can be downloaded from the Box folder at \url{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}. The \texttt{data} folder from the above link should be placed in the root directory of the repository. 
 
 \subsubsection*{Running the Scripts}
 
@@ -105,33 +105,33 @@ If a custom species is desired, the species CSV must be downloaded from GBIF and
 See the above section for instructions on obtaining the appropriate inputs.
 \\\\
 \texttt{\underline{{training-preprocessing.R}}}
-\begin{verbatim}
+\begin{Verbatim}[tabsize=4]
 	Input:	
-			* Species datasets (.csv)
-			* Historical climate datasets (.nc)
+		Species datasets (.csv)
+		Historical climate datasets (.nc)
 	Parameters:
-			* species_list: an array of strings describing the desired species 
-			* e: extent variable that describes longitude/latitude boundaries 
+		species_list: an array of strings describing the desired species 
+		e: extent variable describing longitude/latitude boundaries 
 	Output:
-			* Presence/absence files (.geojson)
-			* Historical climate raster files (.tif)
-\end{verbatim}
+		Presence/absence files (.geojson)
+		Historical climate raster files (.tif)
+\end{Verbatim}
 
-Presence/absence files are created by using 1) occurrences from the species CSV file as presences and 2) an equal number of climate points from the climate NetCDF file as pseudo-absences. Pseudo-absences are used due to lack of real absence data. GeoJSON files are stored under \texttt{/model/input/geojson}.
+\noindent Presence/absence files are created by using 1) occurrences from the species CSV file as presences and 2) an equal number of climate points from the climate NetCDF file as pseudo-absences. Pseudo-absences are used due to lack of real absence data. GeoJSON files are stored under \texttt{/model/input/geojson}.
 
 Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries. TIFF files are stored under \texttt{/model/input/historical}.
 
 All outputs are cropped to the extent variable \texttt{e}. Default \texttt{e} is set to both Americas.
 \\\\
 \texttt{\underline{prediction-preprocessing.R}}
-\begin{verbatim}
+\begin{Verbatim}[tabsize=4]
 	Input:	
-			* Future climate datasets (.nc)
+		Future climate datasets (.nc)
 	Parameters:
-			* e: extent variable that describes longitude/latitude boundaries 
+		e: extent variable that describes longitude/latitude boundaries 
 	Output:
-			* Future climate raster files (.tif)
-\end{verbatim}
+		Future climate raster files (.tif)
+\end{Verbatim}
 
 Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries.
 Unlike the climate rasters for model training (of which there are only two), there exists a pair of future rasters for each year for each SSP model, making a total of 680 raster files. 
@@ -140,14 +140,24 @@ Raster files are cropped to the extent variable \texttt{e}. Default \texttt{e} i
 
 \subsection{Species Distribution Modeling in Python}
 
-The SDM was prototyped in Jupyter Notebook (see \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}) and implemented in python script (see \texttt{\href{run:../model/model\_training.py}{model\_training.py}} and \texttt{\href{run:../model/model\_prediction.py}{model\_prediciton.py}}). Python scripts were used over Jupyter Notebook for implementation due to ease of use with loops and terminal.
+The SDM was prototyped in Jupyter Notebook (see \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}) and implemented in python script (see \texttt{\href{run:../model/model\_train.py}{model\_train.py}} and \texttt{\href{run:../model/model\_predict.py}{model\_predict.py}}). Python scripts were used over Jupyter Notebook for implementation due to ease of use with loops and terminal.
 
 \subsubsection*{Requirements}
-Python scripts were developed using Python 3.10.12, which can be found \href{https://www.python.org/downloads/}{at this link}. While you may use newer versions of Python, they are not guaranteed to work.
+Python scripts were developed using Python 3.10.12, which can be found \href{https://www.python.org/downloads/}{at this link}. While you may use newer versions of Python, they are not guaranteed to work. Required libraries include: 
+\begin{Verbatim}[tabsize=4]
+	tqdm
+	pyimpute
+	rasterio
+	matplotlib
+	geopandas
+	scikit-learn
+	numpy
+	pandas
+\end{Verbatim}
+
+\noindent These libraries can be installed individually or by running the command \texttt{pip install -r model/requirements.txt}
 \\\\
-Required libraries include \texttt{os, tqdm, glob, pyimpute, pickle, rasterio, matplotlib, geopandas, sklearn, numpy,} and \texttt{pandas}. These libraries can be installed in a Python terminal using \texttt{pip}.
-\\\\
-Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data. \texttt{geojson} and \texttt{historical} are required for model training, while \texttt{future} and \texttt{/data/models} is required for model predicting. Example pickle files under \texttt{/data/models} can be found at the Box link \href{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}{here}.
+Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data. \texttt{geojson} and \texttt{historical} are required for model training, while \texttt{future} and \texttt{/data/models} is required for model predicting. Pickle files can be obtained by downloading the \texttt{/data/models} folder at the \href{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}{Box link} or by running \texttt{model/model\_train.py}.
 
 \subsubsection{SDM Training}
 The model is trained by associating presence/absence data with zonal averages for temperature and precipitation. In other words, the model learns what zonal environmental factors typically correlate to a presence or absence of a species. When given a file containing possible future climate readings, the model can then predict how the distribution of a species may react to that climate.
@@ -185,11 +195,13 @@ load_data():
 	these vectors, removing NaN values to avoid training errors.
 \end{Verbatim}
 
-\noindent \texttt{\href{run:../model/model\_training.py}{model\_training.py}} is set up in such a way that it trains and saves models for each bird species in a loop, tracking the process using \texttt{tqdm}. If a custom species is desired, the \texttt{species\_list} variable must be modified to reflect it (ensure that the custom bird species has already undergone R preprocessing). These models are saved to \texttt{/model/output/models} via the \texttt{pickle} library.
+\noindent \texttt{\href{run:../model/model\_train.py}{model\_train.py}} is set up in such a way that it trains and saves models for each bird species in a loop, tracking the process using \texttt{tqdm}. If a custom species is desired, the \texttt{species\_list} variable must be modified to reflect it (ensure that the CSV for the desired bird species has already undergone R preprocessing). These models are saved to \texttt{/data/models} via the \texttt{pickle} library.
+\\\\
+In order to run the script, simply run the command \texttt{python3 model/model\_train.py} in the root directory of this project.
 
 \subsubsection{SDM Predicting}
 
-SDM prediction takes place in \texttt{\href{run:../model/model\_prediction.py}{model\_prediciton.py}}. Its prototyping can again be found in \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}.
+SDM prediction takes place in \texttt{\href{run:../model/model\_predict.py}{model\_predict.py}}. Its prototyping can again be found in \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}.
 \\\\
 Species distribution prediction uses the following process:
 \begin{enumerate}
@@ -201,7 +213,9 @@ Species distribution prediction uses the following process:
 
 \noindent There exists a future climate raster for each year (2015-2100) for each SSP (ssp126, ssp245, ssp370, ssp585). These rasters are used to predict distribution for five species, making a total of 1,720 images.
 \\\\
-\texttt{\href{run:../model/model\_prediction.py}{model\_prediciton.py}} is comprised of a triple-nested for loop (species \verb|->| ssp \verb|->| year) and two functions, \texttt{make\_predictions()} and \texttt{create\_pngs()}. The former function is responsible for steps 1-3 listed above, while the latter function is responsible for step 4. TIFF images are converted to PNG through the use of \texttt{matplotlib}, and are saved in high resolution.
+\texttt{\href{run:../model/model\_predict.py}{model\_predict.py}} is comprised of a triple-nested for loop (species \verb|->| ssp \verb|->| year) and two functions, \texttt{make\_predictions()} and \texttt{create\_pngs()}. The former function is responsible for steps 1-3 listed above, while the latter function is responsible for step 4. TIFF images are converted to PNG through the use of \texttt{matplotlib}, and are saved in high resolution.
+\\\\
+In order to run the script, simply run the command \texttt{python3 model/model\_predict.py} in the root directory of this project.
 
 \section{Web Application}
 
@@ -209,7 +223,7 @@ Species distribution prediction uses the following process:
 
 \subsubsection{React}
 React.js was used to created the front end, and the main component is found under \texttt{/src/App.js}. In App.js, there are calls to the back end to gather data for the various components
-located in the \texttt{/src/components} folder. These components include:
+located in the \texttt{/src/components} directory. These components include:
 \begin{itemize}
 	\item \texttt{BirdInfo.js}: returns the summary of the desired bird
 	\item \texttt{ClimateChart.js}: returns temperature and precipitation graphs
@@ -278,11 +292,11 @@ The second map, "Aggregated Path," is generated in \texttt{/src/components/HeatM
 
 
 \subsection{Usage}
-The website is designed to serve as an interactive tool for ornithologists, researchers, and bird watching enthusiasts. In order to start the application, the following actions must take place.
+The website is designed to serve as an interactive tool for ornithologists, researchers, and bird watching enthusiasts. In order to start the application, the following actions must take place. \textbf{Ensure that your terminal is running commands in the root directory of this project.}
 
 \subsubsection{Requirements}
 
-The backend developed primarily with Python 3.12, but also functions on Python 3.11. It relies primarily on FastAPI for functionality, while unit testing is done using the \texttt{pytest} python module. Ensure that the correct Python version (Python 3.12 or Python 3.11) is installed, and ensure the following Python modules are installed:
+\paragraph{Backend} The backend was developed primarily with Python 3.12, but also functions on Python 3.11. It relies primarily on FastAPI for functionality, while unit testing is done using the \texttt{pytest} python module. Ensure that the correct Python version (Python 3.12 or Python 3.11) is installed, and ensure the following Python modules are installed:
 
 \begin{verbatim}
     fastapi
@@ -296,28 +310,25 @@ The backend developed primarily with Python 3.12, but also functions on Python 3
     pytest
 \end{verbatim}
 
-\noindent These modules can be installed by running the command \texttt{pip install -r requirements.txt} in \texttt{/backend}.
-\\\\
-The front end of the application was implemented with React.js. For React.js to work, first Node.js must be installed. Information on how to do so can be found \href{https://nodejs.org/en/learn/getting-started/how-to-install-nodejs}{here}. Once Node.js is installed, download React.js and Leaflet. Alternatively, running \texttt{npm install} in terminal will install the dependencies required to run the front end.
+\noindent These modules can be installed by running the command \texttt{pip install -r backend/requirements.txt}.
+
+\paragraph{Frontend} The front end of the application was implemented with React.js. For React.js to work, first Node.js must be installed. Information on how to do so can be found \href{https://nodejs.org/en/learn/getting-started/how-to-install-nodejs}{here}. Once Node.js is installed, download React.js and Leaflet. Alternatively, running \texttt{npm install} in terminal will install the dependencies required to run the front end.
 
 
 \subsubsection{Process/Steps}
 \begin{enumerate}
     \item Ensure that all the libraries required to run the application are installed. Refer back to the previous section to see the required libraries.
     \item Prepare two command terminals: one dedicated to running and monitoring the back end, and one to running the front end. The environment could either be a Linux terminal or a Windows terminal.
-    \item Start the backend first by following the following steps:
+    \item Start the backend:
     \begin{enumerate}
-        \item In the terminal dedicated to the back end, run the \texttt{cd} command until the current working directory of the terminal is \texttt{"project root"/backend/app}. for example, if the project is located in a folder called \texttt{birdmigration}, the working directory of the back end terminal should be \texttt{birdmigration/backend/app}.
-        \item In this directory, run the command \texttt{fastapi dev base.py}.
+        \item Run the command \texttt{fastapi dev backend/app/base.py}.
         \item To access documentation of the back end, use a web browser and navigate to \url{localhost:8000/docs}
         \item The back end should update automatically with saved modifications to the file. To terminate the back end, terminate the program with a SIGINT using \texttt{control + C}, if using either a Linux or Windows command terminal.
     \end{enumerate}
     \item Once the back end is initialized, the front end of the application may be started.
     \begin{enumerate}
-        \item In the terminal dedicated to running the front end, ensure the current working directory of the terminal is the root folder for the project. This can be checked by using the command \texttt{ls}, and seeing if the folder \texttt{"project root"/src} is listed.
-        \item Run the command \texttt{npm install} to ensure that all the necessary React.js components and shortcut commands are installed and functional in this directory.
-        \item Once the shortcut commands for React.js are installed (refer to the prior step), run the command \texttt{npm start}.
-        \item After a frew minutes, the front end should open automatically in a new web browser window. If this window is either closed or does not open, use a web browser to navigate to \texttt{http://localhost:3000} to observe the front end User Interface.
+        \item Run the command \texttt{npm start}.
+        \item After a few minutes, the front end should open automatically in a new web browser window. If this window is either closed or does not open, use a web browser to navigate to \texttt{http://localhost:3000} to observe the front end User Interface.
     \end{enumerate}
     \item Do not close either terminal unless their respective application is fully terminated. If a new terminal is started and another instance of either the front end or the back end is already running, a restart of the device may be required.
 \end{enumerate}
@@ -339,7 +350,7 @@ The application's architecture is designed to handle high volumes of data effici
 
 \begin{itemize}
     \item Ensure that all necessary React.js libraries have been installed in the project directory using the \texttt{npm install} command.
-    \item If the front end still does not start, the React cache may need to be cleared. In a Windows or Linux terminal, navigate to the root folder of the project using the \texttt{cd} command, and run the command npm  cache clean --force to clear the React cache, and then execute \texttt{npm install}.
+    \item If the front end still does not start, the React cache may need to be cleared. In a Windows or Linux terminal, navigate to the root directory of the project using the \texttt{cd} command, and run the command \texttt{npm cache clean --force} to clear the React cache, and then execute \texttt{npm install}.
 \end{itemize}
 
 \noindent \textit{The terminals that house the front end and/or back end have been closed without terminating the program, and now the corresponding end point of the application will not start.}
@@ -351,8 +362,8 @@ The application's architecture is designed to handle high volumes of data effici
 \noindent \textit{Running FastAPI on \texttt{base.py} fails due to missing packages}.
 
 \begin{itemize}
-	\item Ensure your terminal is in the \texttt{/backend/app} directory.
-	\item Ensure that all required python packages are installed. This can be done by running \texttt{pip install -r requirements.txt} in \texttt{/backend}
+	\item Ensure your terminal is in the root directory.
+	\item Ensure that all required python packages are installed. This can be done by running \texttt{pip install -r backend/requirements.txt}
 \end{itemize}
 
 \end{document}
