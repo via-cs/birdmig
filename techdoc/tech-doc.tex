@@ -206,7 +206,7 @@ SDM prediction takes place in \texttt{\href{run:../model/model\_predict.py}{mode
 Species distribution prediction uses the following process:
 \begin{enumerate}
 	\item Future climate rasters are loaded from \texttt{/model/input/future} and processed into an appropriate form factor
-	\item Pickle files for each species is loaded from \texttt{/model/output/models}
+	\item Pickle files for each species is loaded from \texttt{/data/models}
 	\item \texttt{impute()} from \texttt{pyimpute} is used to create distribution predictions in the form of TIFF images for each climate raster.
 	\item TIFF images are converted to PNGs for use in the web application and stored in \texttt{/public/png-images}
 \end{enumerate}
