@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./
+    restart: on-failure
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+  
+  backend:
+    build:
+      context: ./backend # Points to the directory containing your Dockerfile and the 'app' directory
+    # env_file: ./backend/.flaskenv # Only uncomment if you need to load additional environment variables
+    stop_signal: SIGINT
+    ports:
+      - "8000:8000"

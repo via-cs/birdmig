@@ -1,0 +1,9 @@
+fastapi
+pydantic
+requests
+pandas
+numpy
+shapely
+rasterio
+pillow
+pytest

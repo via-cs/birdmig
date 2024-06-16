@@ -1,0 +1,369 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{titlesec}
+\usepackage{authblk}
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=black]{hyperref}
+\usepackage{fancyvrb}
+\usepackage{listings}
+
+\title{Visual Analytics of the Impacts of Climate Change on 
+Migratory Bird Habitats \\
+ \Large{Technical Document}}
+\author{Jacob Vogt, Mihika Krishna, Catherine Kang, Hangyul Yun}
+\affil{Professor Dongyu Liu}
+\affil{University of California, Davis}
+\date{June 2024}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+Our Senior Capstone project is comprised of two components:
+
+\begin{enumerate}
+  \item A species distribution model (SDM) capable of predicting how climate change will affect future bird habitats up to year 2100
+  \item A web-app that visualizes SDM output and displays other relevant information such as bird migration patterns and climate trends.
+\end{enumerate}
+
+This technical document will overview how each of these components work, as well as the required data and file structure for them to operate correctly.
+
+\section{Species Distribution Model}
+
+\subsection{Datasets}
+
+The species distribution model (SDM) uses two datasets, one for climate data and one for species distribution data. 
+
+\subsubsection*{Climate Data}
+
+NEX-GDDP-CMIP6 datasets are granular by year and offered for four (future) Shared Socioeconomic Pathways (SSP). These dastasets are offered in NETCDF (.nc) format. 
+Descriptions of each SSP can be found \href{https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change/}{at this link}.
+\\\\
+Climate scenarios used were from the NEX-GDDP-CMIP6 dataset, prepared by the
+Climate Analytics Group and NASA Ames Research Center using the NASA Earth
+Exchange and distributed by the NASA Center for Climate Simulation (NCCS).
+\\\\
+\textit{
+Thrasher, B., Wang, W., Michaelis, A. et al. NASA Global Daily Downscaled
+Projections, CMIP6. Sci Data 9, 262 (2022). \url{https://doi.org/10.1038/s41597-022-01393-4}
+\\\\
+Thrasher, B., Wang, W., Michaelis, A. Nemani, R. (2021). NEX-GDDP-CMIP6. NASA
+Center for Climate Simulation. \url{https://doi.org/10.7917/OFSG3345}}
+
+\subsubsection*{Species Distribution Data}
+
+The occurrence datasets for our bird species come from the Global Biodiversity Information Facility (GBIF). The citations for each dataset is below.
+\textit{
+\begin{itemize}
+    \item Numenius americanus Bechstein, 1812 in GBIF Secretariat (2023). GBIF Backbone Taxonomy. Checklist dataset \url{https://doi.org/10.15468/39omei} accessed via GBIF.org on 2024-06-09.
+    \item Setophaga striata (J.R. Forster, 1772) in GBIF Secretariat (2023). GBIF Backbone Taxonomy. Checklist dataset \url{https://doi.org/10.15468/39omei} accessed via GBIF.org on 2024-06-09.
+    \item Anser albifrons (Scopoli, 1769) in GBIF Secretariat (2023). GBIF Backbone Taxonomy. Checklist dataset \url{https://doi.org/10.15468/39omei} accessed via GBIF.org on 2024-06-09.
+    \item Haliaeetus leucocephalus (Linnaeus, 1766) in GBIF Secretariat (2023). GBIF Backbone Taxonomy. Checklist dataset \url{https://doi.org/10.15468/39omei} accessed via GBIF.org on 2024-06-09.
+    \item Numenius phaeopus subsp. phaeopus in GBIF Secretariat (2023). GBIF Backbone Taxonomy. Checklist dataset \url{https://doi.org/10.15468/39omei} accessed via GBIF.org on 2024-06-09.
+\end{itemize}
+}
+GBIF datasets are downloaded in .csv format.
+
+\subsection{R Preprocessing}
+
+Pre-processing is necessary to transform raw datasets into a form factor that is usable by our SDM.
+This pre-processing step uses R due to its specialty in working with biological and spatial data.
+\\\\
+There are two different R scripts, one for preprocessing training data and another for preprocessing prediction data. These scripts are named \\
+\texttt{\href{run:../model/preprocess\_train.R}{preprocess\_train.R}} and \texttt{\href{run:../model/preprocess\_predict.R}{preprocess\_predict.R}} respectively.
+
+\subsubsection*{Packages}
+
+\begin{itemize}
+	\item \textit{dismo}: Methods for species distribution modeling, that is, predicting the environmental similarity of any site to that of the locations of known occurrences of a species.
+	\item \textit{sf}: Support for simple features, a standardized way to encode spatial vector data. Binds to 'GDAL' for reading and writing data, to 'GEOS' for geometrical operations, and to 'PROJ' for projection conversions and datum transformations. Uses by default the 's2' package for spherical geometry operations on ellipsoidal (long/lat) coordinates.
+	\item \textit{raster}: Reading, writing, manipulating, analyzing and modeling of spatial data. 
+	\item \textit{ncdf4}: Provides a high-level R interface to data files written using Unidata's netCDF library (version 4 or earlier), which are binary data files that are portable across platforms and include metadata information in addition to the data sets.
+\end{itemize}
+
+\subsubsection*{Prerequisites}
+
+The R scripts were developed using the latest version of R as of June 9, 2024 (v4.4.0). Different versions of R including v4.4.0 can be found at \url{https://cran.r-project.org/bin/windows/base/old/}. Versions older than v4.3.2 are not guaranteed to work.
+\\\\
+RStudio is recommended to run the R scripts. Running the scripts from an independent R terminal could work in theory, but is not tested. RStudio can be installed from \url{https://posit.co/download/rstudio-desktop/}
+\\\\
+The above packages should either be installed with RStudio's built-in package installer or by running the command \texttt{install.packages(c("sf", "raster", "dismo", "ncdf4"))} in an R terminal.
+\\\\
+Both of these scripts require datasets that can be downloaded from the Box folder at \url{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}. The \texttt{data} folder from the above link should be placed in the root directory of the repository. 
+
+\subsubsection*{Running the Scripts}
+
+If the above prerequisites are met, then the R scripts should run without issue. To do this in RStudio, open the desired script and click the "Source" button.
+\\\\
+If a custom species is desired, the species CSV must be downloaded from GBIF and stored under \texttt{/data/GBIF/[species name].csv}. Furthermore, the \texttt{species\_list} parameter in \texttt{preprocess\_train.R} must be altered to reflect the new species. 
+
+\subsubsection*{Script Descriptions}
+See the above section for instructions on obtaining the appropriate inputs.
+\\\\
+\texttt{\underline{{preprocess\_train.R}}}
+\begin{Verbatim}[tabsize=4]
+	Input:	
+		Species datasets (.csv)
+		Historical climate datasets (.nc)
+	Parameters:
+		species_list: an array of strings describing the desired species 
+		e: extent variable describing longitude/latitude boundaries 
+	Output:
+		Presence/absence files (.geojson)
+		Historical climate raster files (.tif)
+\end{Verbatim}
+
+\noindent Presence/absence files are created by using 1) occurrences from the species CSV file as presences and 2) an equal number of climate points from the climate NetCDF file as pseudo-absences. Pseudo-absences are used due to lack of real absence data. GeoJSON files are stored under \texttt{/model/input/geojson}.
+
+Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries. TIFF files are stored under \texttt{/model/input/historical}.
+
+All outputs are cropped to the extent variable \texttt{e}. Default \texttt{e} is set to both Americas.
+\\\\
+\texttt{\underline{preprocess\_predict.R}}
+\begin{Verbatim}[tabsize=4]
+	Input:	
+		Future climate datasets (.nc)
+	Parameters:
+		e: extent variable that describes longitude/latitude boundaries 
+	Output:
+		Future climate raster files (.tif)
+\end{Verbatim}
+
+Climate raster files are converted from NetCDF to TIFF format for compatibility with python libraries.
+Unlike the climate rasters for model training (of which there are only two), there exists a pair of future rasters for each year for each SSP model, making a total of 680 raster files. 
+TIFF files are stored under \texttt{/model/input/future}, organized by SSP model and year.
+Raster files are cropped to the extent variable \texttt{e}. Default \texttt{e} is set to both Americas.
+
+\subsection{Species Distribution Modeling in Python}
+
+The SDM was prototyped in Jupyter Notebook (see \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}) and implemented in python script (see \texttt{\href{run:../model/model\_train.py}{model\_train.py}} and \texttt{\href{run:../model/model\_predict.py}{model\_predict.py}}). Python scripts were used over Jupyter Notebook for implementation due to ease of use with loops and terminal.
+
+\subsubsection*{Requirements}
+Python scripts were developed using Python 3.10.12, which can be found \href{https://www.python.org/downloads/}{at this link}. While you may use newer versions of Python, they are not guaranteed to work. Required libraries include: 
+\begin{Verbatim}[tabsize=4]
+	tqdm
+	pyimpute
+	rasterio
+	matplotlib
+	geopandas
+	scikit-learn
+	numpy
+	pandas
+\end{Verbatim}
+
+\noindent These libraries can be installed individually or by running the command \texttt{pip install -r model/requirements.txt}
+\\\\
+Ensure that preprocessed data from R exists under \texttt{/model/input/}. There should be three folders: \texttt{geojson, historical,} and \texttt{future}, each containing the appropriate data. \texttt{geojson} and \texttt{historical} are required for model training, while \texttt{future} and \texttt{/data/models} is required for model predicting. Pickle files can be obtained by downloading the \texttt{/data/models} folder at the \href{https://ucdavis.box.com/s/l5iky1y6z526r6ewifvtr6c4ccp5jsjz}{Box link} or by running \texttt{model/model\_train.py}.
+
+\subsubsection{SDM Training}
+The model is trained by associating presence/absence data with zonal averages for temperature and precipitation. In other words, the model learns what zonal environmental factors typically correlate to a presence or absence of a species. When given a file containing possible future climate readings, the model can then predict how the distribution of a species may react to that climate.
+\\\\
+Training models for each bird species goes as follows:
+\begin{enumerate}
+	\item Data is loaded into training vectors using the \texttt{load\_data()} function
+	\item The random forest classifier is chosen for model training
+	\item Classifier's accuracy is measured by averaging K-fold evaluation (k=5)
+	\item Model is fit with training vectors and saved to a pickle file
+\end{enumerate}
+
+\noindent Random forest was chosen for the model because it showed the highest and most consistent accuracy when compared to other classifiers (extra trees, SVM, xgboost, lightgbm) See \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}.
+\\\\
+A description of the \texttt{load\_data()} function is as follows:
+\begin{Verbatim}[tabsize=4]
+load_data():
+	Parameters:
+		species: string representing species name
+		n: optional int representing sample size (default=None)
+	Return:
+		train_xs: 2D array of floats where each inner array represents 
+				  zonal averages for temperature and precipitation 
+		train_y:  array whose values represent presence or absence & 
+				  are indexed to correlate to each array in train_xs
+				  
+	load_data() loads appropriate files from /model/input/ into training 
+	vectors for SDM training. It takes an optional n parameter that
+	randomly samples the presence/absence data in order to reduce the
+	size of the training vector.
+	
+	load_data() primarily wraps the load_training_vectors() function 
+	from pyimpute, which is responsible for finding the zonal averages
+	to begin with. load_data() is also responsible for postprocessing 
+	these vectors, removing NaN values to avoid training errors.
+\end{Verbatim}
+
+\noindent \texttt{\href{run:../model/model\_train.py}{model\_train.py}} is set up in such a way that it trains and saves models for each bird species in a loop, tracking the process using \texttt{tqdm}. If a custom species is desired, the \texttt{species\_list} variable must be modified to reflect it (ensure that the CSV for the desired bird species has already undergone R preprocessing). These models are saved to \texttt{/data/models} via the \texttt{pickle} library.
+\\\\
+In order to run the script, simply run the command \texttt{python3 model/model\_train.py} in the root directory of this project.
+
+\subsubsection{SDM Predicting}
+
+SDM prediction takes place in \texttt{\href{run:../model/model\_predict.py}{model\_predict.py}}. Its prototyping can again be found in \texttt{\href{run:../model/birdmig\_sdm.ipynb}{birdmig\_sdm.ipynb}}.
+\\\\
+Species distribution prediction uses the following process:
+\begin{enumerate}
+	\item Future climate rasters are loaded from \texttt{/model/input/future} and processed into an appropriate form factor
+	\item Pickle files for each species is loaded from \texttt{/data/models}
+	\item \texttt{impute()} from \texttt{pyimpute} is used to create distribution predictions in the form of TIFF images for each climate raster.
+	\item TIFF images are converted to PNGs for use in the web application and stored in \texttt{/public/png-images}
+\end{enumerate}
+
+\noindent There exists a future climate raster for each year (2015-2100) for each SSP (ssp126, ssp245, ssp370, ssp585). These rasters are used to predict distribution for five species, making a total of 1,720 images.
+\\\\
+\texttt{\href{run:../model/model\_predict.py}{model\_predict.py}} is comprised of a triple-nested for loop (species \verb|->| ssp \verb|->| year) and two functions, \texttt{make\_predictions()} and \texttt{create\_pngs()}. The former function is responsible for steps 1-3 listed above, while the latter function is responsible for step 4. TIFF images are converted to PNG through the use of \texttt{matplotlib}, and are saved in high resolution.
+\\\\
+In order to run the script, simply run the command \texttt{python3 model/model\_predict.py} in the root directory of this project.
+
+\section{Web Application}
+
+\subsection{APIs}
+
+\subsubsection{React}
+React.js was used to created the front end, and the main component is found under \texttt{/src/App.js}. In App.js, there are calls to the back end to gather data for the various components
+located in the \texttt{/src/components} directory. These components include:
+\begin{itemize}
+	\item \texttt{BirdInfo.js}: returns the summary of the desired bird
+	\item \texttt{ClimateChart.js}: returns temperature and precipitation graphs
+	\item \texttt{HeatMap.js}: returns heatmap graph (see Leaflet section)
+	\item \texttt{PolylineMap.js}: return bird trajectory graph (see Leaflet section)
+	\item \texttt{SDMchart.js}: returns png of SDM output
+	\item \texttt{PredictionControl.js}: contains code to display the year slider and SSP buttons that change the Climate and SDM Charts
+\end{itemize}
+
+\noindent In addition to these components, the sidebar and header are created in \texttt{App.js} which allows users to view different birds. All the styling is written up in \texttt{/src/App.css}. 
+
+
+\subsubsection{FastAPI}
+The middleware and back end of the website was developed using python and FastAPI, in the file \texttt{base.py} located under \texttt{/back end/app}. The FastAPI back end primarily serves the purpose of quickly retrieving data and sending it to the front end as requested, allowing the front end user-interface to remain lightweight and easy to load quickly. FastAPI was used to build the back end due to its ease in creating end points for a front end application to call, natively supporting features such as delayed requests and an intuitive way of passing arguments to the FastAPI back end.
+
+The back end is defined predominantly by functions that handle various requests the front end makes in order to retrieve data to display. These functions and their functions are discussed in greater detail in the following section for RestFUL API.
+
+\subsubsection{RestFUL}
+RestFUL API was used to define how the end points were set up, partially due to built-in compatibility with FastAPI, but also due to its simple and intuitive interface. While RestFUL API primarily defines 4 primary methods for GET, PUT, POST, and DELETE, the final application was operational with a stateless back end, meaning only GET and PUT requests were used.
+In the file base.py, GET and PUT requests were used to define the following end points:
+
+\begin{itemize}
+	\item \texttt{get\_temperature\_data()}: a GET endpoint that in turn performs a POST request to grid2.rcc-acis.org to obtain temperature data for the state of California throughout a year, which is specified per the user's request. Currently, this endpoint only utilizes the SSP8.5 scenario as other endpoints have not yet been developed by RCC-ACIS.
+   	 \item \texttt{get\_precipitation\_data()}: a GET endpoint that also performs a POST request to grid2.rcc-acis.org to obtain precipitation data for the state of California throughout a year, specified per the user's request. Like the temperature endpoint, it also currently only utilizes the SSP8.5 scenario due to the limited development of other climate scenarios by RCC-ACIS.
+	\item \texttt{get\_predictions()}: a PUT end point that retrieves the pre-computed predictions the Species Distribution Model makes about a specified bird, for a specified year based on specified emission data. While a GET request would have sufficed for its current utility, a PUT request was preferred as this could be expanded to implement a machine learning model to generate predictions dynamically should such a feature be planned in the future.
+	\item \texttt{get\_trajectory\_data()}: a GET end point that retrieves a csv file containing the migration trajectory of a specific bird, identified by its unique bird ID, that can be used to generate individual trajectory maps of an individual bird. The trajectory information is discussed later in the subsection for Leaflet.
+	\item \texttt{get\_bird\_ids()}: a GET end point that returns all unique bird IDs per a given species. This is used to by the front end component PolylineMap.js to search for a specified bird ID.
+	\item \texttt{get\_heatmap\_data()}: a GET end point that retrieves heatmap data of a bird species, to display the aggregated paths of all birds catalogued for that species on the front end with HeatMap.js, as a heat map. This is discussed in further detail in the Leaflet subsection.
+\end{itemize}
+
+\subsection{Trajectory Map Preprocessing}
+To project trajectory maps on the front end, tracking data from online data repository, \href{https://www.movebank.org/cms/movebank-main} {Movebank}, was saved in CSV files. These files are preprocessed using \texttt{process\_trajectory\_data.py} located in the Box folder linked above. This script takes in an input CSV and the name of the output CSV to be created.
+The code processes the input CSV to only keep the columns utilized on the front end into the output CSV. The columns utilized on the front end are renamed to create standardized CSV files for the front end. The script performs these steps:
+\begin{itemize}
+    \item Defines a dictionary \texttt{new\_columns} for renaming columns.
+    \item Defines a list \texttt{keep\_columns} to specify which columns to retain.
+    \item Reads the input CSV file into a DataFrame.
+    \item Renames the columns using the \texttt{new\_columns} dictionary.
+    \item Filters the DataFrame to keep only the specified columns.
+    \item Sorts the DataFrame by the \texttt{'TIMESTAMP'} column.
+    \item Drops rows with missing values in \texttt{'LATITUDE'} and \texttt{'LONGITUDE'} columns.
+    \item Writes the processed DataFrame to the output CSV file.
+    \item Prints the output file name, the processed DataFrame, and the range of \texttt{'TIMESTAMP'} values.
+\end{itemize}
+
+To run the script, use the following command in the terminal:
+
+\begin{lstlisting}[language=bash]
+python process_bird_data.py <input_file> <output_file>
+\end{lstlisting}
+
+Replace \texttt{<input\_file>} with the path to your input CSV file and \texttt{<output\_file>} with the path where you want to save the processed CSV file.
+
+Example:
+
+\begin{lstlisting}[language=bash]
+python process_bird_data.py bird_data.csv processed_bird_data.csv
+\end{lstlisting}
+
+\subsubsection{Leaflet}
+Leaflet was utilized to delineate bird migration patterns in two distinct manners within the "Trajectory" component. 
+
+The initial map, "Individual Path," is constructed in \texttt{/src/components/PolylineMap.js}. The process involves fetching data from CSV files located in the \texttt{data} directory within \texttt{/public/trajectory\_data}. Initially, all tagged Bird IDs are retrieved from the CSV for the specified bird. Subsequently, the trajectories for the first Bird ID are fetched from the back end and depicted on OpenStreetMap utilizing Leaflet. Additionally, arrows are computed between two points in the \texttt{calculateBearings} function and integrated onto the map.
+
+The second map, "Aggregated Path," is generated in \texttt{/src/components/HeatMap.js}. This function retrieves all latitude and longitude coordinates from the CSV of the desired bird in the \texttt{/public/trajectory\_data} directory. Employing Leaflet and the Leaflet plugin, \texttt{L.heatLayer}, a heat layer is generated to illustrate the combined trajectory path of all tagged birds atop the OpenStreetMap layer.
+
+
+\subsection{Usage}
+The website is designed to serve as an interactive tool for ornithologists, researchers, and bird watching enthusiasts. In order to start the application, the following actions must take place. \textbf{Ensure that your terminal is running commands in the root directory of this project.}
+
+\subsubsection{Requirements}
+
+\paragraph{Backend} The backend was developed primarily with Python 3.12, but also functions on Python 3.11. It relies primarily on FastAPI for functionality, while unit testing is done using the \texttt{pytest} python module. Ensure that the correct Python version (Python 3.12 or Python 3.11) is installed, and ensure the following Python modules are installed:
+
+\begin{verbatim}
+    fastapi
+    pydantic
+    requests
+    pandas
+    numpy
+    shapely
+    rasterio
+    pillow
+    pytest
+\end{verbatim}
+
+\noindent These modules can be installed by running the command \texttt{pip install -r backend/requirements.txt}.
+
+\paragraph{Frontend} The front end of the application was implemented with React.js. For React.js to work, first Node.js must be installed. Information on how to do so can be found \href{https://nodejs.org/en/learn/getting-started/how-to-install-nodejs}{here}. Once Node.js is installed, download React.js and Leaflet. Alternatively, running \texttt{npm install} in terminal will install the dependencies required to run the front end.
+
+
+\subsubsection{Process/Steps}
+\begin{enumerate}
+    \item Ensure that all the libraries required to run the application are installed. Refer back to the previous section to see the required libraries.
+    \item Prepare two command terminals: one dedicated to running and monitoring the back end, and one to running the front end. The environment could either be a Linux terminal or a Windows terminal.
+    \item Start the backend:
+    \begin{enumerate}
+        \item Run the command \texttt{fastapi dev backend/app/base.py}.
+        \item To access documentation of the back end, use a web browser and navigate to \url{localhost:8000/docs}
+        \item The back end should update automatically with saved modifications to the file. To terminate the back end, terminate the program with a SIGINT using \texttt{control + C}, if using either a Linux or Windows command terminal.
+    \end{enumerate}
+    \item Once the back end is initialized, the front end of the application may be started.
+    \begin{enumerate}
+        \item Run the command \texttt{npm start}.
+        \item After a few minutes, the front end should open automatically in a new web browser window. If this window is either closed or does not open, use a web browser to navigate to \texttt{http://localhost:3000} to observe the front end User Interface.
+    \end{enumerate}
+    \item Do not close either terminal unless their respective application is fully terminated. If a new terminal is started and another instance of either the front end or the back end is already running, a restart of the device may be required.
+\end{enumerate}
+
+\subsection{Design}
+The website is developed using a React front end and a FastAPI back end, leveraging modern web technologies and frameworks to ensure a responsive and intuitive user experience. Key design features include:
+
+\begin{itemize}
+    \item \textbf{Modular Design:} The application is structured into several independent components like BirdInfo, SDMChart, and PolylineMap. Each component encapsulates a particular feature of the web app, facilitating seperation of concerns, readability, and scalability.
+    \item \textbf{Data-Driven Interactions:} By integrating with external APIs and processing data through Python-based FastAPI, the application provides real-time data interactions and updates.
+    \item \textbf{User-Centric Interfaces:} Emphasis on usability and accessibility, with interactive charts, maps, and dynamic controls that cater to both novice users and experienced researchers.
+\end{itemize}
+
+The application's architecture is designed to handle high volumes of data efficiently, utilizing caching and asynchronous data fetching to optimize performance and user experience.
+
+\subsection{FAQ}
+
+\noindent \textit{The necessary React.js components are installed, but the front end application is still causing an error.}
+
+\begin{itemize}
+    \item Ensure that all necessary React.js libraries have been installed in the project directory using the \texttt{npm install} command.
+    \item If the front end still does not start, the React cache may need to be cleared. In a Windows or Linux terminal, navigate to the root directory of the project using the \texttt{cd} command, and run the command \texttt{npm cache clean --force} to clear the React cache, and then execute \texttt{npm install}.
+\end{itemize}
+
+\noindent \textit{The terminals that house the front end and/or back end have been closed without terminating the program, and now the corresponding end point of the application will not start.}
+
+\begin{itemize}
+    \item Restart the device, and ensure that the back end and front end applications have fully terminated before closing the terminals. This can be forced by forcing a SIGINT on the program with \texttt{control + C} on either the Windows or Linux terminal.
+\end{itemize}
+
+\noindent \textit{Running FastAPI on \texttt{base.py} fails due to missing packages}.
+
+\begin{itemize}
+	\item Ensure your terminal is in the root directory.
+	\item Ensure that all required python packages are installed. This can be done by running \texttt{pip install -r backend/requirements.txt}
+\end{itemize}
+
+\end{document}

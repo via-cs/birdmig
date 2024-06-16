@@ -1,0 +1,51 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+__pycache__/
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+.coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# custom
+.vscode
+/model/data/*
+!/model/data/geojson
+/model/inputs/
+.R*
+.vscode
+/backend/flask_session
+
+# Ignore data files
+data/*
+!data/png-images
+
+# Ignore all TIFFs
+*.tif
+
+# Ignore model input/output
+model/input
+model/output
+
+# Ignore all TeX files except .tex and .pdf
+/techdoc/*
+!techdoc/tech-doc.pdf
+!techdoc/tech-doc.tex
+backend/app/base.py
